@@ -1,0 +1,46 @@
+
+name: Cont-Air-Near CI
+
+on: [push, pull_request]
+
+jobs:
+  run-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out the repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.8
+
+    - name: Install dependencies
+      run: |
+        cd backend
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Start the FastAPI server in the background
+      run: |
+        uvicorn main:app --host 0.0.0.0 -- port 8000 &
+
+    - name: Wait for server to start
+      run: |
+        # Wait up to 30 seconds for the server to start
+        for i in {1..30}; do
+          if curl -s http://127.0.0.1:8000/; then
+            echo "Server is up!"
+            exit 0
+          fi
+          sleep 1
+        done
+        echo "Server did not start in time" >&2
+        exit 1
+
+    - name: Stop the server
+      if: always()
+      run: |
+        # Kill the uvicorn process
+        pkill -f "uvicorn"
