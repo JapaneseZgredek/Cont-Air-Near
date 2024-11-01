@@ -1,3 +1,4 @@
 backend==0.2.4.1
 fastapi==0.115.4
+pydantic==2.9.2
 SQLAlchemy==2.0.31
