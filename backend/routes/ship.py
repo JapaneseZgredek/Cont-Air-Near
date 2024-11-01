@@ -38,3 +38,10 @@ def create_ship(ship: ShipCreate, db: Session = Depends(get_db)):
 def get_all_ships(db: Session = Depends(get_db)):
     ships = db.query(Ship).all()
     return ships
+
+@router.get("/ships/{id_ship}", response_model=ShipRead)
+def read_ship(id_ship: int, db: Session = Depends(get_db)):
+    db_ship = db.query(Ship).filter(Ship.id_ship == id_ship).first()
+    if db_ship is None:
+        raise HTTPException(status_code=404, detail="Ship not found")
+    return db_ship
