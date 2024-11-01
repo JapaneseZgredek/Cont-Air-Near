@@ -2,9 +2,8 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
 from pathlib import Path
-from database import engine, Base
-from routes import ship
-import models
+from backend.database import engine, Base
+from backend.routes import ship
 
 Base.metadata.create_all(bind=engine)
 
