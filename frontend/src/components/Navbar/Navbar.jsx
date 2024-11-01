@@ -1,9 +1,14 @@
-import React from "react";
+import React from 'react';
+import { Navbar, Container } from 'react-bootstrap'
 
-const Navbar = () => {
+const NavbarComponent = () => {
     return (
-        <nav className="navbar">
-            <h1>Ship Management</h1>
-        </nav>
-    )
-}
+        <Navbar bg="dark" variant="dark" className="mb-4">
+            <Container>
+                <Navbar.Brand>Cont-Air-Near</Navbar.Brand>
+            </Container>
+        </Navbar>
+    );
+};
+
+export default NavbarComponent;
