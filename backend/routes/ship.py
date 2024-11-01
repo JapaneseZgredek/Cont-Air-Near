@@ -45,3 +45,24 @@ def read_ship(id_ship: int, db: Session = Depends(get_db)):
     if db_ship is None:
         raise HTTPException(status_code=404, detail="Ship not found")
     return db_ship
+
+@router.put("/ships/{id_ship}", response_model=dict)
+def update_ship(id_ship: int, ship: ShipUpdate, db: Session = Depends(get_db)):
+    db_ship = db.query(Ship).filter(Ship.id_ship == id_ship).first()
+    if db_ship is None:
+        raise HTTPException(status_code=404, detail="Ship not found")
+
+    if ship.name is not None:
+        db_ship.name = ship.name
+    if ship.capacity is not None:
+        db_ship.capacity = ship.capacity
+    if ship.status is not None:
+        db_ship.status = ship.status
+
+    db.commit()
+    db.refresh(db_ship)
+
+    return {
+        "message": "Ship updated successfully",
+        "ship": ShipRead.from_orm(db_ship)
+    }
