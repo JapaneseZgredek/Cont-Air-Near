@@ -24,7 +24,7 @@ jobs:
 
     - name: Start the FastAPI server in the background
       run: |
-        uvicorn backend.main:app --host 0.0.0.0 --port 8000 &
+        uvicorn main:app --host 0.0.0.0 --port 8000 &
 
     - name: Wait for server to start
       run: |
