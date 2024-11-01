@@ -3,7 +3,7 @@ from sqlalchemy.orm import declarative_base
 from datetime import datetime
 import enum
 
-Base = declarative_base()
+from backend.database import Base
 
 class ShipStatus(enum.Enum):
     ACTIVE = "active"
