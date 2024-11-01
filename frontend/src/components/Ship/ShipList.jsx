@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import ShipItem from './ShipItem';
+import AddShip from './AddShip';
 import { fetchShips } from '../../services/api';
 import { Button, Container } from 'react-bootstrap';
 
@@ -18,7 +19,7 @@ const ShipList = () => {
         <Container>
             <div className="d-flex justify-content-between mb-3">
                 <h2>Ship List</h2>
-                <Button variant="primary">Add</Button>
+                <AddShip onAdd={(newShip) => setShips([...ships, newShip])} />
             </div>
             {ships.length > 0 ? (
                 ships.map((ship) => <ShipItem key={ship.id_ship} ship={ship} />)
