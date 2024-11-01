@@ -4,7 +4,7 @@ from fastapi.responses import HTMLResponse
 from pathlib import Path
 from database import engine, Base
 from routes import ship
-import backend.models
+import models
 
 Base.metadata.create_all(bind=engine)
 

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
-from ..models.ship import Ship, ShipStatus
-from ..database import get_db
+from backend.models.ship import Ship, ShipStatus
+from backend.database import get_db
 from pydantic import BaseModel
 from typing import List, Optional
 
