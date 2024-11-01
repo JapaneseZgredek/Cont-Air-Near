@@ -36,7 +36,7 @@ def create_ship(ship: ShipCreate, db: Session = Depends(get_db)):
     db.refresh(db_ship)
     return {"message": "Ship created successfully", "ship": db_ship.id_ship}
 
-@router.get("/ships/", response_model=List[ShipRead])
+@router.get("/ships", response_model=List[ShipRead])
 def get_all_ships(db: Session = Depends(get_db)):
     logger.info("Getting all ships")
     ships = db.query(Ship).all()

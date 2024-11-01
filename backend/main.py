@@ -4,13 +4,21 @@ from pathlib import Path
 from backend.database import engine, Base
 from backend.routes import ship
 from backend.logging_config import logger
+from fastapi.middleware.cors import CORSMiddleware
 
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-app.include_router(ship.router, prefix='/api')
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # Zezwalaj tylko na frontend lokalny
+    allow_credentials=True,
+    allow_methods=["*"],  # Zezwalaj na wszystkie metody (GET, POST, itd.)
+    allow_headers=["*"],  # Zezwalaj na wszystkie nagłówki
+)
 
+app.include_router(ship.router, prefix='/api')
 
 @app.on_event('startup')
 async def startup_event():
