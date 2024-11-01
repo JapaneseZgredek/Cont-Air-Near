@@ -23,8 +23,6 @@ jobs:
         pip install uvicorn
 
     - name: Start the FastAPI server in the background
-      env:
-        PYTHONPATH: "${{ github.workspace }}"
       working-directory: backend
       run: |
         uvicorn main:app --host 0.0.0.0 --port 8000 &
