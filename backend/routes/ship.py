@@ -66,3 +66,14 @@ def update_ship(id_ship: int, ship: ShipUpdate, db: Session = Depends(get_db)):
         "message": "Ship updated successfully",
         "ship": ShipRead.from_orm(db_ship)
     }
+
+@router.delete("/ships/{id_ship}", response_model=dict)
+def delete_ship(id_ship: int, db: Session = Depends(get_db)):
+    db_ship = db.query(Ship).filter(Ship.id_ship == id_ship).first()
+    if db_ship is None:
+        raise HTTPException(status_code=404, detail="Ship not found")
+    db.delete(db_ship)
+    db.commit()
+    return {"message": "Ship deleted successfully",
+            "ship": ShipRead.from_orm(db_ship)
+    }
