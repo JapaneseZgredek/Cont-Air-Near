@@ -27,7 +27,7 @@ class ShipRead(BaseModel):
     class Config:
         from_attributes = True
 
-@router.post("/ships", response_model=ShipCreate)
+@router.post("/ships", response_model=ShipRead)  # Response model is ShipRead so there is an id in returned object, this allowed to remove objects from the list without reloading page
 def create_ship(ship: ShipCreate, db: Session = Depends(get_db)):
     logger.info(f"Creating new ship: {ship}")
     db_ship = Ship(**ship.dict())
