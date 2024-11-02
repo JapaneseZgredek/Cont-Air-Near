@@ -16,6 +16,8 @@ jobs:
         python-version: 3.8
 
     - name: Install dependencies
+      env:
+        PYTHONPATH: "${{ github.workspace }}"
       run: |
         cd backend
         python -m pip install --upgrade pip
@@ -23,8 +25,11 @@ jobs:
         pip install uvicorn
 
     - name: Start the FastAPI server in the background
+      env:
+        PYTHONPATH: "${{ github.workspace }}"
+      working-directory: backend
       run: |
-        uvicorn backend.main:app --host 0.0.0.0 --port 8000 &
+        uvicorn main:app --host 0.0.0.0 --port 8000 &
 
     - name: Wait for server to start
       run: |
