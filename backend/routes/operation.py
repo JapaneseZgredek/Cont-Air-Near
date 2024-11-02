@@ -68,9 +68,9 @@ def update_operation(id_operation: int, operation: OperationUpdate, db: Session 
         logger(f"Operation with id: {id_operation} not found")
         raise HTTPException(status_code=404, detail="Operation not found")
 
-    if operation.name_of_operation is None:
+    if operation.name_of_operation is not None:
         db_operation.name_of_operation = operation.name_of_operation
-    if operation.operation_type is None:
+    if operation.operation_type is not None:
         db_operation.operation_type = operation.operation_type
     if operation.date_of_operation is not None:
         db_operation.date_of_operation = operation.date_of_operation
