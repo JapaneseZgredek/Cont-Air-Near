@@ -28,7 +28,7 @@ class PortRead(BaseModel):
     country: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 @router.get("/ports", response_model=List[PortRead])
