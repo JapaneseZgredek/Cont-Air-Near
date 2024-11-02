@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, DateTime, Enum, String, ForeignKey
 from sqlalchemy.orm import declarative_base
+from sqlalchemy.orm import relationship
 from datetime import datetime
 import enum
 
@@ -35,6 +36,10 @@ class Operation(Base):
     name_of_operation = Column(String(255),nullable=False)
     operation_type = Column(Enum(OperationType), default=OperationType.AT_BAY)
     date_of_operation = Column(DateTime, default=datetime.now(), nullable=False)
-    id_ship = Column(Integer, ForeignKey('ships.id_ship'), nullable=False) #add
-    id_port = Column(Integer, ForeignKey('ports.id_port'), nullable=False) #add
+    id_ship = Column(Integer, ForeignKey('ship.id_ship'), nullable=False) #add
+    id_port = Column(Integer, ForeignKey('port.id_port'), nullable=False) #add
+
+    # ship = relationship("ship", back_populates="operations")
+    # port = relationship("port", back_populates="operations")
+
 

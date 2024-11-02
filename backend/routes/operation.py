@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
-from sqlalchemy import DateTime
 from sqlalchemy.orm import Session
-from backend.models.operation import Operation,OperationType            ##dodać port?
+from datetime import datetime
+from backend.models.operation import Operation,OperationType
 from backend.database import get_db
 from backend.logging_config import logger
 from pydantic import BaseModel
@@ -12,22 +12,23 @@ router = APIRouter()
 class OperationCreate(BaseModel):
     name_of_operation: str
     operation_type: OperationType
-    date_of_operation: Optional[str]
-    id_ship: int #add ship
-    id_port: int #and port
+    date_of_operation: Optional[datetime]
+    id_ship: int
+    id_port: int
+
 
 class OperationUpdate(BaseModel):
     name_of_operation: Optional[str] = None
     operation_type: Optional[OperationType] = None
-    date_of_operation: Optional[DateTime] = None
-    id_ship: Optional[int] = None #and ship
-    id_port: Optional[int] = None #and port
+    date_of_operation: Optional[datetime] = None
+    id_ship: Optional[int] = None
+    id_port: Optional[int] = None
 
 class OperationRead(BaseModel):
     id_operation: int
     name_of_operation: str
     operation_type: OperationType
-    date_of_operation: DateTime
+    date_of_operation: datetime
     id_ship: int
     id_port: int
 
@@ -40,7 +41,7 @@ def get_all_operations(db: Session = Depends(get_db)):
     operations = db.query(Operation).all()
     return operations
 
-@router.get("/operations/{operation_id}", response_model=OperationRead)
+@router.get("/operations/{id_operation}", response_model=OperationRead)
 def read_operation(id_operation: int, db: Session = Depends(get_db)):
     logger.info(f"Reading operation with id: {id_operation}")
     #operation = db.query(Operation).get(id_operation)
@@ -59,7 +60,7 @@ def create_operation(operation: OperationCreate, db: Session = Depends(get_db)):
     db.refresh(db_operation)
     return db_operation
 
-@router.put("/operations/{operation_id}", response_model=OperationRead)
+@router.put("/operations/{id_operation}", response_model=OperationRead)
 def update_operation(id_operation: int, operation: OperationUpdate, db: Session = Depends(get_db)):
     logger.info(f"Updating operation: {operation}")
     db_operation = db.query(Operation).filter(Operation.id_operation == id_operation).first()
@@ -83,7 +84,7 @@ def update_operation(id_operation: int, operation: OperationUpdate, db: Session 
 
     return db_operation
 
-@router.delete("/operations/{operation_id}", response_model=dict)
+@router.delete("/operations/{id_operation}", response_model=dict)
 def delete_operation(id_operation: int, db: Session = Depends(get_db)):
     logger.info(f"Deleting operation with id: {id_operation}")
     db_operation = db.query(Operation).filter(Operation.id_operation == id_operation).first()
