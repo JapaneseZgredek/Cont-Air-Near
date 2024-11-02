@@ -27,14 +27,14 @@ class ShipRead(BaseModel):
     class Config:
         from_attributes = True
 
-@router.post("/ships", response_model=dict)
+@router.post("/ships", response_model=ShipCreate)
 def create_ship(ship: ShipCreate, db: Session = Depends(get_db)):
     logger.info(f"Creating new ship: {ship}")
     db_ship = Ship(**ship.dict())
     db.add(db_ship)
     db.commit()
     db.refresh(db_ship)
-    return {"message": "Ship created successfully", "ship": db_ship.id_ship}
+    return db_ship
 
 @router.get("/ships", response_model=List[ShipRead])
 def get_all_ships(db: Session = Depends(get_db)):

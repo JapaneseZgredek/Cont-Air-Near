@@ -1,15 +1,24 @@
 import React, { useState } from 'react';
 import { Button, Form, Modal } from 'react-bootstrap';
+import { createShip } from "../../services/api";
 
 const AddShip = ({ onAdd }) => {
     const [show, setShow] = useState(false);
     const [name, setName] = useState('');
     const [capacity, setCapacity] = useState('');
+    const [error, setError] = useState(null);
 
-    const handleSubimt = (e) => {
+    const handleSubimt = async (e) => {
         e.preventDefault();
-        onAdd({ name, capacity })
-        setShow(false);
+        try {
+            const newShip = await createShip({ name, capacity: parseInt(capacity) });
+            onAdd(newShip);
+            setShow(false);
+            setName('');
+            setCapacity('');
+        } catch (err) {
+            setError('Failed to create ship')
+        }
     };
 
     return (
@@ -20,6 +29,7 @@ const AddShip = ({ onAdd }) => {
                     <Modal.Title>Add New Ship</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
+                    {error && <p style={{ color: 'red'}}>{error}</p>}
                     <Form onSubmit={handleSubimt}>
                         <Form.Group className="mb-3">
                             <Form.Label>Ship Name</Form.Label>
