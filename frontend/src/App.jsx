@@ -1,12 +1,10 @@
 import React from 'react';
-import NavbarComponent from './components/Navbar/Navbar';
-import ShipList from "./components/Ship/ShipList";
+import ShipPage from './pages/ShipPage';
 
 const App = () => {
   return (
     <div className="App">
-      <NavbarComponent />
-        <ShipList />
+      <ShipPage />
     </div>
   );
 };
