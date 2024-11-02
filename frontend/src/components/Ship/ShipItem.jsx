@@ -1,9 +1,11 @@
-import { React, useState } from 'react';
+import React, { useState } from 'react';
 import { Card, Button, Modal } from 'react-bootstrap';
 import { deleteShip } from '../../services/api';
+import UpdateShip from "./UpdateShip";
 
-const ShipItem = ({ ship, onDelete }) => {
+const ShipItem = ({ ship, onUpdate, onDelete }) => {
     const [showConfirm, setShowConfirm] = useState(false);
+    const [showUpdatedModal, setShowUpdateModal] = useState(false);
 
     const handleDelete = async () => {
         try {
@@ -15,6 +17,14 @@ const ShipItem = ({ ship, onDelete }) => {
         }
     };
 
+    const openUpdateModal = () => {
+        setShowUpdateModal(true);
+    };
+
+    const closeUpdateModal = () => {
+        setShowUpdateModal(false);
+    }
+
     return (
         <>
         <Card className="mb-3">
@@ -24,7 +34,7 @@ const ShipItem = ({ ship, onDelete }) => {
                     <Card.Text>Capacity: {ship.capacity}</Card.Text>
                 </div>
                 <div>
-                    <Button variant="warning" className="me-2">Update</Button>
+                    <Button variant="warning" className="me-2" onClick={openUpdateModal}>Update</Button>
                     <Button variant="danger" onClick={() => setShowConfirm(true)}>Delete</Button>
                 </div>
             </Card.Body>
@@ -42,6 +52,13 @@ const ShipItem = ({ ship, onDelete }) => {
                 <Button variant="danger" onClick={handleDelete}>Yes, delete</Button>
             </Modal.Footer>
         </Modal>
+
+        <UpdateShip
+            ship={ship}
+            show={showUpdatedModal}
+            onHide={closeUpdateModal}
+            onUpdate={onUpdate}
+        />
         </>
     );
 };

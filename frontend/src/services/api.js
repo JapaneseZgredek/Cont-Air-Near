@@ -28,3 +28,12 @@ export const deleteShip = async (id) => {
     throw new Error('Failed to delete ship');
   }
 };
+
+export const updateShip = async (ship) => {
+  const response = await fetch(`http://localhost:8000/api/ships/${ship.id_ship}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(ship),
+  });
+  return response.json();
+};

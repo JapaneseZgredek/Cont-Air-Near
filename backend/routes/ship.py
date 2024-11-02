@@ -51,7 +51,7 @@ def read_ship(id_ship: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Ship not found")
     return db_ship
 
-@router.put("/ships/{id_ship}", response_model=dict)
+@router.put("/ships/{id_ship}", response_model=ShipRead)
 def update_ship(id_ship: int, ship: ShipUpdate, db: Session = Depends(get_db)):
     logger.info(f"Updating Ship with id: {id_ship}")
     db_ship = db.query(Ship).filter(Ship.id_ship == id_ship).first()
@@ -69,10 +69,7 @@ def update_ship(id_ship: int, ship: ShipUpdate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(db_ship)
 
-    return {
-        "message": "Ship updated successfully",
-        "ship": ShipRead.from_orm(db_ship)
-    }
+    return db_ship
 
 @router.delete("/ships/{id_ship}", response_model=dict)
 def delete_ship(id_ship: int, db: Session = Depends(get_db)):

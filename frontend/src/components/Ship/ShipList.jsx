@@ -25,6 +25,14 @@ const ShipList = () => {
         setShips((prevShips) => [...prevShips, newShip]);
     };
 
+    const handleUpdateShip = (updateShip) => {
+        setShips((prevShips) =>
+            prevShips.map((ship) =>
+                ship.id_ship === updateShip.id_ship ? updateShip : ship
+            )
+        );
+    };
+
     const handleDeleteShip = (id) => {
         setShips((prevShips) => prevShips.filter((ship) => ship.id_ship !== id));
     }
@@ -37,7 +45,7 @@ const ShipList = () => {
             </div>
             {error && <p style={{ color: 'red'}}>{error}</p>}
             {ships.length > 0 ? (
-                ships.map((ship) => <ShipItem key={ship.id_ship} ship={ship} onDelete={handleDeleteShip}/>)
+                ships.map((ship) => <ShipItem key={ship.id_ship} ship={ship} onDelete={handleDeleteShip} onUpdate={handleUpdateShip}/>)
             ) : (
                 <p>No ships available.</p>
             )}
