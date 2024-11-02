@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, DateTime, Enum, String
-from sqlalchemy.orm import declarative_base
+from sqlalchemy.orm import declarative_base, relationship
 from datetime import datetime
 import enum
 
@@ -17,3 +17,5 @@ class Ship(Base):
     status = Column(Enum(ShipStatus), default=ShipStatus.ACTIVE)
     created_at = Column(DateTime, default=datetime.now())
     updated_at = Column(DateTime, default=datetime.now(), onupdate=datetime.now())
+
+    operations = relationship("Operation", back_populates="ship")

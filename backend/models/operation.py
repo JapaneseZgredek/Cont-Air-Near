@@ -39,7 +39,8 @@ class Operation(Base):
     id_ship = Column(Integer, ForeignKey('ship.id_ship'), nullable=False) #add
     id_port = Column(Integer, ForeignKey('port.id_port'), nullable=False) #add
 
-    # ship = relationship("ship", back_populates="operations")
-    # port = relationship("port", back_populates="operations")
+    ship = relationship("Ship", back_populates="operations")
+    port = relationship("Port", back_populates="operations")
+
 
 
