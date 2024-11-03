@@ -6,6 +6,7 @@ import './styles/global.css';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
+  //   Dodać BrowserRouter do nawigacji
   <React.StrictMode>
     <App />
   </React.StrictMode>
