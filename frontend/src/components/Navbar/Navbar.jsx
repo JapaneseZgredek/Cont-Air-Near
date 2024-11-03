@@ -1,5 +1,6 @@
 import React from 'react';
 import { Navbar, Container } from 'react-bootstrap'
+import { LinkContainer } from 'react-router-bootstrap'
 
 const NavbarComponent = () => {
     return (
