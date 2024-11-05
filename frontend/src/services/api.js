@@ -126,3 +126,48 @@ export const updatePort = async (port) => {
   }
   return response.json();
 };
+
+// Products table related
+
+export const fetchProducts = async () => {
+  const response = await fetch('http://localhost:8000/api/products');
+  if (!response.ok) {
+    throw new Error('Failed to fetch products');
+  }
+  return response.json();
+};
+
+export const createProduct = async (product) => {
+  const response = await fetch('http://localhost:8000/api/products', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(product),
+  });
+  if (!response.ok) {
+    throw new Error('Failed to create product');
+  }
+  return response.json();
+};
+
+export const deleteProduct = async (id_product) => {
+  const response = await fetch(`http://localhost:8000/api/products/${id_product}`, {
+    method: 'DELETE',
+  });
+  if (!response.ok) {
+    throw new Error('Failed to delete product');
+  }
+};
+
+export const updateProduct = async (product) => {
+  const response = await fetch(`http://localhost:8000/api/products/${product.id_product}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(product),
+  });
+  if (!response.ok) {
+    throw new Error('Failed to update product');
+  }
+  return response.json();
+};

@@ -19,6 +19,9 @@ const NavbarComponent = () => {
                         <LinkContainer to="/ports">
                             <Nav.Link>Ports</Nav.Link>
                         </LinkContainer>
+                        <LinkContainer to="/products">
+                            <Nav.Link>Products</Nav.Link>
+                        </LinkContainer>
                     {/*    Add the Home Button Later*/}
                     </Nav>
                 </Navbar.Collapse>
