@@ -1,27 +1,51 @@
 import React, { useEffect, useState } from 'react';
 import ShipItem from './ShipItem';
+import AddShip from './AddShip';
 import { fetchShips } from '../../services/api';
-import { Button, Container } from 'react-bootstrap';
+import { Container } from 'react-bootstrap';
 
 const ShipList = () => {
     const [ships, setShips] = useState([]);
+    const [error, setError] = useState(null);
 
-    useEffect(() => {
-        const loadShips = async () => {
+    const loadShips = async () => {
+        try {
             const data = await fetchShips();
             setShips(data);
-        };
+        } catch (err) {
+            setError('Failed to load ships');
+        }
+    };
+
+    useEffect(() => {
         loadShips();
     }, []);
+
+    const handleAddShip = (newShip) => {
+        setShips((prevShips) => [...prevShips, newShip]);
+    };
+
+    const handleUpdateShip = (updateShip) => {
+        setShips((prevShips) =>
+            prevShips.map((ship) =>
+                ship.id_ship === updateShip.id_ship ? updateShip : ship
+            )
+        );
+    };
+
+    const handleDeleteShip = (id) => {
+        setShips((prevShips) => prevShips.filter((ship) => ship.id_ship !== id));
+    }
 
     return (
         <Container>
             <div className="d-flex justify-content-between mb-3">
                 <h2>Ship List</h2>
-                <Button variant="primary">Add</Button>
+                <AddShip onAdd={handleAddShip} />
             </div>
+            {error && <p style={{ color: 'red'}}>{error}</p>}
             {ships.length > 0 ? (
-                ships.map((ship) => <ShipItem key={ship.id_ship} ship={ship} />)
+                ships.map((ship) => <ShipItem key={ship.id_ship} ship={ship} onDelete={handleDeleteShip} onUpdate={handleUpdateShip}/>)
             ) : (
                 <p>No ships available.</p>
             )}
