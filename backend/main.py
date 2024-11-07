@@ -3,10 +3,15 @@ from fastapi.responses import HTMLResponse
 from pathlib import Path
 from backend.database import engine, Base
 from backend.routes import ship
+from backend.routes import operation
+from backend.routes import port
+from backend.routes import product
 from backend.logging_config import logger
 from fastapi.middleware.cors import CORSMiddleware
 
-Base.metadata.create_all(bind=engine)
+# Base.metadata.drop_all(bind=engine)   <- to drop tables
+
+Base.metadata.create_all(bind=engine)   # to create them
 
 app = FastAPI()
 
@@ -19,6 +24,9 @@ app.add_middleware(
 )
 
 app.include_router(ship.router, prefix='/api')
+app.include_router(operation.router, prefix='/api')
+app.include_router(port.router, prefix='/api')
+app.include_router(product.router, prefix='/api')
 
 @app.on_event('startup')
 async def startup_event():
