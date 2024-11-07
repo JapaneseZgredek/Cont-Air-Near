@@ -57,7 +57,13 @@ Cont-Air-Near/
    uvicorn backend.main:app --reload
    ```
 
-2. **Access the application**:
+2. **Start npm***
+   ```bash
+      cd /frontend
+      npm start
+   ```
+
+3. **Access the application**:
 
    Open your browser and navigate to `http://127.0.0.1:8000`. You should see an HTML page served by FastAPI from the `frontend` folder.
 
