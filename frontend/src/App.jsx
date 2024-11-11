@@ -4,22 +4,21 @@ import ShipPage from './pages/ShipPage';
 import OperationPage from './pages/OperationPage';
 import PortPage from './pages/PortPage';
 import ProductPage from './pages/ProductPage';
+import OrderPage from './pages/OrderPage';
 
 const App = () => {
-  return (
-    // <div className="App">
-    //   <ShipPage />
-    // </div>
-    <Router>
-      <Routes>
-        <Route path="/ships" element={<ShipPage />} />
-        <Route path="/operations" element={<OperationPage />} />
-        <Route path="/ports" element={<PortPage />} />
-        <Route path="/products" element={<ProductPage />} />
-        <Route path="/" element={<ShipPage />} />       {/*    Change to The Home button to empty element*/}
-      </Routes>
-    </Router>
-  );
+    return (
+        <Router>
+            <Routes>
+                <Route path="/ships" element={<ShipPage />} />
+                <Route path="/operations" element={<OperationPage />} />
+                <Route path="/ports" element={<PortPage />} />
+                <Route path="/products" element={<ProductPage />} />
+                <Route path="/orders" element={<OrderPage />} />
+                <Route path="/" element={<ShipPage />} />
+            </Routes>
+        </Router>
+    );
 };
 
 export default App;

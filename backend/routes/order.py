@@ -41,7 +41,7 @@ def get_all_orders(db: Session = Depends(get_db)):
 
 @router.post("/orders", response_model=OrderRead)
 def create_order(order: OrderCreate, db: Session = Depends(get_db)):
-    logger.info(f"Creating order: {order}")
+    logger.info(f"Received data for creating order: {order.dict()}")
     db_order = Order(**order.dict())
     db.add(db_order)
     db.commit()

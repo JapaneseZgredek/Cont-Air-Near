@@ -1,10 +1,10 @@
 import React from 'react';
-import { Navbar, Container, Nav } from 'react-bootstrap'
-import { LinkContainer } from 'react-router-bootstrap'
+import { Navbar, Container, Nav } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
 
 const NavbarComponent = () => {
     return (
-<Navbar bg="dark" variant="dark" expand="lg" className="mb-4">
+        <Navbar bg="dark" variant="dark" expand="lg" className="mb-4">
             <Container>
                 <Navbar.Brand>Cont-Air-Near</Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -22,12 +22,14 @@ const NavbarComponent = () => {
                         <LinkContainer to="/products">
                             <Nav.Link>Products</Nav.Link>
                         </LinkContainer>
-                    {/*    Add the Home Button Later*/}
+                        <LinkContainer to="/orders">
+                            <Nav.Link>Orders</Nav.Link>
+                        </LinkContainer>
+                        {/* Add the Home Button Later */}
                     </Nav>
                 </Navbar.Collapse>
             </Container>
         </Navbar>
-
     );
 };
 
