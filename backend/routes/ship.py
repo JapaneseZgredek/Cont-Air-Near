@@ -1,5 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
+
+from backend.models import Operation
 from backend.models.ship import Ship, ShipStatus
 from backend.database import get_db
 from backend.logging_config import logger
@@ -78,8 +80,12 @@ def delete_ship(id_ship: int, db: Session = Depends(get_db)):
     if db_ship is None:
         logger.error(f"Ship with id: {id_ship} not found")
         raise HTTPException(status_code=404, detail="Ship not found")
+
+    db.query(Operation).filter(Operation.id_ship == id_ship).delete()
+
     db.delete(db_ship)
     db.commit()
     return {"message": "Ship deleted successfully",
             "ship": ShipRead.from_orm(db_ship)
     }
+
