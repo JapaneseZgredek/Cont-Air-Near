@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 
 from backend.models import Operation
+from backend.models.order import Order
 from backend.models.port import Port
 from backend.database import get_db
 from backend.logging_config import logger
@@ -88,6 +89,7 @@ def delete_port(id_port: int, db: Session = Depends(get_db)):
         logger.warning(f"Port with id: {id_port} not found")
         raise HTTPException(status_code=404, detail="Port not found")
 
+    db.query(Order).filter(Order.id_port == id_port).delete()
     db.query(Operation).filter(Operation.id_port == id_port).delete()
 
     db.delete(db_port)

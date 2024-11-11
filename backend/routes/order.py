@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from datetime import datetime
+
+from backend.models import Operation
 from backend.models.order import Order, OrderStatus
 from backend.database import get_db
 from backend.logging_config import logger
@@ -54,3 +56,40 @@ def read_order(id_order: int, db: Session = Depends(get_db)):
         logger.error(f"Order with id: {id_order} not found")
         raise HTTPException(status_code=404, detail="Order not found")
     return db_order
+
+@router.put("/orders/{id_order}", response_model=OrderRead)
+def update_order(id_order: int, order: OrderUpdate, db: Session = Depends(get_db)):
+    logger.info(f"Updating order with id: {id_order}")
+    db_order = db.query(Order).filter(Order.id_order == id_order).first()
+    if db_order is None:
+        logger.error(f"Order with id: {id_order} not found")
+        raise HTTPException(status_code=404, detail="Order not found")
+
+    if order.id_port is not None:
+        db_order.id_port = order.id_port
+    if order.status is not None:
+        db_order.status = order.status
+    if order.date_of_order is not None:
+        db_order.date_of_order = order.date_of_order
+    # TO DO: Update id_client when Client model is available
+
+    db.commit()
+    db.refresh(db_order)
+    return db_order
+
+@router.delete("/orders/{id_order}", response_model=dict)
+def delete_order(id_order: int, db: Session = Depends(get_db)):
+    logger.info(f"Deleting order with id: {id_order}")
+    db_order = db.query(Order).filter(Order.id_order == id_order).first()
+    if db_order is None:
+        logger.error(f"Order with id: {id_order} not found")
+        raise HTTPException(status_code=404, detail="Order not found")
+    # TO DO: Usuniecie powiazanych Order_History
+    # TO DO: Usuniecie powiazanych Order_Product
+
+    db.delete(db_order)
+    db.commit()
+    return {
+        "message": "Order deleted successfully",
+        "order": OrderRead.from_orm(db_order)
+    }

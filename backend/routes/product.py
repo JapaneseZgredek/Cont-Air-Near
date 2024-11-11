@@ -68,8 +68,8 @@ def update_product(id_product: int, product: ProductUpdate, db: Session = Depend
         db_product.price = product.price
     if product.weight is not None:
         db_product.weight = product.weight
-    #if product.id_port is not None:
-    #    db_product.id_port=product.id_port
+    if product.id_port is not None:
+        db_product.id_port = product.id_port
 
     db.commit()
     db.refresh(db_product)
@@ -83,8 +83,13 @@ def delete_product(id_product: int, db: Session = Depends(get_db)):
     if db_product is None:
         logger.error(f"Product with id: {id_product} not found")
         raise HTTPException(status_code=404, detail="Product not found")
+
+    # TO DO: Usunięcie wszystkich rekordów OrderProduct powiązanych z danym produktem, gdy OrderProduct jest dostępny
+    # db.query(OrderProduct).filter(OrderProduct.id_product == id_product).delete()
+
     db.delete(db_product)
     db.commit()
-    return {"message": "Product deleted successfully",
-            "product": ProductRead.from_orm(db_product)
+    return {
+        "message": "Product deleted successfully",
+        "product": ProductRead.from_orm(db_product)
     }
