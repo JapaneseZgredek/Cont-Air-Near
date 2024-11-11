@@ -45,3 +45,12 @@ def create_order(order: OrderCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(db_order)
     return db_order
+
+@router.get("/orders/{id_order}", response_model=OrderRead)
+def read_order(id_order: int, db: Session = Depends(get_db)):
+    logger.info(f"Reading order with id: {id_order}")
+    db_order = db.query(Order).filter(Order.id_order == id_order).first()
+    if db_order is None:
+        logger.error(f"Order with id: {id_order} not found")
+        raise HTTPException(status_code=404, detail="Order not found")
+    return db_order
