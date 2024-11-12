@@ -6,13 +6,12 @@ const NavbarComponent = () => {
     return (
 <Navbar bg="dark" variant="dark" expand="lg" className="mb-4">
             <Container>
-                <Navbar.Brand>Cont-Air-Near</Navbar.Brand>
+                <LinkContainer to="/">
+                    <Navbar.Brand>Cont-Air-Near</Navbar.Brand>
+                </LinkContainer>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="ml-auto">
-			<LinkContainer to="/">
-                            <Nav.Link>Home</Nav.Link>
-                        </LinkContainer>
                         <LinkContainer to="/ships">
                             <Nav.Link>Ships</Nav.Link>
                         </LinkContainer>
@@ -28,7 +27,6 @@ const NavbarComponent = () => {
 			<LinkContainer to="/clients">
                             <Nav.Link>Clients</Nav.Link>
                         </LinkContainer>
-                    {/*    Add the Home Button Later*/}
                     </Nav>
                 </Navbar.Collapse>
             </Container>

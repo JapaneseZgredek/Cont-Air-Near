@@ -6,29 +6,29 @@ const AddClient = ({ onAdd }) => {
     const [show, setShow] = useState(false);
     const [name, setName] = useState('');
     const [address, setAddress] = useState('');
-    const [phone_no, setPhone_no] = useState('');
+    const [telephone_number, setTelephone_number] = useState('');
     const [email, setEmail] = useState('');
     const [error, setError] = useState(null);
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            const newClient = await createClient({
-                name,
-                address,
-                phone_no: parseInt(phone_no),
-		email
-            });
-            onAdd(newClient);
-            setShow(false);
-            setName('');
-            setAddress('');
-            setPhone_no('');
-            setEmail('');
-        } catch (err) {
-            setError('Failed to create client');
-        }
-    };
+    e.preventDefault();
+    try {
+        const newClient = await createClient({
+            name,
+            address,
+            telephone_number: telephone_number ? parseInt(telephone_number) : null,
+            email
+        });
+        onAdd(newClient);
+        setShow(false);
+        setName('');
+        setAddress('');
+        setTelephone_number('');
+        setEmail('');
+    } catch (err) {
+        setError('Failed to create client');
+    }
+};
 
     return (
         <>
@@ -59,12 +59,12 @@ const AddClient = ({ onAdd }) => {
                             />
                         </Form.Group>
 			<Form.Group className="mb-3">
-                            <Form.Label>Phone number</Form.Label>
+                            <Form.Label>Telephone_number</Form.Label>
                             <Form.Control
                                 type="number"
-                                value={phone_no}
-                                onChange={(e) => setPhone_no(e.target.value)}
-                                placeholder="Enter phone no"
+                                value={telephone_number}
+                                onChange={(e) => setTelephone_number(e.target.value)}
+                                placeholder="Enter telephone_number"
                             />
                         </Form.Group>
                         <Form.Group className="mb-3">

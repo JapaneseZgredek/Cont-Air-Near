@@ -5,22 +5,29 @@ import { updateClient } from '../../services/api';
 const UpdateClient = ({ client, show, onHide, onUpdate }) => {
   const [name, setName] = useState(client.name);
   const [address, setAddress] = useState(client.address);
-  const [phone_no, setPhone_no] = useState(client.phone_no);
+  const [telephone_number, setTelephone_number] = useState(client.telephone_number);
   const [email, setEmail] = useState(client.email);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     console.log('handleSubmit wywolane');
-    const updatedClient = { ...client, name, address, phone_no, email};
+    const updatedClient = { 
+        ...client, 
+        name, 
+        address, 
+        telephone_number: telephone_number ? parseInt(telephone_number) : null,
+        email
+    };
+    
     try {
-      const result = await updateClient(updatedClient);
-      onUpdate(result);
-      onHide();
+        const result = await updateClient(updatedClient);
+        onUpdate(result);
+        onHide();
     } catch (error) {
-      console.error('Failed to update client:', error);
+        console.error('Failed to update client:', error);
     }
-  };
+};
 
   return (
     <Modal show={show} onHide={onHide}>
@@ -48,12 +55,12 @@ const UpdateClient = ({ client, show, onHide, onUpdate }) => {
             />
           </Form.Group>
 	<Form.Group className="mb-3">
-            <Form.Label>Phone no</Form.Label>
+            <Form.Label>Telephone_number</Form.Label>
             <Form.Control
               type="number"
-              value={phone_no}
-              onChange={(e) => setPhone_no(e.target.value)}
-              placeholder="Enter phone no"
+              value={telephone_number}
+              onChange={(e) => setTelephone_number(e.target.value)}
+              placeholder="Enter telephone_number"
             />
           </Form.Group>
           <Form.Group className="mb-3">

@@ -1,14 +1,14 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base, relationship
 
 from backend.database import Base
 
-Base = declarative_base()
-
 class Client(Base):
     __tablename__ = 'client'
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String(255))
-    address = Column(String(255))
-    telephone_number = Column(Integer, nullable=True)
-    email = Column(String(255))
+    id_client = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    name = Column(String(255),nullable=False)
+    address = Column(String(255),nullable=False)
+    telephone_number = Column(Integer)
+    email = Column(String(255),nullable=False)
+
+    #order = relationship("Order", back_populates="client")

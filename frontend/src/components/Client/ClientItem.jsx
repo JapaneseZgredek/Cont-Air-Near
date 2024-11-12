@@ -32,7 +32,7 @@ const ClientItem = ({ client, onUpdate, onDelete }) => {
                 <div>
                     <Card.Title>{client.name}</Card.Title>
                     <Card.Text>Address: {client.address}</Card.Text>
-                    <Card.Text>Phone no: {client.phone_no}</Card.Text>
+                    <Card.Text>Telephone_number: {client.telephone_number}</Card.Text>
                     <Card.Text>Email: {client.email}</Card.Text>
                 </div>
                 <div>
