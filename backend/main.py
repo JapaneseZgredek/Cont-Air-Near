@@ -2,11 +2,7 @@ from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from pathlib import Path
 from backend.database import engine, Base
-from backend.routes import ship
-from backend.routes import operation
-from backend.routes import port
-from backend.routes import product
-from backend.routes import client
+from backend.routes import ship, operation, port, product, order, client
 from backend.logging_config import logger
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -29,6 +25,7 @@ app.include_router(operation.router, prefix='/api')
 app.include_router(port.router, prefix='/api')
 app.include_router(product.router, prefix='/api')
 app.include_router(client.router, prefix='/api')
+app.include_router(order.router, prefix='/api')
 
 @app.on_event('startup')
 async def startup_event():

@@ -11,3 +11,4 @@ class Port(Base):
     country = Column(String(255), nullable=False)
 
     operations = relationship("Operation", back_populates="port")
+    orders = relationship("Order", back_populates="port")
