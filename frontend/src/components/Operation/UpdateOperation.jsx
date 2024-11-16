@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Form, Modal } from 'react-bootstrap';
 import { updateOperation } from '../../services/api';
+import { fetchShips } from '../../services/api';
+import { fetchPorts } from '../../services/api';
 
 const UpdateOperation = ({ operation, show, onHide, onUpdate }) => {
   const [nameOfOperation, setNameOfOperation] = useState(operation.name_of_operation);
@@ -8,6 +10,7 @@ const UpdateOperation = ({ operation, show, onHide, onUpdate }) => {
   const [dateOfOperation, setDateOfOperation] = useState(operation.date_of_operation);
   const [idShip, setIdShip] = useState(operation.id_ship);
   const [idPort, setIdPort] = useState(operation.id_port);
+  const [error, setError] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -31,12 +34,37 @@ const UpdateOperation = ({ operation, show, onHide, onUpdate }) => {
     }
   };
 
+  //for ships/ports dropdown list
+  const [ships, setShips] = useState([]);
+  const [ports, setPorts] = useState([]);
+  const loadShips = async () => {
+    try {
+        const data = await fetchShips();
+        setShips(data);
+    } catch (err) {
+        setError('Failed to load ships');
+    }
+};
+  const loadPorts = async () => {
+      try {
+          const data = await fetchPorts();
+          setPorts(data);
+      } catch (err) {
+          setError('Failed to load ports');
+      }
+  };
+  useEffect(() => {
+    loadShips();
+    loadPorts();
+  }, []);
+
   return (
     <Modal show={show} onHide={onHide}>
       <Modal.Header closeButton>
         <Modal.Title>Update Operation</Modal.Title>
       </Modal.Header>
       <Modal.Body>
+      {error && <p style={{ color: 'red' }}>{error}</p>}
         <Form onSubmit={handleSubmit}>
           <Form.Group className="mb-3">
             <Form.Label>Operation Name</Form.Label>
@@ -72,23 +100,38 @@ const UpdateOperation = ({ operation, show, onHide, onUpdate }) => {
             />
           </Form.Group>
           <Form.Group className="mb-3">
-            <Form.Label>Ship ID</Form.Label>
-            <Form.Control
-              type="number"
+              <Form.Label>Ship</Form.Label>
+              <Form.Control 
+              as="select"
+              required
               value={idShip}
               onChange={(e) => setIdShip(e.target.value)}
-              placeholder="Enter ship ID"
-            />
+              placeholder="Select ship">
+                  <option value="">Select Ship</option>
+            {
+            	ships.map((ship, id_ship) => (
+            		<option key={id_ship} value={id_ship}>{ship.name}</option>
+            	))
+            }
+              </Form.Control>
           </Form.Group>
           <Form.Group className="mb-3">
-            <Form.Label>Port ID</Form.Label>
-            <Form.Control
-              type="number"
+              <Form.Label>Port</Form.Label>
+              <Form.Control
+              as="select"
+              required
               value={idPort}
               onChange={(e) => setIdPort(e.target.value)}
-              placeholder="Enter port ID"
-            />
+              placeholder="Select port">
+                  <option value="">Select Port</option>
+              {
+              	ports.map((port, id_port) => (
+              		<option key={id_port} value={id_port}>{port.name}</option>
+              	))
+              }
+              </Form.Control>
           </Form.Group>
+          
           <Button variant="success" type="submit">
             Save Changes
           </Button>
