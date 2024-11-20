@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 export const fetchShips = async () => {
   const response = await fetch('http://localhost:8000/api/ships');
   if (!response.ok) {
@@ -262,3 +264,27 @@ export const updateClient = async (client) => {
   });
   return response.json();
 };
+
+
+export const registerUser = async (user) => {
+  try {
+    const response = await axios.post('http://localhost:8000/api/users', user);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.detail || 'Registration failed');
+  }
+};
+
+export const loginUser = async (credentials) => {
+    try {
+        const response = await axios.post('http://localhost:8000/api/users/login', credentials, {
+            headers: { 'Content-Type': 'application/json' },
+        });
+        return response.data; //tutaj zwracany jest token JWT, który potem dla usera nie bedzie widoczny tak jak jest teraz (to jest po debug)
+    } catch (error) {
+        throw new Error(error.response?.data?.detail || 'Login failed');
+    }
+};
+
+
+
