@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import {Button, Modal, ModalBody, Spinner, Table} from 'react-bootstrap';
-import { fetchOperationsByPort } from "../../services/api";
+import { fetchOperationsByPort, fetchOperationsByShip } from "../../services/api";
 
-function OperationsButton({ portId, portName }) {
+function OperationsButton({ portId, portName, shipId, shipName }) {
+    if (!portId && !shipId) {
+        throw new Error("OperationsButton required either portId or shipId");
+    }
     const [operations, setOperations] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -10,8 +13,13 @@ function OperationsButton({ portId, portName }) {
     const openModal = async () => {
         setLoading(true);
         try {
-            const operationData = await fetchOperationsByPort(portId);
-            setOperations(operationData);
+            let operationsData;
+            if (portId) {
+                operationsData = await fetchOperationsByPort(portId);
+            } else if (shipId) {
+                operationsData = await fetchOperationsByShip(shipId);
+            }
+            setOperations(operationsData);
         } catch (error) {
             console.error('Failed to fetch operations:', error);
         } finally {
@@ -33,7 +41,7 @@ function OperationsButton({ portId, portName }) {
 
             <Modal show={showModal} onHide={closeModal} size="lg">
                 <Modal.Header closeButton>
-                    <Modal.Title>Operations for Port {portName}</Modal.Title>
+                    <Modal.Title>Operations for Port {portId ? portName : shipName}</Modal.Title>
                 </Modal.Header>
                 <ModalBody>
                     {loading ? (
