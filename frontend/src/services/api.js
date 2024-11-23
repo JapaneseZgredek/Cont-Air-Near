@@ -40,7 +40,13 @@ export const updateShip = async (ship) => {
 
 
 // Operation table related
-
+export async function fetchOperationsByPort(portId) {
+  const response = await fetch(`http://localhost:8000/api/operations/${portId}`);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch operations for port ${portId}`);
+  }
+  return await response.json()
+}
 export const fetchOperations = async() => {
   const response = await fetch(`http://localhost:8000/api/operations/`);
 
