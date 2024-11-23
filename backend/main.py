@@ -14,18 +14,18 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # Zezwalaj tylko na frontend lokalny
+    allow_origins=["http://localhost:3000"],
     allow_credentials=True,
-    allow_methods=["*"],  # Zezwalaj na wszystkie metody (GET, POST, itd.)
-    allow_headers=["*"],  # Zezwalaj na wszystkie nagłówki
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
-app.include_router(ship.router, prefix='/api')
-app.include_router(operation.router, prefix='/api')
-app.include_router(port.router, prefix='/api')
-app.include_router(product.router, prefix='/api')
-app.include_router(client.router, prefix='/api')
-app.include_router(order.router, prefix='/api')
+app.include_router(ship.router, prefix='/api', tags=['Ship API'])
+app.include_router(operation.router, prefix='/api', tags=['Operation API'])
+app.include_router(port.router, prefix='/api', tags=['Port API'])
+app.include_router(product.router, prefix='/api', tags=['Product API'])
+app.include_router(client.router, prefix='/api', tags=['Client API'])
+app.include_router(order.router, prefix='/api', tags=['Orders API'])
 
 @app.on_event('startup')
 async def startup_event():
