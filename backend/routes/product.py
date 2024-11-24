@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from backend.models.product import Product
+from backend.models.order_product import Order_product
 from backend.database import get_db
 from backend.logging_config import logger
 from pydantic import BaseModel
@@ -83,10 +84,8 @@ def delete_product(id_product: int, db: Session = Depends(get_db)):
     if db_product is None:
         logger.error(f"Product with id: {id_product} not found")
         raise HTTPException(status_code=404, detail="Product not found")
-
-    # TO DO: Usunięcie wszystkich rekordów OrderProduct powiązanych z danym produktem, gdy OrderProduct jest dostępny
-    # db.query(OrderProduct).filter(OrderProduct.id_product == id_product).delete()
-
+    
+    db.query(Order_product).filter(Order_product.id_product == id_product).delete()
     db.delete(db_product)
     db.commit()
     return {

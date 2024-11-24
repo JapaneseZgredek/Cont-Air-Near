@@ -1,21 +1,35 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Form, Modal } from 'react-bootstrap';
-import { createOrder } from '../../services/api';
+import { createOrder, createOrder_product } from '../../services/api';
+import { fetchPorts } from '../../services/api';
+import { fetchProducts } from '../../services/api';
+
+
 
 const OrderAdd = ({ onAdd }) => {
     const [show, setShow] = useState(false);
     const [status, setStatus] = useState('pending'); // Domyślna wartość, która jest zgodna z backendem
     const [idPort, setIdPort] = useState('');
+    const [idProduct, setIdProduct] = useState('');
+    const [quantity, setQuantity] = useState('');
     const [error, setError] = useState(null);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const orderData = { status, id_port: parseInt(idPort) };
+        const orderData = {
+            status,
+            id_port: parseInt(idPort)};
         console.log("Sending data:", orderData); // Debugging
 
         try {
             const newOrder = await createOrder(orderData);
             onAdd(newOrder);
+            const order_productData = {
+                id_order: parseInt(newOrder.id_order),
+                id_product: parseInt(idProduct),
+                quantity: parseInt(quantity)};
+            console.log("Sending data:", orderData); // Debugging
+            await createOrder_product(order_productData);
             setShow(false);
             setStatus('pending');
             setIdPort('');
@@ -23,6 +37,29 @@ const OrderAdd = ({ onAdd }) => {
             setError('Failed to create order');
         }
     };
+
+    const [ports, setPorts] = useState([]);
+    const [products, setProducts] = useState([]);
+    const loadPorts = async () => {
+        try {
+            const data = await fetchPorts();
+            setPorts(data);
+        } catch (err) {
+            setError('Failed to load ports');
+        }
+    };
+    const loadProducts = async () => {
+        try {
+            const data = await fetchProducts();
+            setProducts(data);
+        } catch (err) {
+            setError('Failed to load products');
+        }
+    };
+    useEffect(() => {
+        loadPorts();
+        loadProducts();
+    }, []);
 
 
     return (
@@ -45,13 +82,46 @@ const OrderAdd = ({ onAdd }) => {
                             </Form.Select>
                         </Form.Group>
                         <Form.Group className="mb-3">
-                            <Form.Label>Port ID</Form.Label>
+                            <Form.Label>Port</Form.Label>
                             <Form.Control
-                                type="number"
-                                value={idPort}
-                                onChange={(e) => setIdPort(e.target.value)}
-                                placeholder="Enter port ID"
-                                required
+                            as="select"
+                            required
+                            value={idPort}
+                            onChange={(e) => setIdPort(e.target.value)}
+                            placeholder="Select port">
+                                <option value="">Select Port</option>
+                			    {
+                			    	ports.map((port) => (
+                			    		<option key={port.id_port} value={port.id_port}>{port.name}</option>
+                			    	))
+                			    }
+                            </Form.Control>
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Product</Form.Label>
+                            <Form.Control
+                            as="select"
+                            required
+                            value={idProduct}
+                            onChange={(e) => setIdProduct(e.target.value)}
+                            placeholder="Select product">
+                                <option value="">Select Product</option>
+                			    {
+                			    	products.map((product) => (
+                			    		<option key={product.id_product} value={product.id_product}>{product.name}</option>
+                			    	))
+                			    }
+                            </Form.Control>
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Quantity</Form.Label>
+                            <Form.Control
+                            type="number"
+                            required
+                            value={quantity}
+                            min="1"
+                            onChange={(e) => setQuantity(e.target.value)}
+                            placeholder="Enter quantity"
                             />
                         </Form.Group>
                         <Button variant="success" type="submit">Add Order</Button>
