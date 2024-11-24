@@ -15,23 +15,37 @@ class OrderCreate(BaseModel):
     status: OrderStatus
     date_of_order: Optional[datetime] = None
     id_port: int
-    # TO DO: Add id_client when the Client model is available
+    id_client: int
 
 class OrderUpdate(BaseModel):
     status: Optional[OrderStatus] = None
     date_of_order: Optional[datetime] = None
     id_port: Optional[int] = None
-    # TO DO: Add id_client when the Client model is available
+    id_client: Optional[int] = None
 
 class OrderRead(BaseModel):
     id_order: int
     status: OrderStatus
     date_of_order: datetime
     id_port: int
-    # TO DO: Add client informaiton when Client model is available
+    id_client: int
 
     class Config:
         from_attributes = True
+
+@router.get("/orders/port/{id_port}", response_model=List[OrderRead])
+def read_orders_by_port(id_port: int, db: Session = Depends(get_db)):
+    orders = db.query(Order).filter(Order.id_port == id_port).all()
+    if not orders:
+        raise HTTPException(status_code=404, detail=f"No orders found for port with id: {id_port}")
+    return orders
+
+@router.get("/orders/client/{id_client}", response_model=List[OrderRead])
+def read_orders_by_client(id_client: int, db: Session = Depends(get_db)):
+    orders = db.query(Order).filter(Order.id_client == id_client).all()
+    if not orders:
+        raise HTTPException(status_code=404, detail=f"No orders found for client with id: {id_client}")
+    return orders
 
 @router.get("/orders", response_model=List[OrderRead])
 def get_all_orders(db: Session = Depends(get_db)):
@@ -71,7 +85,8 @@ def update_order(id_order: int, order: OrderUpdate, db: Session = Depends(get_db
         db_order.status = order.status
     if order.date_of_order is not None:
         db_order.date_of_order = order.date_of_order
-    # TO DO: Update id_client when Client model is available
+    if order.id_client is not None:
+        db_order.id_client = order.id_client
 
     db.commit()
     db.refresh(db_order)

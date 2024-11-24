@@ -11,4 +11,4 @@ class Client(Base):
     telephone_number = Column(Integer)
     email = Column(String(255),nullable=False)
 
-    #order = relationship("Order", back_populates="client")
+    orders = relationship("Order", back_populates="client")
