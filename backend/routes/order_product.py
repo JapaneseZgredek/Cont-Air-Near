@@ -54,7 +54,7 @@ def read_order_product(id_order: int, id_product: int, db: Session = Depends(get
 
 @router.put("/orders_products/{id_order}_{id_product}", response_model=Order_productRead)
 def update_order_product(id_order: int, id_product: int, order_product: Order_productUpdate, db: Session = Depends(get_db)):
-    logger.info(f"Updating order with id: {id_order}")
+    logger.info(f"Updating order_product with id: {id_order}")
     db_order_product = db.query(Order_product).filter(
         Order_product.id_order == id_order).filter(
         Order_product.id_product == id_product).first()
