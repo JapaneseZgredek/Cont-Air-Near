@@ -259,7 +259,7 @@ export const deleteOrder_product = async (id_order, id_product) => {
 };
 
 export const updateOrder_product = async (order_product) => {
-  const response = await fetch(`http://localhost:8000/api/orders_products/${order_product.id_order}_${order_product.id_product}`, {
+  const response = await fetch(`http://localhost:8000/api/orders_products/${id_order}_${id_product}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(order_product),

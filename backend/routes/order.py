@@ -4,7 +4,6 @@ from datetime import datetime
 
 from backend.models import Operation
 from backend.models.order import Order, OrderStatus
-from backend.models.order_product import Order_product
 from backend.database import get_db
 from backend.logging_config import logger
 from pydantic import BaseModel
@@ -85,8 +84,8 @@ def delete_order(id_order: int, db: Session = Depends(get_db)):
     if db_order is None:
         logger.error(f"Order with id: {id_order} not found")
         raise HTTPException(status_code=404, detail="Order not found")
-    db.query(Order_product).filter(Order_product.id_order == id_order).delete()
     # TO DO: Usuniecie powiazanych Order_History
+    # TO DO: Usuniecie powiazanych Order_Product
 
     db.delete(db_order)
     db.commit()

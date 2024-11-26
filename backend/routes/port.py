@@ -3,7 +3,6 @@ from sqlalchemy.orm import Session
 
 from backend.models import Operation
 from backend.models.order import Order
-from backend.models.order_product import Order_product
 from backend.models.port import Port
 from backend.database import get_db
 from backend.logging_config import logger
@@ -90,14 +89,7 @@ def delete_port(id_port: int, db: Session = Depends(get_db)):
         logger.warning(f"Port with id: {id_port} not found")
         raise HTTPException(status_code=404, detail="Port not found")
 
-    order_ids_to_delete = db.query(Order.id_order).filter(Order.id_port == id_port).all()
-    if order_ids_to_delete:
-        order_ids_to_delete = [order.id_order for order in order_ids_to_delete]
-        db.query(Order_product).filter(Order_product.id_order.in_(order_ids_to_delete)).delete(synchronize_session=False)
-        logger.info(f"Deleted related Order_product entries for orders: {order_ids_to_delete}")
-
-    db.query(Order).filter(Order.id_port == id_port).delete(synchronize_session=False)
-    logger.info(f"Deleted orders with port id: {id_port}")
+    db.query(Order).filter(Order.id_port == id_port).delete()
     db.query(Operation).filter(Operation.id_port == id_port).delete()
 
     db.delete(db_port)
