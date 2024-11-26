@@ -109,8 +109,8 @@ const UpdateOperation = ({ operation, show, onHide, onUpdate }) => {
               placeholder="Select ship">
                   <option value="">Select Ship</option>
             {
-            	ships.map((ship, id_ship) => (
-            		<option key={id_ship} value={id_ship}>{ship.name}</option>
+            	ships.map((ship) => (
+            		<option key={ship.id_ship} value={ship.id_ship}>{ship.name}</option>
             	))
             }
               </Form.Control>
@@ -125,8 +125,8 @@ const UpdateOperation = ({ operation, show, onHide, onUpdate }) => {
               placeholder="Select port">
                   <option value="">Select Port</option>
               {
-              	ports.map((port, id_port) => (
-              		<option key={id_port} value={id_port}>{port.name}</option>
+              	ports.map((port) => (
+              		<option key={port.id_port} value={port.id_port}>{port.name}</option>
               	))
               }
               </Form.Control>

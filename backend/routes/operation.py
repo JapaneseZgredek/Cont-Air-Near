@@ -35,6 +35,20 @@ class OperationRead(BaseModel):
     class Config:
         from_attributes = True
 
+@router.get("/operations/port/{id_port}", response_model=List[OperationRead])
+def get_operations_by_port(id_port: int, db: Session = Depends(get_db)):
+    operations = db.query(Operation).filter(Operation.id_port == id_port).all()
+    if not operations:
+        raise HTTPException(status_code=404, detail=f"No operations found for port with id: {id_port}")
+    return operations
+
+@router.get("/operations/ship/{id_ship}", response_model=List[OperationRead])
+def get_operations_by_ship(id_ship: int, db: Session = Depends(get_db)):
+    operations = db.query(Operation).filter(Operation.id_ship == id_ship).all()
+    if not operations:
+        raise HTTPException(status_code=404, detail=f"No operations found for ship with id: {id_ship}")
+    return operations
+
 @router.get("/operations", response_model=List[OperationRead])
 def get_all_operations(db: Session = Depends(get_db)):
     logger.info("Getting all operations")
