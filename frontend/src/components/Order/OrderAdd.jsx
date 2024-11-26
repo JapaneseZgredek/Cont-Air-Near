@@ -1,16 +1,19 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import { Button, Form, Modal } from 'react-bootstrap';
-import { createOrder } from '../../services/api';
+import { createOrder, fetchClients, fetchPorts } from '../../services/api';
 
 const OrderAdd = ({ onAdd }) => {
     const [show, setShow] = useState(false);
     const [status, setStatus] = useState('pending'); // Domyślna wartość, która jest zgodna z backendem
     const [idPort, setIdPort] = useState('');
+    const [idClient, setIdClient] = useState('');
+    const [ports, setPorts] = useState([]);
+    const [clients, setClients] = useState([]);
     const [error, setError] = useState(null);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const orderData = { status, id_port: parseInt(idPort) };
+        const orderData = { status, id_port: parseInt(idPort), id_client: parseInt(idClient) };
         console.log("Sending data:", orderData); // Debugging
 
         try {
@@ -19,10 +22,34 @@ const OrderAdd = ({ onAdd }) => {
             setShow(false);
             setStatus('pending');
             setIdPort('');
+            setIdClient('');
         } catch (err) {
             setError('Failed to create order');
         }
     };
+
+    const loadPorts = async () => {
+        try {
+            const data = await fetchPorts();
+            setPorts(data);
+        } catch (err) {
+            setError("Failed to load ports");
+        }
+    };
+
+    const loadClients = async () => {
+        try {
+            const data = await fetchClients();
+            setClients(data);
+        } catch (err) {
+            setError("Failed to load clients");
+        }
+    };
+
+    useEffect(() => {
+        loadPorts();
+        loadClients();
+    }, []);
 
 
     return (
@@ -46,13 +73,29 @@ const OrderAdd = ({ onAdd }) => {
                         </Form.Group>
                         <Form.Group className="mb-3">
                             <Form.Label>Port ID</Form.Label>
-                            <Form.Control
-                                type="number"
+                            <Form.Select
                                 value={idPort}
                                 onChange={(e) => setIdPort(e.target.value)}
-                                placeholder="Enter port ID"
                                 required
-                            />
+                            >
+                                <option value="">Select Port</option>
+                                {ports.map((port) => (
+                                    <option key={port.id_port} value={port.id_port}>{port.name}</option>
+                                ))}
+                            </Form.Select>
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Client</Form.Label>
+                            <Form.Select
+                                value={idClient}
+                                onChange={(e) => setIdClient(e.target.value)}
+                                required
+                            >
+                                <option value="">Select Client</option>
+                                {clients.map((client) => (
+                                    <option key={client.id_client} value={client.id_client}>{client.name}</option>
+                                ))}
+                            </Form.Select>
                         </Form.Group>
                         <Button variant="success" type="submit">Add Order</Button>
                     </Form>

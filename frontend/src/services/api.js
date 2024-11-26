@@ -194,6 +194,22 @@ export const fetchOrders = async () => {
   return response.json();
 };
 
+export const fetchOrdersByPort = async (port_id) => {
+  const response = await fetch(`http://localhost:8000/api/orders/port/${port_id}`)
+  if (!response.ok) {
+    throw new Error(`Failed to fetch orders for port with id: ${port_id}`)
+  }
+  return response.json();
+}
+
+export const fetchOrdersByClient = async (client_id) => {
+  const response = await fetch(`http://localhost:8000/api/orders/client/${client_id}`)
+  if (!response.ok) {
+    throw new Error(`Failed to fetch orders for client with id: ${client_id}`)
+  }
+  return response.json();
+}
+
 export const createOrder = async (order) => {
   const response = await fetch('http://localhost:8000/api/orders', {
     method: 'POST',

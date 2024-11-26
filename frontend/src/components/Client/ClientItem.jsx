@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Card, Button, Modal } from 'react-bootstrap';
 import { deleteClient } from '../../services/api';
 import UpdateClient from "./UpdateClient";
+import OrdersButton from "../Order/OrdersButton";
 
 const ClientItem = ({ client, onUpdate, onDelete }) => {
     const [showConfirm, setShowConfirm] = useState(false);
@@ -36,6 +37,7 @@ const ClientItem = ({ client, onUpdate, onDelete }) => {
                     <Card.Text>Email: {client.email}</Card.Text>
                 </div>
                 <div>
+                    <OrdersButton clientId={client.id_client} clientName={client.name} />
                     <Button variant="warning" className="me-2" onClick={openUpdateModal}>Update</Button>
                     <Button variant="danger" onClick={() => setShowConfirm(true)}>Delete</Button>
                 </div>
