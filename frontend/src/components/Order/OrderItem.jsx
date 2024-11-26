@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Card, Button, Modal } from 'react-bootstrap';
 import { deleteOrder } from '../../services/api';
 import OrderUpdate from './OrderUpdate';
+import Order_productButton from "../Order_product/Order_productButton";
 
 const OrderItem = ({ order, onUpdate, onDelete }) => {
     const [showConfirm, setShowConfirm] = useState(false);
@@ -37,6 +38,7 @@ const OrderItem = ({ order, onUpdate, onDelete }) => {
                     <div>
                         <Button variant="warning" className="me-2" onClick={openUpdateModal}>Update</Button>
                         <Button variant="danger" onClick={() => setShowConfirm(true)}>Delete</Button>
+                        <Order_productButton orderId={order.id_order}/>
                     </div>
                 </Card.Body>
             </Card>
