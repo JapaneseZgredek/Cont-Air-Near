@@ -14,7 +14,7 @@ router = APIRouter()
 class OrderHistoryCreate(BaseModel):
     description: str
     date: datetime
-    Order_id_order: int
+    Order_id_order: Optional[int]
 
 class OrderHistoryUpdate(BaseModel):
     description: str
@@ -24,7 +24,7 @@ class OrderHistoryRead(BaseModel):
     id_history: int
     description: str
     date: datetime
-    Order_id_order: int
+    Order_id_order: Optional[int]
 
     class Config:
         from_attributes = True
