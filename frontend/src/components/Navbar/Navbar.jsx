@@ -30,6 +30,9 @@ const NavbarComponent = () => {
                         <LinkContainer to="/orders">
                             <Nav.Link>Orders</Nav.Link>
                         </LinkContainer>
+                        <LinkContainer to="/order_products">
+                            <Nav.Link>Order_products</Nav.Link>
+                        </LinkContainer>
                         {/* Add the Home Button Later */}
                     </Nav>
                 </Navbar.Collapse>

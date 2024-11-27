@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from pathlib import Path
 from backend.database import engine, Base
-from backend.routes import ship, operation, port, product, order, client
+from backend.routes import ship, operation, port, product, order, client, order_product
 from backend.logging_config import logger
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -20,12 +20,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(ship.router, prefix='/api', tags=['Ship API'])
-app.include_router(operation.router, prefix='/api', tags=['Operation API'])
-app.include_router(port.router, prefix='/api', tags=['Port API'])
-app.include_router(product.router, prefix='/api', tags=['Product API'])
-app.include_router(client.router, prefix='/api', tags=['Client API'])
-app.include_router(order.router, prefix='/api', tags=['Orders API'])
+app.include_router(ship.router, prefix='/api')
+app.include_router(operation.router, prefix='/api')
+app.include_router(port.router, prefix='/api')
+app.include_router(product.router, prefix='/api')
+app.include_router(client.router, prefix='/api')
+app.include_router(order.router, prefix='/api')
+app.include_router(order_product.router, prefix='/api')
 
 @app.on_event('startup')
 async def startup_event():
