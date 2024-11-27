@@ -4,21 +4,24 @@ import AuthenticationForm from "../components/User/AuthenticationForm";
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
+const HomePage = () => {
+    const token = localStorage.getItem('token');
 
-function HomePage() {
     return (
         <div>
-            <Navbar/>
+            <Navbar />
             <div className="d-flex flex-column justify-content-center align-items-center mt-5">
                 <h1 className="display-1 text-primary fw-bold text-center">
-                    Welcome to the Homepage!
+                    Welcome to Cont-Air-Near!
                 </h1>
-                {/*<img src="/image.png" alt="Cont-air-near logo" className="img-fluid mt-4"/>*/}
+                {token ? (
+                    <p>Enjoy access to all operations and management tools!</p>
+                ) : (
+                    <p>Log in to manage your logistics efficiently.</p>
+                )}
             </div>
-                <AuthenticationForm/>
-
-            {/*  */}
-        </div>);
-}
+        </div>
+    );
+};
 
 export default HomePage;
