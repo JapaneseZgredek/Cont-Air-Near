@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Form, Modal } from 'react-bootstrap';
-import { createOrderHistory } from '../../services/api';
+import { createOrderHistory, fetchOrders } from '../../services/api';
 
 const OrderHistoryAdd = ({ onAdd }) => {
     const [show, setShow] = useState(false);
@@ -24,6 +24,19 @@ const OrderHistoryAdd = ({ onAdd }) => {
             setError('Failed to create order history');
         }
     };
+
+    const [orders, setOrderss] = useState([]);
+    const loadOrders = async () => {
+        try {
+            const data = await fetchOrders();
+            setOrderss(data);
+        } catch (err) {
+            setError('Failed to load orders');
+        }
+    };
+    useEffect(() => {
+        loadOrders();
+    }, []);
 
     return (
         <>
@@ -57,14 +70,20 @@ const OrderHistoryAdd = ({ onAdd }) => {
                             />
                         </Form.Group>
                         <Form.Group className="mb-3">
-                            <Form.Label>Order ID</Form.Label>
+                            <Form.Label>Order</Form.Label>
                             <Form.Control
-                                type="number"
-                                value={orderId}
-                                onChange={(e) => setOrderId(e.target.value)}
-                                placeholder="Enter associated order ID"
-                                required
-                            />
+                            as="select"
+                            required
+                            value={orderId}
+                            onChange={(e) => setOrderId(e.target.value)}
+                            placeholder="Select Order">
+                                <option value="">Select Order</option>
+                			    {
+                			    	orders.map((order) => (
+                			    		<option key={order.id_order} value={order.id_order}>{order.id_order}</option>
+                			    	))
+                			    }
+                            </Form.Control>
                         </Form.Group>
                         <Button variant="success" type="submit">
                             Add History
