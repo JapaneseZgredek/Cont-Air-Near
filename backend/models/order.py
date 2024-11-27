@@ -20,6 +20,7 @@ class Order(Base):
     # id_client = Column(Integer, ForeignKey('client.id_client'), nullable=True)
 
     port = relationship("Port", back_populates="orders")
+    order_histories = relationship("OrderHistory", back_populates="order")
 
     # TO DO: Add relationship with Client when the Client model is available
     # client = relationship("Client", back_populates="orders")
