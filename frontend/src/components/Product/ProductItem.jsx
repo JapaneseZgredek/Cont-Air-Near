@@ -38,7 +38,7 @@ const ProductItem = ({product, onUpdate, onDelete }) => {
                     </div>
                     <div>
                         <Button variant="warning" className="me-2" onClick={openUpdateModal}>Update</Button>
-                        <Button variant="danger" onClick={(ś) => setShowConfirm(true)}>Delete</Button>
+                        <Button variant="danger" onClick={() => setShowConfirm(true)}>Delete</Button>
                         <Order_productButton productId={product.id_product} productName={product.name}/>
                     </div>
                 </Card.Body>
