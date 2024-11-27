@@ -7,6 +7,8 @@ import ProductPage from './pages/ProductPage';
 import ClientPage from './pages/ClientPage';
 import HomePage from './pages/HomePage';
 import OrderPage from './pages/OrderPage';
+import Order_productPage from './pages/Order_productPage';
+import OrderHistoryPage from './pages/OrderHistoryPage';
 
 const App = () => {
     return (
@@ -17,6 +19,8 @@ const App = () => {
                 <Route path="/ports" element={<PortPage />} />
                 <Route path="/products" element={<ProductPage />} />
                 <Route path="/orders" element={<OrderPage />} />
+                <Route path="/order_products" element={<Order_productPage />} />
+                <Route path="/order_histories" element={<OrderHistoryPage />} />
                 <Route path="/clients" element={<ClientPage />} />
                 <Route path="/" element={<HomePage />} />
             </Routes>

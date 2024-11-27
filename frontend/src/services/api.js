@@ -186,6 +186,8 @@ export const updateProduct = async (product) => {
   return response.json();
 };
 
+//Orders table related
+
 export const fetchOrders = async () => {
   const response = await fetch('http://localhost:8000/api/orders');
   if (!response.ok) {
@@ -249,6 +251,118 @@ export const fetchOrderById = async (id_order) => {
   const response = await fetch(`http://localhost:8000/api/orders/${id_order}`);
   if (!response.ok) {
     throw new Error('Failed to fetch order details');
+  }
+  return response.json();
+};
+
+export const fetchOrderHistories = async () => {
+  const response = await fetch('http://localhost:8000/api/order_histories');
+  if (!response.ok) {
+    throw new Error('Failed to fetch order histories');
+  }
+  return response.json();
+};
+
+export const createOrderHistory = async (orderHistory) => {
+  const response = await fetch('http://localhost:8000/api/order_histories', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(orderHistory),
+  });
+  if (!response.ok) {
+    throw new Error('Failed to create order history');
+  }
+  return response.json();
+};
+
+export const deleteOrderHistory = async (id_history) => {
+  const response = await fetch(`http://localhost:8000/api/order_histories/${id_history}`, {
+    method: 'DELETE',
+  });
+  if (!response.ok) {
+    throw new Error('Failed to delete order history');
+  }
+};
+
+export const updateOrderHistory = async (orderHistory) => {
+  const response = await fetch(`http://localhost:8000/api/order_histories/${orderHistory.id_history}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(orderHistory),
+  });
+  if (!response.ok) {
+    throw new Error('Failed to update order history');
+  }
+  return response.json();
+};
+
+export const fetchOrderHistoryById = async (id_history) => {
+  const response = await fetch(`http://localhost:8000/api/order_histories/${id_history}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch order history details');
+  }
+  return response.json();
+};
+
+// Orders_products table related
+
+export const fetchOrders_products = async () => {
+  const response = await fetch('http://localhost:8000/api/orders_products');
+  if (!response.ok) {
+    throw new Error('Failed to fetch orders_products');
+  }
+  return response.json();
+};
+
+export const createOrder_product = async (order_product) => {
+  const response = await fetch('http://localhost:8000/api/orders_products', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(order_product),
+  });
+  if (!response.ok) {
+    throw new Error('Failed to create order_product');
+  }
+  return response.json();
+};
+
+export const deleteOrder_product = async (id_order, id_product) => {
+  const response = await fetch(`http://localhost:8000/api/orders_products/${id_order}_${id_product}`, {
+    method: 'DELETE',
+  });
+  if (!response.ok) {
+    throw new Error('Failed to delete order_product');
+  }
+};
+
+export const updateOrder_product = async (order_product) => {
+  const response = await fetch(`http://localhost:8000/api/orders_products/${order_product.id_order}_${order_product.id_product}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(order_product),
+  });
+  if (!response.ok) {
+    throw new Error('Failed to update order_product');
+  }
+  return response.json();
+};
+
+export const fetchOrders_productsByOrder = async (order_id) => {
+  const response = await fetch(`http://localhost:8000/api/orders_products/order/${order_id}`)
+  if (!response.ok) {
+    throw new Error(`Failed to fetch order_products for order id: ${order_id}`)
+  }
+  return response.json();
+};
+
+export const fetchOrders_productsByProduct = async (product_id) => {
+  const response = await fetch(`http://localhost:8000/api/orders_products/product/${product_id}`)
+  if (!response.ok) {
+    throw new Error(`Failed to fetch order_products for product id: ${product_id}`)
   }
   return response.json();
 };
