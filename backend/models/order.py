@@ -20,6 +20,10 @@ class Order(Base):
 
     port = relationship("Port", back_populates="orders")
     client = relationship("Client", back_populates="orders")
+    order_histories = relationship("OrderHistory", back_populates="order")
+
+    # TO DO: Add relationship with Client when the Client model is available
+    # client = relationship("Client", back_populates="orders")
 
     # TO DO: Add relationship with OrderProduct once the OrderProduct table is available
     # order_products = relationship("OrderProduct", back_populates="order", cascade="all, delete-orphan")

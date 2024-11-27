@@ -255,6 +255,57 @@ export const fetchOrderById = async (id_order) => {
   return response.json();
 };
 
+export const fetchOrderHistories = async () => {
+  const response = await fetch('http://localhost:8000/api/order_histories');
+  if (!response.ok) {
+    throw new Error('Failed to fetch order histories');
+  }
+  return response.json();
+};
+
+export const createOrderHistory = async (orderHistory) => {
+  const response = await fetch('http://localhost:8000/api/order_histories', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(orderHistory),
+  });
+  if (!response.ok) {
+    throw new Error('Failed to create order history');
+  }
+  return response.json();
+};
+
+export const deleteOrderHistory = async (id_history) => {
+  const response = await fetch(`http://localhost:8000/api/order_histories/${id_history}`, {
+    method: 'DELETE',
+  });
+  if (!response.ok) {
+    throw new Error('Failed to delete order history');
+  }
+};
+
+export const updateOrderHistory = async (orderHistory) => {
+  const response = await fetch(`http://localhost:8000/api/order_histories/${orderHistory.id_history}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(orderHistory),
+  });
+  if (!response.ok) {
+    throw new Error('Failed to update order history');
+  }
+  return response.json();
+};
+
+export const fetchOrderHistoryById = async (id_history) => {
+  const response = await fetch(`http://localhost:8000/api/order_histories/${id_history}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch order history details');
+  }
+  return response.json();
+};
+
 // Orders_products table related
 
 export const fetchOrders_products = async () => {
@@ -300,44 +351,18 @@ export const updateOrder_product = async (order_product) => {
   return response.json();
 };
 
-//Clients table related
-
-export const fetchClients = async () => {
-  const response = await fetch('http://localhost:8000/api/clients');
+export const fetchOrders_productsByOrder = async (order_id) => {
+  const response = await fetch(`http://localhost:8000/api/orders_products/order/${order_id}`)
   if (!response.ok) {
-    throw new Error('Failed to fetch clients');
+    throw new Error(`Failed to fetch order_products for order id: ${order_id}`)
   }
   return response.json();
 };
 
-export const createClient = async (client) => {
-  const response = await fetch('http://localhost:8000/api/clients', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(client),
-  });
+export const fetchOrders_productsByProduct = async (product_id) => {
+  const response = await fetch(`http://localhost:8000/api/orders_products/product/${product_id}`)
   if (!response.ok) {
-    throw new Error('Failed to create client');
+    throw new Error(`Failed to fetch order_products for product id: ${product_id}`)
   }
-  return response.json();
-}
-
-export const deleteClient = async (id) => {
-  const response = await fetch(`http://localhost:8000/api/clients/${id}`, {
-    method: 'DELETE',
-  });
-  if (!response.ok) {
-    throw new Error('Failed to delete client');
-  }
-};
-
-export const updateClient = async (client) => {
-  const response = await fetch(`http://localhost:8000/api/clients/${client.id_client}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(client),
-  });
   return response.json();
 };
