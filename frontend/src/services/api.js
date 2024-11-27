@@ -366,3 +366,43 @@ export const fetchOrders_productsByProduct = async (product_id) => {
   }
   return response.json();
 };
+
+export const fetchClients = async () => {
+  const response = await fetch('http://localhost:8000/api/clients');
+  if (!response.ok) {
+    throw new Error('Failed to fetch clients');
+  }
+  return response.json();
+};
+
+export const createClient = async (client) => {
+  const response = await fetch('http://localhost:8000/api/clients', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(client),
+  });
+  if (!response.ok) {
+    throw new Error('Failed to create client');
+  }
+  return response.json();
+}
+
+export const deleteClient = async (id) => {
+  const response = await fetch(`http://localhost:8000/api/clients/${id}`, {
+    method: 'DELETE',
+  });
+  if (!response.ok) {
+    throw new Error('Failed to delete client');
+  }
+};
+
+export const updateClient = async (client) => {
+  const response = await fetch(`http://localhost:8000/api/clients/${client.id_client}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(client),
+  });
+  return response.json();
+};
