@@ -143,5 +143,5 @@ def delete_operation(id_operation: int, db: Session = Depends(get_db), current_u
     db.delete(db_operation)
     db.commit()
     return {"message": "Operation deleted successfully",
-            "operation": OperationRead.from_attributes(db_operation)}
+            }
     # "operation": OperationRead.from_orm(db_operation)}
