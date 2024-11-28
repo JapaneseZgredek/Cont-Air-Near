@@ -19,7 +19,7 @@ const AddClient = ({ onAdd }) => {
         if (!address.trim()) errors.address = "Address is required";
         if (!telephone_number.trim()) {
             errors.telephone_number = "Telephone number is required."
-        } else if (!/^\d{7,}$/.test(telephone_number)) {
+        } else if (!/^\d{7,15}$/.test(telephone_number)) {
             errors.telephone_number = "Telephone number must be at least 7 digits"
         }
         if (!email.trim()) {
