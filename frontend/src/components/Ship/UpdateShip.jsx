@@ -5,11 +5,29 @@ import { updateShip } from '../../services/api';
 const UpdateShip = ({ ship, show, onHide, onUpdate }) => {
   const [name, setName] = useState(ship.name);
   const [capacity, setCapacity] = useState(ship.capacity);
+  const [validationErrors, setValidationErrors] = useState({});
 
+  const validateInputs = () => {
+    const errors = {};
+
+    if (!name.trim()) errors.name = "Ship name is required";
+    if (!capacity) {
+      errors.capacity = "Capacity is required";
+    } else if (!/^\d+$/.test(String(capacity)) || capacity <= 0) {
+      errors.capacity = "Capacity must be a positive number.";
+    }
+
+    return errors
+  }
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log('handleSubmit wywolane');
+    const errors = validateInputs();
+    if (Object.keys(errors).length > 0) {
+      setValidationErrors(errors);
+      return;
+    }
+
     const updatedShip = { ...ship, name, capacity };
     try {
       const result = await updateShip(updatedShip);
@@ -34,7 +52,11 @@ const UpdateShip = ({ ship, show, onHide, onUpdate }) => {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Enter ship name"
+              isInvalid={!!validationErrors.name}
             />
+            <Form.Control.Feedback type="invalid">
+              {validationErrors.name}
+            </Form.Control.Feedback>
           </Form.Group>
           <Form.Group className="mb-3">
             <Form.Label>Capacity</Form.Label>
@@ -43,7 +65,11 @@ const UpdateShip = ({ ship, show, onHide, onUpdate }) => {
               value={capacity}
               onChange={(e) => setCapacity(e.target.value)}
               placeholder="Enter capacity"
+              isInvalid={!!validationErrors.capacity}
             />
+            <Form.Control.Feedback type="invalid">
+              {validationErrors.capacity}
+            </Form.Control.Feedback>
           </Form.Group>
           <Button variant="success" type="submit">
             Save Changes
