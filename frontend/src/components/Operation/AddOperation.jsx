@@ -18,7 +18,7 @@ const AddOperation = ({ onAdd }) => {
       try {
         const newOperation = await createOperation({
           name_of_operation: nameOfOperation,
-          operation_type: operationType,
+          operation_type: operationType.toLowerCase(),
           date_of_operation: dateOfOperation || new Date().toISOString(),
           id_ship: parseInt(idShip),
           id_port: parseInt(idPort),
@@ -87,8 +87,8 @@ const AddOperation = ({ onAdd }) => {
                                   <option value="TRANSFER">Transfer</option>
                                   <option value="DEPARTURE">Departure</option>
                                   <option value="ARRIVAL">Arrival</option>
-                                  <option value="CARGO_LOADING">Cargo Loading</option>
-                                  <option value="CARGO_DISCHARGE">Cargo Discharge</option>
+                                  <option value="loading">Cargo Loading</option>
+                                  <option value="discharge">Cargo Discharge</option>
                                 </Form.Select>
                         </Form.Group>
 
