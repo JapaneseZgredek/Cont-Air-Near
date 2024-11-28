@@ -37,7 +37,7 @@ class OperationRead(BaseModel):
     id_port: int
 
     class Config:
-        orm_mode = True     # Add   -> wszystko hula trzeba delete tylko fix, bo dziala, ale sie nie odswieza
+        orm_mode = True     # Add   -> wszystko hula trzeba tak dla delete operacji bo inaczej nie zadziała
         # from_attributes = True
 
 @router.get("/operations/{id_operation}", response_model=OperationRead)
@@ -63,17 +63,6 @@ def get_all_operations(
             status_code=404, detail="No operations found"
         )
     return operations
-
-
-# @router.get("/operations/{id_operation}", response_model=OperationRead)
-# def read_operation(id_operation: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
-#     logger.info(f"Reading operation with id: {id_operation}")
-#     #operation = db.query(Operation).get(id_operation)
-#     db_operation = db.query(Operation).filter(Operation.id_operation == id_operation).first()
-#     if db_operation is None:
-#         logger(f"Operation with id: {id_operation} not found")
-#         raise HTTPException(status_code=404, detail="Operation not found")
-#     return db_operation
 
 @router.post("/operations", response_model=OperationRead)
 def create_operation(
