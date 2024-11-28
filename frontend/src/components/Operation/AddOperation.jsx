@@ -12,9 +12,27 @@ const AddOperation = ({ onAdd }) => {
     const [idShip, setIdShip] = useState('');
     const [idPort, setIdPort] = useState('');
     const [error, setError] = useState(null);
+    const [validationErrors, setValidationErrors] = useState({});
+
+    const validateInputs = () => {
+        const errors = {};
+
+        if (!nameOfOperation.trim()) errors.nameOfOperation = "Operation name is required";
+        if (!idShip) errors.idShip = "You must select a ship.";
+        if (!idPort) errors.idPort = "You must select a port.";
+        if (!dateOfOperation) errors.dateOfOperation = "Date of operation is required.";
+
+        return errors;
+    }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        const errors = validateInputs();
+        if (Object.keys(errors).length > 0) {
+            setValidationErrors(errors);
+            return;
+        }
         try {
             const newOperation = await createOperation({
                 name_of_operation: nameOfOperation,
@@ -25,6 +43,7 @@ const AddOperation = ({ onAdd }) => {
             });
             onAdd(newOperation);
             setShow(false);
+            setValidationErrors({});
         } catch (err) {
             setError('Failed to create an operation');
         }
@@ -71,7 +90,11 @@ const AddOperation = ({ onAdd }) => {
                                 value={nameOfOperation}
                                 onChange={(e) => setNameOfOperation(e.target.value)}
                                 placeholder="Enter operation name"
+                                isInvalid={!!validationErrors.nameOfOperation}
                             />
+                            <Form.Control.Feedback type="invalid">
+                                {validationErrors.nameOfOperation}
+                            </Form.Control.Feedback>
                         </Form.Group>
 
                         <Form.Group className="mb-3">
@@ -96,7 +119,11 @@ const AddOperation = ({ onAdd }) => {
                                 type="datetime-local"
                                 value={dateOfOperation}
                                 onChange={(e) => setDateOfOperation(e.target.value)}
+                                isInvalid={!!validationErrors.dateOfOperation}
                             />
+                            <Form.Control.Feedback type="invalid">
+                                {validationErrors.dateOfOperation}
+                            </Form.Control.Feedback>
                         </Form.Group>
 
                         <Form.Group className="mb-3">
@@ -106,7 +133,9 @@ const AddOperation = ({ onAdd }) => {
                             required
                             value={idShip}
                             onChange={(e) => setIdShip(e.target.value)}
-                            placeholder="Select ship">
+                            placeholder="Select ship"
+                            isInvalid={!!validationErrors.idShip}
+                            >
                                 <option value="">Select Ship</option>
                 			    {
                 			    	ships.map((ship) => (
@@ -114,6 +143,9 @@ const AddOperation = ({ onAdd }) => {
                 			    	))
                 			    }
                             </Form.Control>
+                            <Form.Control.Feedback type="invalid">
+                                {validationErrors.idShip}
+                            </Form.Control.Feedback>
                         </Form.Group>
                         
                         <Form.Group className="mb-3">
@@ -123,7 +155,9 @@ const AddOperation = ({ onAdd }) => {
                             required
                             value={idPort}
                             onChange={(e) => setIdPort(e.target.value)}
-                            placeholder="Select port">
+                            placeholder="Select port"
+                            isInvalid={!!validationErrors.idPort}
+                            >
                                 <option value="">Select Port</option>
                 			    {
                 			    	ports.map((port) => (
@@ -131,6 +165,9 @@ const AddOperation = ({ onAdd }) => {
                 			    	))
                 			    }
                             </Form.Control>
+                            <Form.Control.Feedback type="invalid">
+                                {validationErrors.idPort}
+                            </Form.Control.Feedback>
                         </Form.Group>
 
                         <Button variant="success" type="submit">Add Operation</Button>
