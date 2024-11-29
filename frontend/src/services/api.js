@@ -78,6 +78,13 @@ export const fetchOperations = async () => {
 };
 
 
+export async function fetchOperationsByShip(shipId) {
+  const response = await fetch(`http://localhost:8000/api/operations/ship/${shipId}`);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch operations for ship ${shipId}`);
+  }
+  return await response.json();
+}
 
 export const createOperation = async (operation) => {
   return await fetchProtectedData('/api/operations/', {
