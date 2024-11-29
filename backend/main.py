@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from pathlib import Path
 from backend.database import engine, Base
-from backend.routes import ship, operation, port, product, order, client, user
+from backend.routes import ship, operation, port, product, order, client, order_history, order_product, user
 from backend.logging_config import logger
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -14,19 +14,25 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # Zezwalaj tylko na frontend lokalny
+    allow_origins=["http://localhost:3000"],
     allow_credentials=True,
-    allow_methods=["*"],  # Zezwalaj na wszystkie metody (GET, POST, itd.)
-    allow_headers=["*"],  # Zezwalaj na wszystkie nagłówki
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
+# Database routers
 app.include_router(ship.router, prefix='/api')
 app.include_router(operation.router, prefix='/api')
 app.include_router(port.router, prefix='/api')
 app.include_router(product.router, prefix='/api')
 app.include_router(client.router, prefix='/api')
 app.include_router(order.router, prefix='/api')
+app.include_router(order_product.router, prefix='/api')
+app.include_router(order_history.router, prefix='/api')
+
+#Users routers
 app.include_router(user.router, prefix='/api')
+
 
 @app.on_event('startup')
 async def startup_event():

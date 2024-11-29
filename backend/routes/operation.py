@@ -38,7 +38,23 @@ class OperationRead(BaseModel):
 
     class Config:
         orm_mode = True     # Add   -> wszystko hula trzeba tak dla delete operacji bo inaczej nie zadziała
-        # from_attributes = True
+        # from_attributes = True        # musi być na orm_mode inaczej auth nie przejdzie
+
+#Dodać authentykacje
+@router.get("/operations/port/{id_port}", response_model=List[OperationRead])
+def get_operations_by_port(id_port: int, db: Session = Depends(get_db)):
+    operations = db.query(Operation).filter(Operation.id_port == id_port).all()
+    if not operations:
+        raise HTTPException(status_code=404, detail=f"No operations found for port with id: {id_port}")
+    return operations
+
+#Dodać authentykacje
+@router.get("/operations/ship/{id_ship}", response_model=List[OperationRead])
+def get_operations_by_ship(id_ship: int, db: Session = Depends(get_db)):
+    operations = db.query(Operation).filter(Operation.id_ship == id_ship).all()
+    if not operations:
+        raise HTTPException(status_code=404, detail=f"No operations found for ship with id: {id_ship}")
+    return operations
 
 @router.get("/operations/{id_operation}", response_model=OperationRead)
 def get_operation(

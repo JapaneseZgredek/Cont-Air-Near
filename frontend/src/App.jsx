@@ -7,19 +7,28 @@ import ProductPage from './pages/ProductPage';
 import ClientPage from './pages/ClientPage';
 import HomePage from './pages/HomePage';
 import OrderPage from './pages/OrderPage';
+import Order_productPage from './pages/Order_productPage';
+import OrderHistoryPage from './pages/OrderHistoryPage';
+
+import ProtectedRoute from './components/ProtectedRoute';
+// Login Register + Navbar if we need that to be injected just as partial (in future*)
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import Navbar from './components/Navbar/Navbar';
-import ProtectedRoute from './components/ProtectedRoute';
 
 const App = () => {
     return (
         <Router>
             <Routes>
                 {/* Public Routes */}
+                {/* Guest Tables */}
                 <Route path="/" element={<HomePage />} />
                 <Route path="/ships" element={<ShipPage />} />
                 <Route path="/products" element={<ProductPage />} />
+                {/* New Unprotected Tables */}
+                <Route path="/order_products" element={<Order_productPage />} />
+                <Route path="/order_histories" element={<OrderHistoryPage />} />
+                {/*Login & Register*/}
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
 

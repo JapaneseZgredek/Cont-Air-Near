@@ -35,7 +35,13 @@ const NavbarComponent = () => {
                         <LinkContainer to="/products">
                             <Nav.Link>Products</Nav.Link>
                         </LinkContainer>
-
+                        {/* New Unprotected Tables */}
+                        <LinkContainer to="/order_products">
+                            <Nav.Link>Order_products</Nav.Link>
+                        </LinkContainer>
+                        <LinkContainer to="/order_histories">
+                            <Nav.Link>OrderHistory</Nav.Link>
+                        </LinkContainer>
                         {/* Conditional Links Based on Authentication */}
                         {isLoggedIn ? (
                             <>

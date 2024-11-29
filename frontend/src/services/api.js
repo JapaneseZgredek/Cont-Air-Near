@@ -65,6 +65,13 @@ export const updateShip = async (ship) => {
 
 
 // Operation table related
+export async function fetchOperationsByPort(portId) {
+  const response = await fetch(`http://localhost:8000/api/operations/port/${portId}`);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch operations for port ${portId}`);
+  }
+  return await response.json()
+}
 
 export const fetchOperations = async () => {
   return await fetchProtectedData('/api/operations/');
@@ -170,6 +177,8 @@ export const updateProduct = async (product) => {
   return response.json();
 };
 
+//Orders table related
+
 export const fetchOrders = async () => {
   const response = await fetch('${API_URL}/api/orders');
   if (!response.ok) {
@@ -177,6 +186,22 @@ export const fetchOrders = async () => {
   }
   return response.json();
 };
+
+export const fetchOrdersByPort = async (port_id) => {
+  const response = await fetch(`http://localhost:8000/api/orders/port/${port_id}`)
+  if (!response.ok) {
+    throw new Error(`Failed to fetch orders for port with id: ${port_id}`)
+  }
+  return response.json();
+}
+
+export const fetchOrdersByClient = async (client_id) => {
+  const response = await fetch(`http://localhost:8000/api/orders/client/${client_id}`)
+  if (!response.ok) {
+    throw new Error(`Failed to fetch orders for client with id: ${client_id}`)
+  }
+  return response.json();
+}
 
 export const createOrder = async (order) => {
   const response = await fetch('${API_URL}/api/orders', {
@@ -217,6 +242,118 @@ export const fetchOrderById = async (id_order) => {
   const response = await fetch(`${API_URL}/api/orders/${id_order}`);
   if (!response.ok) {
     throw new Error('Failed to fetch order details');
+  }
+  return response.json();
+};
+
+export const fetchOrderHistories = async () => {
+  const response = await fetch('http://localhost:8000/api/order_histories');
+  if (!response.ok) {
+    throw new Error('Failed to fetch order histories');
+  }
+  return response.json();
+};
+
+export const createOrderHistory = async (orderHistory) => {
+  const response = await fetch('http://localhost:8000/api/order_histories', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(orderHistory),
+  });
+  if (!response.ok) {
+    throw new Error('Failed to create order history');
+  }
+  return response.json();
+};
+
+export const deleteOrderHistory = async (id_history) => {
+  const response = await fetch(`http://localhost:8000/api/order_histories/${id_history}`, {
+    method: 'DELETE',
+  });
+  if (!response.ok) {
+    throw new Error('Failed to delete order history');
+  }
+};
+
+export const updateOrderHistory = async (orderHistory) => {
+  const response = await fetch(`http://localhost:8000/api/order_histories/${orderHistory.id_history}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(orderHistory),
+  });
+  if (!response.ok) {
+    throw new Error('Failed to update order history');
+  }
+  return response.json();
+};
+
+export const fetchOrderHistoryById = async (id_history) => {
+  const response = await fetch(`http://localhost:8000/api/order_histories/${id_history}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch order history details');
+  }
+  return response.json();
+};
+
+// Orders_products table related
+
+export const fetchOrders_products = async () => {
+  const response = await fetch('http://localhost:8000/api/orders_products');
+  if (!response.ok) {
+    throw new Error('Failed to fetch orders_products');
+  }
+  return response.json();
+};
+
+export const createOrder_product = async (order_product) => {
+  const response = await fetch('http://localhost:8000/api/orders_products', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(order_product),
+  });
+  if (!response.ok) {
+    throw new Error('Failed to create order_product');
+  }
+  return response.json();
+};
+
+export const deleteOrder_product = async (id_order, id_product) => {
+  const response = await fetch(`http://localhost:8000/api/orders_products/${id_order}_${id_product}`, {
+    method: 'DELETE',
+  });
+  if (!response.ok) {
+    throw new Error('Failed to delete order_product');
+  }
+};
+
+export const updateOrder_product = async (order_product) => {
+  const response = await fetch(`http://localhost:8000/api/orders_products/${order_product.id_order}_${order_product.id_product}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(order_product),
+  });
+  if (!response.ok) {
+    throw new Error('Failed to update order_product');
+  }
+  return response.json();
+};
+
+export const fetchOrders_productsByOrder = async (order_id) => {
+  const response = await fetch(`http://localhost:8000/api/orders_products/order/${order_id}`)
+  if (!response.ok) {
+    throw new Error(`Failed to fetch order_products for order id: ${order_id}`)
+  }
+  return response.json();
+};
+
+export const fetchOrders_productsByProduct = async (product_id) => {
+  const response = await fetch(`http://localhost:8000/api/orders_products/product/${product_id}`)
+  if (!response.ok) {
+    throw new Error(`Failed to fetch order_products for product id: ${product_id}`)
   }
   return response.json();
 };
@@ -262,28 +399,6 @@ export const updateClient = async (client) => {
 };
 
 
-// export const registerUser = async (user) => {
-//   try {
-//     const response = await axios.post(`${API_URL}/api/users`, user);
-//     return response.data;
-//   } catch (error) {
-//     throw new Error(error.response?.data?.detail || 'Registration failed');
-//   }
-// };
-//
-// export const loginUser = async (credentials) => {
-//     try {
-//         const response = await axios.post('http://localhost:8000/api/users/login', credentials, {
-//             headers: { 'Content-Type': 'application/json' },
-//         });
-//         return response.data; //tutaj zwracany jest token JWT, który potem dla usera nie bedzie widoczny tak jak jest teraz (to jest po debug)
-//     } catch (error) {
-//         throw new Error(error.response?.data?.detail || 'Login failed');
-//     }
-// };
-
-
-
 // Login
 export const loginUser = async (credentials) => {
   const response = await fetch(`${API_URL}/api/users/login`, {
@@ -315,22 +430,6 @@ export const registerUser = async (userData) => {
 
   return await response.json();
 };
-
-// export const fetchProtectedData = async (endpoint) => {
-//   const token = getAuthToken();
-//   const response = await fetch(`${API_URL}${endpoint}`, {
-//     headers: {
-//       Authorization: `Bearer ${token}`,
-//       'Content-Type': 'application/json',
-//     },
-//   });
-//
-//   if (!response.ok) {
-//     throw new Error('Failed to fetch protected data');
-//   }
-//
-//   return await response.json();
-// };
 
 export const fetchProtectedData = async (endpoint, options = {}) => {
     const token = getAuthToken();
