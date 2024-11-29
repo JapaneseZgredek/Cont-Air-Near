@@ -187,11 +187,13 @@ export const updateProduct = async (product) => {
 //Orders table related
 
 export const fetchOrders = async () => {
-  const response = await fetch(`${API_URL}/api/orders`);
-  if (!response.ok) {
-    throw new Error('Failed to fetch orders');
-  }
-  return response.json();
+  return await fetchProtectedData(`/api/orders/`);
+
+  // const response = await fetch(`${API_URL}/api/orders`);
+  // if (!response.ok) {
+  //   throw new Error('Failed to fetch orders');
+  // }
+  // return response.json();
 };
 
 export const fetchOrdersByPort = async (port_id) => {
@@ -211,38 +213,23 @@ export const fetchOrdersByClient = async (client_id) => {
 }
 
 export const createOrder = async (order) => {
-  const response = await fetch(`${API_URL}/api/orders`, {
+  return await fetchProtectedData(`/api/orders/`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
     body: JSON.stringify(order),
   });
-  if (!response.ok) {
-    throw new Error('Failed to create order');
-  }
-  return response.json();
 };
 
 export const deleteOrder = async (id_order) => {
-  const response = await fetch(`${API_URL}/api/orders/${id_order}`, {
+  return await fetchProtectedData(`/api/orders/${id_order}`, {
     method: 'DELETE',
   });
-  if (!response.ok) {
-    throw new Error('Failed to delete order');
-  }
 };
 
 export const updateOrder = async (order) => {
-  const response = await fetch(`${API_URL}/api/orders/${order.id_order}`, {
+  return await fetchProtectedData(`/api/orders/${order.id_order}`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(order),
   });
-  if (!response.ok) {
-    throw new Error('Failed to update order');
-  }
-  return response.json();
 };
 
 export const fetchOrderById = async (id_order) => {

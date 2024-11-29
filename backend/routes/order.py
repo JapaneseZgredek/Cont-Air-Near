@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from datetime import datetime
-
 from backend.models import Operation
 from backend.models.order import Order, OrderStatus
 from backend.models.order_product import Order_product
+from backend.models.client import Client
 from backend.database import get_db
 from backend.logging_config import logger
 from pydantic import BaseModel
@@ -46,7 +46,7 @@ def read_orders_by_port(id_port: int, db: Session = Depends(get_db), current_use
 
 @router.get("/orders/client/{id_client}", response_model=List[OrderRead])
 def read_orders_by_client(id_client: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
-    orders = db.query(Order).filter(Order.id_client == id_client).all()
+    orders = db.query(Order).filter(Order.id_client == Client.id_client).all()
     if not orders:
         raise HTTPException(status_code=404, detail=f"No orders found for client with id: {id_client}")
     return orders
@@ -114,5 +114,4 @@ def delete_order(id_order: int, db: Session = Depends(get_db), current_user=Depe
     db.commit()
     return {
         "message": "Order deleted successfully",
-        "order": OrderRead.from_orm(db_order)
     }

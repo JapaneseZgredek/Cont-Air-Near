@@ -43,8 +43,9 @@ const OrderList = () => {
                 <h2>Order List</h2>
                 <OrderAdd onAdd={handleAddOrder} />
             </div>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
-            {orders.length > 0 ? (
+            {error ? (
+                <p style={{ color: 'red' }}>{error}</p>
+            ) : orders.length > 0 ? (
                 orders.map((order) => (
                     <OrderItem
                         key={order.id_order}
@@ -57,6 +58,7 @@ const OrderList = () => {
                 <p>No orders available.</p>
             )}
         </Container>
+
     );
 };
 
