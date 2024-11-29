@@ -7,7 +7,6 @@ from backend.logging_config import logger
 from pydantic import BaseModel
 from typing import List, Optional
 from ..models import Ship, Port, User
-from fastapi import APIRouter, Depends, HTTPException
 from .user import get_current_user
 
 
