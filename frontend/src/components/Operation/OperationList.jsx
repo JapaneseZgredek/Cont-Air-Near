@@ -43,12 +43,20 @@ const OperationList = () => {
                 <h2>Operation List</h2>
                 <AddOperation onAdd={handleAddOperation} />
             </div>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
-            {operations.length > 0 ? (
-                operations.map((operation) => <OperationItem key={operation.id_operation} operation={operation} onDelete={handleDeleteOperation} onUpdate={handleUpdateOperation}/>)
-            ) : (
-                <p>No operations available.</p>
-            )}
+            {error ? (
+                  <p style={{ color: 'red' }}>{error}</p>
+                ) : operations.length > 0 ? (
+                  operations.map((operation) => (
+                    <OperationItem
+                      key={operation.id_operation}
+                      operation={operation}
+                      onDelete={handleDeleteOperation}
+                      onUpdate={handleUpdateOperation}
+                    />
+                  ))
+                ) : (
+                  <p>No operations available.</p>
+                )}
         </Container>
     );
 };

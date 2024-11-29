@@ -1,5 +1,26 @@
+import axios from 'axios';
+
+const API_URL = 'http://localhost:8000';
+
+const getAuthToken = () => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    console.error('No token found in localStorage');
+  }
+  return token;
+};
+
+const authHeaders = () => {
+  const token = getAuthToken();
+  return {
+    Authorization: `Bearer ${token}`,
+    'Content-Type': 'application/json',
+  };
+};
+
+
 export const fetchShips = async () => {
-  const response = await fetch('http://localhost:8000/api/ships');
+  const response = await fetch(`${API_URL}/api/ships`);
   if (!response.ok) {
     throw new Error('Failed to fetch ships');
   }
@@ -7,22 +28,21 @@ export const fetchShips = async () => {
 };
 
 export const createShip = async (ship) => {
-  const response = await fetch('http://localhost:8000/api/ships', {
+  const response = await fetch(`${API_URL}/api/ships`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: authHeaders(),
     body: JSON.stringify(ship),
   });
   if (!response.ok) {
     throw new Error('Failed to create ship');
   }
   return response.json();
-}
+};
 
 export const deleteShip = async (id) => {
-  const response = await fetch(`http://localhost:8000/api/ships/${id}`, {
+  const response = await fetch(`${API_URL}/api/ships/${id}`, {
     method: 'DELETE',
+    headers: authHeaders(),
   });
   if (!response.ok) {
     throw new Error('Failed to delete ship');
@@ -30,13 +50,18 @@ export const deleteShip = async (id) => {
 };
 
 export const updateShip = async (ship) => {
-  const response = await fetch(`http://localhost:8000/api/ships/${ship.id_ship}`, {
+  const response = await fetch(`${API_URL}/api/ships/${ship.id_ship}`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers: authHeaders(),
     body: JSON.stringify(ship),
   });
+  if (!response.ok) {
+    throw new Error('Failed to update ship');
+  }
   return response.json();
 };
+
+
 
 
 // Operation table related
@@ -48,103 +73,69 @@ export async function fetchOperationsByPort(portId) {
   return await response.json()
 }
 
-export async function fetchOperationsByShip(shipId) {
-  const response = await fetch(`http://localhost:8000/api/operations/ship/${shipId}`);
-  if (!response.ok) {
-    throw new Error(`Failed to fetch operations for ship ${shipId}`);
-  }
-  return await response.json();
-}
-export const fetchOperations = async() => {
-  const response = await fetch(`http://localhost:8000/api/operations/`);
-
-  if(!response.ok){
-    throw new Error('Failed to fetch operations')
-  }
-  return response.json();
+export const fetchOperations = async () => {
+  return await fetchProtectedData('/api/operations/');
 };
 
-export const createOperation = async(operation) => {
-  const response = await fetch(`http://localhost:8000/api/operations/`, {
-     method: 'POST',
-     headers: {
-      'Content-Type': 'application/json',
-     },
-     body: JSON.stringify(operation),
-  });
-  if (!response.ok) {
-    throw new Error('Failed to create operation');
-  }
-  return response.json();
-};
 
-export const deleteOperation = async (id_operation) => {
-  const response = await fetch(`http://localhost:8000/api/operations/${id_operation}`, {
-    method: 'DELETE',
-  });
-  if (!response.ok) {
-    throw new Error('Failed to create operation');
-  }
-};
 
-export const updateOperation = async(operation) => {
-  const response = await fetch(`http://localhost:8000/api/operations/${operation.id_operation}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+export const createOperation = async (operation) => {
+  return await fetchProtectedData('/api/operations/', {
+    method: 'POST',
     body: JSON.stringify(operation),
   });
-  return response.json();
 };
+
+
+
+export const deleteOperation = async (id_operation) => {
+  return await fetchProtectedData(`/api/operations/${id_operation}`, {
+    method: 'DELETE',
+  });
+};
+
+export const updateOperation = async (operation) => {
+  return await fetchProtectedData(`/api/operations/${operation.id_operation}`, {
+    method: 'PUT',
+    body: JSON.stringify(operation),
+  });
+};
+
+
+
 
 // Ports table related
 
 export const fetchPorts = async () => {
-  const response = await fetch('http://localhost:8000/api/ports');
-  if (!response.ok) {
-    throw new Error('Failed to fetch ports');
-  }
-  return response.json();
+  return await fetchProtectedData('/api/ports');
 };
+
 
 export const createPort = async (port) => {
-  const response = await fetch('http://localhost:8000/api/ports', {
+  return await fetchProtectedData('/api/ports', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
     body: JSON.stringify(port),
   });
-  if (!response.ok) {
-    throw new Error('Failed to create port');
-  }
-  return response.json();
 };
 
+
 export const deletePort = async (id_port) => {
-  const response = await fetch(`http://localhost:8000/api/ports/${id_port}`, {
+  return await fetchProtectedData(`/api/ports/${id_port}`, {
     method: 'DELETE',
   });
-  if (!response.ok) {
-    throw new Error('Failed to delete port');
-  }
 };
 
 export const updatePort = async (port) => {
-  const response = await fetch(`http://localhost:8000/api/ports/${port.id_port}`, {
+  return await fetchProtectedData(`/api/ports/${port.id_port}`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(port),
   });
-  if (!response.ok) {
-    throw new Error('Failed to update port');
-  }
-  return response.json();
 };
 
 // Products table related
 
 export const fetchProducts = async () => {
-  const response = await fetch('http://localhost:8000/api/products');
+  const response = await fetch(`${API_URL}/api/products`);
   if (!response.ok) {
     throw new Error('Failed to fetch products');
   }
@@ -152,7 +143,7 @@ export const fetchProducts = async () => {
 };
 
 export const createProduct = async (product) => {
-  const response = await fetch('http://localhost:8000/api/products', {
+  const response = await fetch(`${API_URL}/api/products`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -166,7 +157,7 @@ export const createProduct = async (product) => {
 };
 
 export const deleteProduct = async (id_product) => {
-  const response = await fetch(`http://localhost:8000/api/products/${id_product}`, {
+  const response = await fetch(`${API_URL}/api/products/${id_product}`, {
     method: 'DELETE',
   });
   if (!response.ok) {
@@ -175,7 +166,7 @@ export const deleteProduct = async (id_product) => {
 };
 
 export const updateProduct = async (product) => {
-  const response = await fetch(`http://localhost:8000/api/products/${product.id_product}`, {
+  const response = await fetch(`${API_URL}/api/products/${product.id_product}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(product),
@@ -189,7 +180,7 @@ export const updateProduct = async (product) => {
 //Orders table related
 
 export const fetchOrders = async () => {
-  const response = await fetch('http://localhost:8000/api/orders');
+  const response = await fetch('${API_URL}/api/orders');
   if (!response.ok) {
     throw new Error('Failed to fetch orders');
   }
@@ -213,7 +204,7 @@ export const fetchOrdersByClient = async (client_id) => {
 }
 
 export const createOrder = async (order) => {
-  const response = await fetch('http://localhost:8000/api/orders', {
+  const response = await fetch('${API_URL}/api/orders', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -227,7 +218,7 @@ export const createOrder = async (order) => {
 };
 
 export const deleteOrder = async (id_order) => {
-  const response = await fetch(`http://localhost:8000/api/orders/${id_order}`, {
+  const response = await fetch(`${API_URL}/api/orders/${id_order}`, {
     method: 'DELETE',
   });
   if (!response.ok) {
@@ -236,7 +227,7 @@ export const deleteOrder = async (id_order) => {
 };
 
 export const updateOrder = async (order) => {
-  const response = await fetch(`http://localhost:8000/api/orders/${order.id_order}`, {
+  const response = await fetch(`${API_URL}/api/orders/${order.id_order}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(order),
@@ -248,7 +239,7 @@ export const updateOrder = async (order) => {
 };
 
 export const fetchOrderById = async (id_order) => {
-  const response = await fetch(`http://localhost:8000/api/orders/${id_order}`);
+  const response = await fetch(`${API_URL}/api/orders/${id_order}`);
   if (!response.ok) {
     throw new Error('Failed to fetch order details');
   }
@@ -368,7 +359,7 @@ export const fetchOrders_productsByProduct = async (product_id) => {
 };
 
 export const fetchClients = async () => {
-  const response = await fetch('http://localhost:8000/api/clients');
+  const response = await fetch(`${API_URL}/api/clients`);
   if (!response.ok) {
     throw new Error('Failed to fetch clients');
   }
@@ -376,7 +367,7 @@ export const fetchClients = async () => {
 };
 
 export const createClient = async (client) => {
-  const response = await fetch('http://localhost:8000/api/clients', {
+  const response = await fetch(`${API_URL}/api/clients`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -390,7 +381,7 @@ export const createClient = async (client) => {
 }
 
 export const deleteClient = async (id) => {
-  const response = await fetch(`http://localhost:8000/api/clients/${id}`, {
+  const response = await fetch(`${API_URL}/api/clients/${id}`, {
     method: 'DELETE',
   });
   if (!response.ok) {
@@ -399,10 +390,74 @@ export const deleteClient = async (id) => {
 };
 
 export const updateClient = async (client) => {
-  const response = await fetch(`http://localhost:8000/api/clients/${client.id_client}`, {
+  const response = await fetch(`${API_URL}/api/clients/${client.id_client}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(client),
   });
   return response.json();
 };
+
+
+// Login
+export const loginUser = async (credentials) => {
+  const response = await fetch(`${API_URL}/api/users/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(credentials),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.detail || 'Login failed');
+  }
+
+  return await response.json();
+};
+
+// Register
+export const registerUser = async (userData) => {
+  const response = await fetch(`${API_URL}/api/users`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(userData),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.detail || 'Registration failed');
+  }
+
+  return await response.json();
+};
+
+export const fetchProtectedData = async (endpoint, options = {}) => {
+    const token = getAuthToken();
+    if (!token) {
+        throw new Error("Authentication token not found");
+    }
+
+    const headers = {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+        ...options.headers,
+    };
+
+    const response = await fetch(`${API_URL}${endpoint}`, {
+        ...options,
+        headers,
+    });
+
+    if (!response.ok) {
+        const error = await response.json();
+        console.error(`Error fetching ${endpoint}:`, error);
+        throw new Error(error.detail || "Failed to fetch protected data");
+    }
+
+    return response.json();
+};
+
+
+
+
+

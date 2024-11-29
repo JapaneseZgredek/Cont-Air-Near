@@ -29,7 +29,7 @@ jobs:
         PYTHONPATH: "${{ github.workspace }}"
       working-directory: backend
       run: |
-        uvicorn main:app --host 0.0.0.0 --port 8000 &
+        uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000 &
 
     - name: Wait for server to start
       run: |
