@@ -29,23 +29,23 @@ const NavbarComponent = () => {
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="ml-auto">
                         {/* Public Links */}
-                        <LinkContainer to="/ships">
-                            <Nav.Link>Ships</Nav.Link>
-                        </LinkContainer>
+                        {/* New Unprotected Tables */}
                         <LinkContainer to="/products">
                             <Nav.Link>Products</Nav.Link>
-                        </LinkContainer>
-                        {/* New Unprotected Tables */}
-                        <LinkContainer to="/order_products">
-                            <Nav.Link>Order_products</Nav.Link>
-                        </LinkContainer>
-                        <LinkContainer to="/order_histories">
-                            <Nav.Link>OrderHistory</Nav.Link>
                         </LinkContainer>
                         {/* Conditional Links Based on Authentication */}
                         {isLoggedIn ? (
                             <>
                                 {/* Protected Links */}
+                                <LinkContainer to="/ships">
+                                    <Nav.Link>Ships</Nav.Link>
+                                </LinkContainer>
+                                <LinkContainer to="/order_products">
+                                    <Nav.Link>Order_products</Nav.Link>
+                                </LinkContainer>
+                                <LinkContainer to="/order_histories">
+                                    <Nav.Link>OrderHistory</Nav.Link>
+                                </LinkContainer>
                                 <LinkContainer to="/operations">
                                     <Nav.Link>Operations</Nav.Link>
                                 </LinkContainer>
