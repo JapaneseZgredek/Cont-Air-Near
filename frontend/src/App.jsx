@@ -23,16 +23,40 @@ const App = () => {
                 {/* Public Routes */}
                 {/* Guest Tables */}
                 <Route path="/" element={<HomePage />} />
-                <Route path="/ships" element={<ShipPage />} />
                 <Route path="/products" element={<ProductPage />} />
                 {/* New Unprotected Tables */}
-                <Route path="/order_products" element={<Order_productPage />} />
-                <Route path="/order_histories" element={<OrderHistoryPage />} />
                 {/*Login & Register*/}
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
 
                 {/* Protected Routes */}
+                <Route
+                    path="/ships"
+                    element={
+                        <ProtectedRoute>
+                            <ShipPage />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/order_products"
+                    element={
+                        <ProtectedRoute>
+                            <Order_productPage />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/order_histories"
+                    element={
+                        <ProtectedRoute>
+                            <OrderHistoryPage />
+                        </ProtectedRoute>
+                    }
+                />
+
                 <Route
                     path="/operations"
                     element={
