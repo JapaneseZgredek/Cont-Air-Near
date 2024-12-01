@@ -127,48 +127,39 @@ const AddOperation = ({ onAdd }) => {
                         </Form.Group>
 
                         <Form.Group className="mb-3">
-                          <Form.Label>Ship</Form.Label>
-                          <Form.Select
-                            value={idShip}
-                            onChange={(e) => setIdShip(e.target.value)}
-                            placeholder="Select ship"
-                            isInvalid={!!validationErrors.idShip}
+                            <Form.Label>Ship</Form.Label>
+                            <Form.Select
+                                value={idShip}
+                                onChange={(e) => setIdShip(e.target.value)}
+                                isInvalid={!!validationErrors.idShip}
                             >
-                              <Form.Control>
                                 <option value="">Select Ship</option>
-                			    {
-                			    	ships.map((ship) => (
-                			    		<option key={ship.id_ship} value={ship.id_ship}>{ship.name}</option>
-                			    	))
-                			    }
-                            </Form.Control>
+                                {ships.map((ship) => (
+                                    <option key={ship.id_ship} value={ship.id_ship}>{ship.name}</option>
+                                ))}
+                            </Form.Select>
                             <Form.Control.Feedback type="invalid">
                                 {validationErrors.idShip}
                             </Form.Control.Feedback>
-                          </Form.Select>
                         </Form.Group>
 
+
                         <Form.Group className="mb-3">
-                          <Form.Label>Port</Form.Label>
-                          <Form.Select
-                            value={idPort}
-                            onChange={(e) => setIdPort(e.target.value)}
-                            placeholder="Select port"
-                            isInvalid={!!validationErrors.idPort}
+                            <Form.Label>Port</Form.Label>
+                            <Form.Select
+                                value={idPort}
+                                onChange={(e) => setIdPort(e.target.value)}
+                                isInvalid={!!validationErrors.idPort}
                             >
-                            <Form.Control>
                                 <option value="">Select Port</option>
-                			    {
-                			    	ports.map((port) => (
-                			    		<option key={port.id_port} value={port.id_port}>{port.name}</option>
-                			    	))
-                			    }
-                            </Form.Control>
+                                {ports.map((port) => (
+                                    <option key={port.id_port} value={port.id_port}>{port.name}</option>
+                                ))}
+                            </Form.Select>
                             <Form.Control.Feedback type="invalid">
                                 {validationErrors.idPort}
                             </Form.Control.Feedback>
-                          </Form.Select>
-                        </Form.Group>
+                         </Form.Group>
 
                         <Button variant="success" type="submit">Add Operation</Button>
                     </Form>
