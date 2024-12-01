@@ -12,24 +12,41 @@ const AddOperation = ({ onAdd }) => {
     const [idShip, setIdShip] = useState('');
     const [idPort, setIdPort] = useState('');
     const [error, setError] = useState(null);
+    const [validationErrors, setValidationErrors] = useState({});
+
+    const validateInputs = () => {
+        const errors = {};
+
+        if (!nameOfOperation.trim()) errors.nameOfOperation = "Operation name is required";
+        if (!idShip) errors.idShip = "You must select a ship.";
+        if (!idPort) errors.idPort = "You must select a port.";
+        if (!dateOfOperation) errors.dateOfOperation = "Date of operation is required.";
+
+        return errors;
+    }
 
     const handleSubmit = async (e) => {
-      e.preventDefault();
-      try {
-        const newOperation = await createOperation({
-          name_of_operation: nameOfOperation,
-          operation_type: operationType.toLowerCase(),
-          date_of_operation: dateOfOperation || new Date().toISOString(),
-          id_ship: parseInt(idShip),
-          id_port: parseInt(idPort),
-        });
-        console.log('Operation created:', newOperation); // Debugging log
-        onAdd(newOperation);
-        setShow(false);
-      } catch (err) {
-        console.error('Failed to create operation:', err.message); // Debugging log
-        setError('Failed to create operation');
-      }
+        e.preventDefault();
+
+        const errors = validateInputs();
+        if (Object.keys(errors).length > 0) {
+            setValidationErrors(errors);
+            return;
+        }
+        try {
+            const newOperation = await createOperation({
+                name_of_operation: nameOfOperation,
+                operation_type: operationType,
+                date_of_operation: dateOfOperation || new Date().toISOString(),
+                id_ship: parseInt(idShip),
+                id_port: parseInt(idPort)
+            });
+            onAdd(newOperation);
+            setShow(false);
+            setValidationErrors({});
+        } catch (err) {
+            setError('Failed to create an operation');
+        }
     };
 
     //for ships/ports dropdown list
@@ -73,7 +90,11 @@ const AddOperation = ({ onAdd }) => {
                                 value={nameOfOperation}
                                 onChange={(e) => setNameOfOperation(e.target.value)}
                                 placeholder="Enter operation name"
+                                isInvalid={!!validationErrors.nameOfOperation}
                             />
+                            <Form.Control.Feedback type="invalid">
+                                {validationErrors.nameOfOperation}
+                            </Form.Control.Feedback>
                         </Form.Group>
 
                         <Form.Group className="mb-3">
@@ -93,12 +114,16 @@ const AddOperation = ({ onAdd }) => {
                         </Form.Group>
 
                         <Form.Group className="mb-3">
-                          <Form.Label>Date of Operation</Form.Label>
-                          <Form.Control
-                            type="datetime-local"
-                            value={dateOfOperation || new Date().toISOString().slice(0, 16)}
-                            onChange={(e) => setDateOfOperation(e.target.value)}
-                          />
+                            <Form.Label>Date of Operation</Form.Label>
+                            <Form.Control
+                                type="datetime-local"
+                                value={dateOfOperation || new Date().toISOString().slice(0, 16)}
+                                onChange={(e) => setDateOfOperation(e.target.value)}
+                                isInvalid={!!validationErrors.dateOfOperation}
+                            />
+                            <Form.Control.Feedback type="invalid">
+                                {validationErrors.dateOfOperation}
+                            </Form.Control.Feedback>
                         </Form.Group>
 
                         <Form.Group className="mb-3">
@@ -106,13 +131,20 @@ const AddOperation = ({ onAdd }) => {
                           <Form.Select
                             value={idShip}
                             onChange={(e) => setIdShip(e.target.value)}
-                          >
-                            <option value="">Select Ship</option>
-                            {ships.map((ship) => (
-                              <option key={ship.id_ship} value={ship.id_ship}>
-                                {ship.name || `Ship ${ship.id_ship}`}
-                              </option>
-                            ))}
+                            placeholder="Select ship"
+                            isInvalid={!!validationErrors.idShip}
+                            >
+                              <Form.Control>
+                                <option value="">Select Ship</option>
+                			    {
+                			    	ships.map((ship) => (
+                			    		<option key={ship.id_ship} value={ship.id_ship}>{ship.name}</option>
+                			    	))
+                			    }
+                            </Form.Control>
+                            <Form.Control.Feedback type="invalid">
+                                {validationErrors.idShip}
+                            </Form.Control.Feedback>
                           </Form.Select>
                         </Form.Group>
 
@@ -121,13 +153,20 @@ const AddOperation = ({ onAdd }) => {
                           <Form.Select
                             value={idPort}
                             onChange={(e) => setIdPort(e.target.value)}
-                          >
-                            <option value="">Select Port</option>
-                            {ports.map((port) => (
-                              <option key={port.id_port} value={port.id_port}>
-                                {port.name || `Port ${port.id_port}`}
-                              </option>
-                            ))}
+                            placeholder="Select port"
+                            isInvalid={!!validationErrors.idPort}
+                            >
+                            <Form.Control>
+                                <option value="">Select Port</option>
+                			    {
+                			    	ports.map((port) => (
+                			    		<option key={port.id_port} value={port.id_port}>{port.name}</option>
+                			    	))
+                			    }
+                            </Form.Control>
+                            <Form.Control.Feedback type="invalid">
+                                {validationErrors.idPort}
+                            </Form.Control.Feedback>
                           </Form.Select>
                         </Form.Group>
 

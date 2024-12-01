@@ -10,9 +10,26 @@ const OrderAdd = ({ onAdd }) => {
     const [ports, setPorts] = useState([]);
     const [clients, setClients] = useState([]);
     const [error, setError] = useState(null);
+    const [validationErrors, setValidationErrors] = useState({});
+
+
+    const validateInputs = () => {
+        const errors = {};
+        if (!idPort) errors.idPort = "Port must be selected.";
+        if (!idClient) errors.idClient = "Client must be selected.";
+
+        return errors;
+    }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        const errors = validateInputs();
+        if (Object.keys(errors).length > 0) {
+            setValidationErrors(errors);
+            return;
+        }
+
         const orderData = { status, id_port: parseInt(idPort), id_client: parseInt(idClient) };
         console.log("Sending data:", orderData); // Debugging
 
@@ -73,29 +90,41 @@ const OrderAdd = ({ onAdd }) => {
                         </Form.Group>
                         <Form.Group className="mb-3">
                             <Form.Label>Port ID</Form.Label>
-                            <Form.Select
+                            <Form.Control
+                                as="select"
+                                required
                                 value={idPort}
                                 onChange={(e) => setIdPort(e.target.value)}
-                                required
+                                placeholder="Select Port"
+                                isInvalid={!!validationErrors.idPort}
                             >
                                 <option value="">Select Port</option>
                                 {ports.map((port) => (
                                     <option key={port.id_port} value={port.id_port}>{port.name}</option>
                                 ))}
-                            </Form.Select>
+                            </Form.Control>
+                            <Form.Control.Feedback type="invalid">
+                                {validationErrors.idPort}
+                            </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group className="mb-3">
                             <Form.Label>Client</Form.Label>
-                            <Form.Select
+                            <Form.Control
+                                as="select"
+                                required
                                 value={idClient}
                                 onChange={(e) => setIdClient(e.target.value)}
-                                required
+                                placeholder="Select Client"
+                                isInvalid={!!validationErrors.idClient}
                             >
                                 <option value="">Select Client</option>
                                 {clients.map((client) => (
                                     <option key={client.id_client} value={client.id_client}>{client.name}</option>
                                 ))}
-                            </Form.Select>
+                            </Form.Control>
+                            <Form.Control.Feedback type="invalid">
+                                {validationErrors.idClient}
+                            </Form.Control.Feedback>
                         </Form.Group>
                         <Button variant="success" type="submit">Add Order</Button>
                     </Form>
