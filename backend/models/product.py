@@ -17,3 +17,5 @@ class Product(Base):
     #port = relationship("Port", back_populates="product")
     #poniższy wrzucić do port.py
     #products = relationship("Product", back_populates="port")
+
+    order_products=relationship("Order_product", back_populates="product")

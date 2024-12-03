@@ -52,14 +52,14 @@ def get_order_product(id_order: int, id_product: int, db: Session = Depends(get_
         raise HTTPException(status_code=404, detail="Order not found")
     return db_order_product
 
-@router.get("/orders_products/order/{id_order}", response_model=Order_productRead)
+@router.get("/orders_products/order/{id_order}", response_model=List[Order_productRead])
 def get_order_product_by_order(id_order: int, db: Session = Depends(get_db)):
     db_order_product = db.query(Order_product).filter(Order_product.id_order == id_order).all()
     if not db_order_product:
         raise HTTPException(status_code=404, detail="No order_products found with this order ID: {id_order}")
     return db_order_product
 
-@router.get("/orders_products/product/{id_product}", response_model=Order_productRead)
+@router.get("/orders_products/product/{id_product}", response_model=List[Order_productRead])
 def get_order_product_by_product(id_product: int, db: Session = Depends(get_db)):
     logger.info(f"Reading order_product with product id: {id_product}")
     db_order_product = db.query(Order_product).filter(
