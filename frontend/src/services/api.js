@@ -214,6 +214,22 @@ export const fetchOrders_products = async () => {
   return await fetchProtectedData(`/api/orders_products`);
 };
 
+export const fetchOrders_productsByOrder = async (order_id) => {
+  const response = await fetch(`http://localhost:8000/api/orders_products/order/${order_id}`)
+  if (!response.ok) {
+    throw new Error(`Failed to fetch order_products for order id: ${order_id}`)
+  }
+  return response.json();
+}
+
+export const fetchOrders_productsByProduct = async (product_id) => {
+  const response = await fetch(`http://localhost:8000/api/orders_products/product/${product_id}`)
+  if (!response.ok) {
+    throw new Error(`Failed to fetch order_products for product id: ${product_id}`)
+  }
+  return response.json();
+}
+
 export const createOrder_product = async (order_product) => {
   return await fetchProtectedData(`/api/orders_products`, {
     method: 'POST',

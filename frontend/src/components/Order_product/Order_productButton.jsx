@@ -1,12 +1,13 @@
 import React, {useEffect, useState} from 'react';
 import {Button, Modal, ModalBody, Spinner, Table} from 'react-bootstrap';
-import {fetchOrders_productsByOrder, fetchOrders_productsByProduct, fetchOrders_products} from "../../services/api";
+import {fetchOrders_productsByOrder, fetchOrders_productsByProduct, fetchOrders_products, fetchProducts} from "../../services/api";
 
 function Order_productsButton({orderId, productId, productName}) {
     if (!orderId && !productId) {
         throw new Error("OrdersButton requires either orderId or productId");
     }
     const [order_products, setOrder_products] = useState([]);
+    const [products, setProducts] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [loading, setLoading ] = useState(false);
     const [error, setError] = useState("");
@@ -15,13 +16,13 @@ function Order_productsButton({orderId, productId, productName}) {
         setLoading(true);
         try {
             let order_productsData;
-            //powinno być któreś z ifa, ale na razie są wszystkie
-            order_productsData = await fetchOrders_products();
-            /*if (orderId) {
+            if (orderId) {
                 order_productsData = await fetchOrders_productsByOrder(orderId);
+                const products_data = await fetchProducts();
+                setProducts(products_data);
             } else if (productId) {
                 order_productsData = await fetchOrders_productsByProduct(productId);
-            }*/
+            }
             setOrder_products(order_productsData);
         } catch (error) {
             console.error('Failed to fetch order_products:', error);
@@ -66,7 +67,7 @@ function Order_productsButton({orderId, productId, productName}) {
                                 <tr key={`${op.id_order}-${op.id_product}`}>
                                     <td>{index + 1}</td>
                                     <td>{op.id_order}</td>
-                                    <td>{productName ? productName : op.id_product}</td>
+                                    <td>{productName ? productName : products.find((product) => product.id_product === op.id_product)?.name || 'Unknown Product'}</td>
                                     <td>{op.quantity}</td>
                                 </tr>
                             )}

@@ -22,8 +22,7 @@ class Order(Base):
     client = relationship("Client", back_populates="orders")
     order_histories = relationship("OrderHistory", back_populates="order")
 
-    # TO DO: Add relationship with OrderProduct once the OrderProduct table is available
-    # order_products = relationship("OrderProduct", back_populates="order", cascade="all, delete-orphan")
+    order_products=relationship("Order_product", back_populates="order")
 
     # Placeholder for total price calculation
     @property
