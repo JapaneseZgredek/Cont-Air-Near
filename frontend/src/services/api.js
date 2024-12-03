@@ -180,6 +180,15 @@ export const fetchOrderById = async (id_order) => {
   return await fetchProtectedData(`/api/orders/${id_order}`);
 };
 
+export const fetchOrderHistoriesByOrder = async (orderId) => {
+  const response = await fetch(`http://localhost:8000/api/order_histories/order/${orderId}`);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch order histories for order id: ${orderId}`);
+  }
+  return response.json();
+};
+
+
 export const fetchOrderHistories = async () => {
   return await fetchProtectedData(`/api/order_histories`);
 };
