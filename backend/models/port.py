@@ -12,3 +12,4 @@ class Port(Base):
 
     operations = relationship("Operation", back_populates="port")
     orders = relationship("Order", back_populates="port")
+    products = relationship("Product", back_populates="port")

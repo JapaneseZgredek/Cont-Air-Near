@@ -30,6 +30,19 @@ class ProductRead(BaseModel):
     class Config:
         from_attributes = True
 
+
+@router.get("/products/port/{port_id}", response_model=List[ProductRead])
+def get_products_by_port(port_id: int, db: Session = Depends(get_db)):
+    """
+    Get all products for a specific port ID.
+    """
+    logger.info(f"Getting products for port ID: {port_id}")
+    products = db.query(Product).filter(Product.id_port == port_id).all()
+    if not products:
+        logger.warning(f"No products found for port ID: {port_id}")
+    return products
+
+
 @router.post("/products", response_model=ProductRead)
 def create_product(product: ProductCreate, db: Session = Depends(get_db)):
     logger.info(f"Creating new product: {product}")

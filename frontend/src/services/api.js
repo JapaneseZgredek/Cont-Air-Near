@@ -112,6 +112,15 @@ export const updatePort = async (port) => {
 
 // Products table related
 // Guest Table product
+
+export const fetchProductsByPort = async (portId) => {
+  const response = await fetch(`http://localhost:8000/api/products/port/${portId}`);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch products for port id: ${portId}`);
+  }
+  return response.json();
+};
+
 export const fetchProducts = async () => {
   const response = await fetch(`${API_URL}/api/products`);
   if (!response.ok) {
