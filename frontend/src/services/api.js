@@ -250,11 +250,11 @@ export const updateOrder_product = async (order_product) => {
   });
 };
 
-export const fetchOrders_productsByOrder = async (order_id) => {
+export const fetchOrders_productsByOrder_zapas = async (order_id) => {
   return await fetchProtectedData(`/api/orders_products/order/${order_id}`);
 };
 
-export const fetchOrders_productsByProduct = async (product_id) => {
+export const fetchOrders_productsByProduct_zapas = async (product_id) => {
     return await fetchProtectedData(`/api/orders_products/product/${product_id}`);
 };
 
