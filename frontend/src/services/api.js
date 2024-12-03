@@ -172,6 +172,17 @@ export const updateProduct = async (product) => {
   return response.json();
 };
 
+export const fetchProductImage = async (id_product) => {
+  const response = await fetch(`http://localhost:8000/api/products/image/${id_product}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch product image');
+  }
+  // response converted to Blob object
+  const imageBlob = await response.blob();
+  const imageUrl = URL.createObjectURL(imageBlob);
+  return imageUrl;
+};
+
 //Orders table related
 
 export const fetchOrders = async () => {

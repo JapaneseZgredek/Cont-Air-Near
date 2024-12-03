@@ -5,6 +5,9 @@ from backend.database import get_db
 from backend.logging_config import logger
 from pydantic import BaseModel
 from typing import List, Optional
+from fastapi.responses import FileResponse
+import os
+from pathlib import Path
 
 router = APIRouter()
 
@@ -93,3 +96,17 @@ def delete_product(id_product: int, db: Session = Depends(get_db)):
         "message": "Product deleted successfully",
         "product": ProductRead.from_orm(db_product)
     }
+
+@router.get("/products/image/{id_product}", response_model=ProductRead)
+def get_image(id_product: int):
+    uploads_dir = Path(__file__).resolve().parent.parent / 'uploads'
+    filename = f"product_{id_product}.jpg"
+    filepath = uploads_dir / filename
+    if os.path.exists(filepath):
+        return FileResponse(filepath)
+    else:
+        missing_filepath = uploads_dir / 'missing.jpg'
+        if os.path.exists(missing_filepath):
+            return FileResponse(missing_filepath)
+        else:
+            raise HTTPException(status_code=404, detail="Image not found for this product, and missing.jpg is also missing.")

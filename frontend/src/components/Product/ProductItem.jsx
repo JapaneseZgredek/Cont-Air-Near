@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, Button, Modal } from 'react-bootstrap';
-import { deleteProduct } from '../../services/api';
+import { deleteProduct , fetchProductImage } from '../../services/api';
 import UpdateProduct from "./UpdateProduct";
 import Order_productButton from "../Order_product/Order_productButton";
 
 const ProductItem = ({product, onUpdate, onDelete }) => {
     const [showConfirm, setShowConfirm] = useState(false);
     const [showUpdateModal, setShowUpdateModal] = useState(false);
+    const [imageUrl, setImageUrl] = useState(null);
+    const [loadingImage, setLoadingImage] = useState(true);
 
     const handleDelete = async () => {
         try{
@@ -26,6 +28,24 @@ const ProductItem = ({product, onUpdate, onDelete }) => {
         setShowUpdateModal(false);
     };
 
+  useEffect(() => {
+    const loadImage = async () => {
+      try {
+            setLoadingImage(true);
+            const url = await fetchProductImage(product.id_product);
+            setImageUrl(url);
+        } catch (error) {
+            console.error("Failed to load product image", error);
+            setImageUrl(null);
+        } finally {
+            setLoadingImage(false);
+        }
+    };
+
+    loadImage();
+    }, [product.id_product]);
+
+
     return(
         <>
             <Card className="mb-3">
@@ -35,6 +55,20 @@ const ProductItem = ({product, onUpdate, onDelete }) => {
                         <Card.Text>Price: {product.price}</Card.Text>
                         <Card.Text>Weight: {product.weight}</Card.Text>
                         {/*<Card.Text>Port ID: {product.id_port}</Card.Text>*/}
+                    </div>
+                    <div>
+                        {loadingImage ? (
+                            <div>Loading image...</div>
+                        ) : imageUrl ? (
+                            <img 
+                                src={imageUrl} 
+                                alt={`Product_${product.id_product}`} 
+                                style={{ maxWidth: '200px', maxHeight: '200px', objectFit: 'cover' }} 
+                                //TODO replace inline style by creating CSS
+                                />
+                        ) : (
+                            <div>Missing image</div>
+                        )}
                     </div>
                     <div>
                         <Button variant="warning" className="me-2" onClick={openUpdateModal}>Update</Button>
