@@ -30,6 +30,19 @@ class OrderHistoryRead(BaseModel):
         from_attributes = True
 
 
+@router.get("/order_histories/order/{order_id}", response_model=List[OrderHistoryRead])
+def get_order_histories_by_order_id(order_id: int, db: Session = Depends(get_db)):
+    """
+    Get all order histories for a specific order ID.
+    :param order_id:
+    :param db:
+    :return List of order histories based on OrderHistoryRead:
+    """
+    logger.info(f"Getting order histories for Order ID: {order_id}")
+    histories = db.query(OrderHistory).filter(OrderHistory.Order_id_order == order_id).all()
+    if not histories:
+        raise HTTPException(status_code=404, detail=f"No order_histories found for Order ID: {order_id}")
+    return histories
 
 @router.get("/order_histories", response_model=List[OrderHistoryRead])
 def get_all_order_histories(db: Session = Depends(get_db)):

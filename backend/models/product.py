@@ -12,10 +12,8 @@ class Product(Base):
     weight = Column(Float, nullable=False)
     created_at = Column(DateTime, default=datetime.now())
     updated_at = Column(DateTime, default=datetime.now(), onupdate=datetime.now())
-    #id_port = Column(Integer, ForeignKey('port.id_port'), nullable=False) #add
+    id_port = Column(Integer, ForeignKey('port.id_port'), nullable=False)
 
-    #port = relationship("Port", back_populates="product")
-    #poniższy wrzucić do port.py
-    #products = relationship("Product", back_populates="port")
+    port = relationship("Port", back_populates="products")
 
-    order_products=relationship("Order_product", back_populates="product")
+    order_products = relationship("Order_product", back_populates="product")

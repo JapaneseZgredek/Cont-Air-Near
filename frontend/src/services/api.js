@@ -112,6 +112,15 @@ export const updatePort = async (port) => {
 
 // Products table related
 // Guest Table product
+
+export const fetchProductsByPort = async (portId) => {
+  const response = await fetch(`http://localhost:8000/api/products/port/${portId}`);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch products for port id: ${portId}`);
+  }
+  return response.json();
+};
+
 export const fetchProducts = async () => {
   const response = await fetch(`${API_URL}/api/products`);
   if (!response.ok) {
@@ -179,6 +188,15 @@ export const updateOrder = async (order) => {
 export const fetchOrderById = async (id_order) => {
   return await fetchProtectedData(`/api/orders/${id_order}`);
 };
+
+export const fetchOrderHistoriesByOrder = async (orderId) => {
+  const response = await fetch(`http://localhost:8000/api/order_histories/order/${orderId}`);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch order histories for order id: ${orderId}`);
+  }
+  return response.json();
+};
+
 
 export const fetchOrderHistories = async () => {
   return await fetchProtectedData(`/api/order_histories`);
