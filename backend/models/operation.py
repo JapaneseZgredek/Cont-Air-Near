@@ -6,13 +6,13 @@ import enum
 from backend.database import Base
 
 class OperationType(enum.Enum):
-    AT_BAY = "at_bay"
-    TRANSPORT = "transport"
-    TRANSFER = "transfer"
-    DEPARTURE = "departure"
-    ARRIVAL = "arrival"
-    CARGO_LOADING = "loading"
-    CARGO_DISCHARGE = "discharge"
+    AT_BAY = "AT_BAY"
+    TRANSPORT = "TRANSPORT"
+    TRANSFER = "TRANSFER"
+    DEPARTURE = "DEPARTURE"
+    ARRIVAL = "ARRIVAL"
+    CARGO_LOADING = "CARGO_LOADING"
+    CARGO_DISCHARGE = "CARGO_DISCHARGE"
 
     #A Short disclaimer for others about OperationType (Enum)       TYPE/DESCRIPTION/is there a use case or not
     #                   -> change some of them or remove if not needed

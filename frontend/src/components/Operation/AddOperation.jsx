@@ -25,29 +25,38 @@ const AddOperation = ({ onAdd }) => {
         return errors;
     }
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+const handleSubmit = async (e) => {
+    e.preventDefault();
 
-        const errors = validateInputs();
-        if (Object.keys(errors).length > 0) {
-            setValidationErrors(errors);
-            return;
-        }
-        try {
-            const newOperation = await createOperation({
-                name_of_operation: nameOfOperation,
-                operation_type: operationType,
-                date_of_operation: dateOfOperation || new Date().toISOString(),
-                id_ship: parseInt(idShip),
-                id_port: parseInt(idPort)
-            });
-            onAdd(newOperation);
-            setShow(false);
-            setValidationErrors({});
-        } catch (err) {
-            setError('Failed to create an operation');
-        }
-    };
+    // Prevent double Submit
+    if (error) return;
+
+    const errors = validateInputs();
+    if (Object.keys(errors).length > 0) {
+        setValidationErrors(errors);
+        return;
+    }
+
+    try {
+        setError(null); // Clear previous errors
+        console.log("Sending payload to create operation");
+        const newOperation = await createOperation({
+            name_of_operation: nameOfOperation,
+            operation_type: operationType,
+            date_of_operation: dateOfOperation || new Date().toISOString(),
+            id_ship: parseInt(idShip),
+            id_port: parseInt(idPort),
+        });
+        console.log("Operation created:", newOperation);
+        onAdd(newOperation);
+        setShow(false);
+        setValidationErrors({});
+    } catch (err) {
+        console.error("Error creating operation:", err.message);
+        setError("Failed to create operation. Please try again.");
+    }
+};
+
 
     //for ships/ports dropdown list
     const [ships, setShips] = useState([]);

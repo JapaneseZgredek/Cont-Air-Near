@@ -5,10 +5,11 @@ const API_URL = 'http://localhost:8000';
 const getAuthToken = () => {
   const token = localStorage.getItem('token');
   if (!token) {
-    console.error('No token found in localStorage');
+    throw new Error('No token found');
   }
   return token;
 };
+
 
 const authHeaders = () => {
   const token = getAuthToken();
@@ -45,38 +46,70 @@ export const updateShip = async (ship) => {
 
 // Operation table related
 export async function fetchOperationsByPort(portId) {
+    await verifyRoles(['EMPLOYEE', 'ADMIN']);
     return await fetchProtectedData(`/api/operations/port/${portId}`);
 }
 
-export const fetchOperations = async () => {
-  return await fetchProtectedData(`/api/operations/`);
-};
-
-
 export async function fetchOperationsByShip(shipId) {
+  await verifyRoles(['EMPLOYEE', 'ADMIN']);
   return await fetchProtectedData(`/api/operations/ship/${shipId}`);
 }
 
+export const fetchOperations = async () => {
+  await verifyRoles(['EMPLOYEE', 'ADMIN']);
+  return await fetchProtectedData(`/api/operations/`);
+};
+
+// export const createOperation = async (operation) => {
+//   await verifyRoles(['EMPLOYEE', 'ADMIN']);
+//   return await fetchProtectedData(`/api/operations`, {
+//     method: 'POST',
+//     // body: JSON.stringify(operation),
+//   });
+// };
+
 export const createOperation = async (operation) => {
-  return await fetchProtectedData(`/api/operations/`, {
-    method: 'POST',
-    body: JSON.stringify(operation),
-  });
+    await verifyRoles(['EMPLOYEE', 'ADMIN']);
+    try {
+        console.log("Making POST request to /api/operations with payload:", operation);
+        const response = await axios.post(`${API_URL}/api/operations`, operation, {
+            headers: {
+                Authorization: `Bearer ${getAuthToken()}`,
+                'Content-Type': 'application/json',
+            },
+        });
+        console.log("Response from /api/operations:", response.data);
+        return await response.data;
+    } catch (error) {
+        console.error("Error in createOperation:", error.response?.data || error.message);
+        throw error.response?.data || new Error("Failed to create operation");
+    }
 };
 
 
-
 export const deleteOperation = async (id_operation) => {
+  await verifyRoles(['EMPLOYEE', 'ADMIN']);
   return await fetchProtectedData(`/api/operations/${id_operation}`, {
     method: 'DELETE',
   });
 };
 
 export const updateOperation = async (operation) => {
-  return await fetchProtectedData(`/api/operations/${operation.id_operation}`, {
-    method: 'PUT',
-    body: JSON.stringify(operation),
-  });
+    await verifyRoles(['EMPLOYEE', 'ADMIN']);
+    try {
+        console.log("Making PUT request to /api/operations with payload:", operation);
+        const response = await axios.put(`${API_URL}/api/operations/${operation.id_operation}`, operation, {
+            headers: {
+                Authorization: `Bearer ${getAuthToken()}`,
+                'Content-Type': 'application/json',
+            },
+        });
+        console.log("Response from /api/operations:", response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error in updateOperation:", error.response?.data || error.message);
+        throw error.response?.data || new Error("Failed to update operation");
+    }
 };
 
 
@@ -268,61 +301,164 @@ export const updateClient = async (client) => {
 
 // Login
 export const loginUser = async (credentials) => {
-  const response = await fetch(`${API_URL}/api/users/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(credentials),
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.detail || 'Login failed');
-  }
-
-  return await response.json();
+  const response = await axios.post(`${API_URL}/api/users/login`, credentials);
+  const { access_token, role } = response.data;
+  localStorage.setItem('token', access_token);
+  localStorage.setItem('role', role); // Ensure role is stored
+  return response.data;
 };
 
 // Register
 export const registerUser = async (userData) => {
-  const response = await fetch(`${API_URL}/api/users`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(userData),
-  });
+  const response = await axios.post(`${API_URL}/api/users`, userData);
+  return response.data;
+};
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.detail || 'Registration failed');
+
+
+// Role Verification
+
+// export const verifyRole = async (requiredRole) => {
+//   const token = getAuthToken();
+//   if (!token) {
+//     throw new Error('Authentication token not found');
+//   }
+//
+//   try {
+//     const response = await axios.get(`${API_URL}/api/users/me`, {
+//       headers: {
+//         Authorization: `Bearer ${token}`,
+//       },
+//     });
+//
+//     const { role } = response.data; // Assuming role is returned by the API
+//     if (role !== requiredRole) {
+//         throw new Error(`Insufficient permissions. Required role: ${requiredRole}`);
+//     }
+//
+//     return true;
+//   } catch (error) {
+//     console.error('Role verification failed:', error);
+//     throw error;
+//   }
+// };
+
+export const fetchCurrentUser = async () => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    console.error("Authentication token not found in localStorage.");
+    throw new Error("Authentication required. Please log in.");
   }
 
-  return await response.json();
+  try {
+    const response = await axios.get(`${API_URL}/api/users/me`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+    console.log("User details fetched:", response.data); // Debug response
+    return response.data; // Ensure this contains { role }
+  } catch (error) {
+    if (error.response?.status === 404) {
+      console.warn("/api/users/me endpoint not found. Falling back to localStorage.");
+      const role = localStorage.getItem('role');
+      if (!role) {
+        throw new Error("Role information is missing. Please log in.");
+      }
+      return { role }; // Minimal fallback response
+    }
+    console.error("Error fetching current user details:", error.message);
+    throw error;
+  }
 };
 
-export const fetchProtectedData = async (endpoint, options = {}) => {
-    const token = getAuthToken();
-    if (!token) {
-        throw new Error("Authentication token not found");
+
+
+export const verifyRoles = async (requiredRoles) => {
+  try {
+    const currentUser = await fetchCurrentUser();
+    const { role } = currentUser;
+
+    if (!role) {
+      throw new Error("User role is undefined. Please check the backend or localStorage.");
     }
 
-    const headers = {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-        ...options.headers,
-    };
+    console.log(`User role: ${role}, Required roles: ${requiredRoles.join(', ')}`); // Debug
+    if (!requiredRoles.includes(role)) {
+      throw new Error(
+        `Access denied. User role: ${role}, Required: ${requiredRoles.join(', ')}`
+      );
+    }
+    return true;
+  } catch (error) {
+    console.error("Role verification failed:", error.message);
+    throw error;
+  }
+};
 
-    const response = await fetch(`${API_URL}${endpoint}`, {
-        ...options,
-        headers,
+
+
+
+// const fetchProtectedData = async (endpoint, options = {}) => {
+//   const token = getAuthToken();
+//   const response = await axios(`${API_URL}${endpoint}`, {
+//     ...options,
+//     headers: {
+//       Authorization: `Bearer ${token}`,
+//       'Content-Type': 'application/json',
+//       ...options.headers,
+//     },
+//   });
+//
+//   return response.data;
+// };
+
+const fetchProtectedData = async (endpoint, options = {}) => {
+  const token = localStorage.getItem('token'); // Token retrieval logic
+  if (!token) {
+    console.error("Authentication token not found in localStorage");
+    throw new Error("Authentication required. Please log in.");
+  }
+
+  try {
+    const response = await axios(`${API_URL}${endpoint}`, {
+      ...options,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
     });
 
-    if (!response.ok) {
-        const error = await response.json();
-        console.error(`Error fetching ${endpoint}:`, error);
-        throw new Error(error.detail || "Failed to fetch protected data");
+    return response.data; // Return parsed JSON data
+  } catch (error) {
+    // Enhanced error handling
+    if (error.response) {
+      console.error(`Error fetching ${endpoint}:`, error.response.data);
+      if (error.response.status === 404) {
+        throw new Error("Endpoint not found. Please check the API URL.");
+      } else if (error.response.status === 403) {
+        throw new Error("Access denied. Insufficient permissions.");
+      } else if (error.response.status === 401) {
+        throw new Error("Unauthorized. Please log in again.");
+      } else {
+        throw new Error(
+          error.response.data.detail || "An error occurred while fetching data."
+        );
+      }
+    } else if (error.request) {
+      console.error("No response received from the server:", error.request);
+      throw new Error("Unable to reach the server. Please check your network.");
+    } else {
+      console.error("Error during request setup:", error.message);
+      throw new Error(error.message || "Unexpected error occurred.");
     }
-
-    return response.json();
+  }
 };
+
+
+
 
 
 
