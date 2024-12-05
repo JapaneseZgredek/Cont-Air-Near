@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, File, UploadFile
 from sqlalchemy.orm import Session
 from backend.models.product import Product
 from backend.database import get_db
@@ -10,6 +10,7 @@ import os
 from pathlib import Path
 
 router = APIRouter()
+uploads_dir = Path(__file__).resolve().parent.parent / 'uploads'
 
 class ProductCreate(BaseModel):
     name: str
@@ -99,7 +100,6 @@ def delete_product(id_product: int, db: Session = Depends(get_db)):
 
 @router.get("/products/image/{id_product}", response_model=ProductRead)
 def get_image(id_product: int):
-    uploads_dir = Path(__file__).resolve().parent.parent / 'uploads'
     filename = f"product_{id_product}.jpg"
     filepath = uploads_dir / filename
     if os.path.exists(filepath):
@@ -110,3 +110,27 @@ def get_image(id_product: int):
             return FileResponse(missing_filepath)
         else:
             raise HTTPException(status_code=404, detail="Image not found for this product, and missing.jpg is also missing.")
+
+@router.post("/products/image/{id_product}")
+async def upload_image(id_product: int, file: UploadFile = File(...)):
+    filename = f"product_{id_product}.jpg"
+    filepath = uploads_dir / filename
+
+    try:
+        uploads_dir.mkdir(parents=True, exist_ok=True)
+        with open(filepath, "wb") as buffer:
+            buffer.write(await file.read())
+
+        return {"message": "Image for product with id:{id_product} uploaded successfully."}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to upload image for product {id_product}: {e}")
+    
+@router.delete("/products/image/{id_product}")
+def delete_image(id_product: int):
+    filename = f"product_{id_product}.jpg"
+    filepath = uploads_dir / filename
+    if os.path.exists(filepath):
+        os.remove(filepath)
+        return {"detail": "Image deleted successfully"}
+    else:
+        raise HTTPException(status_code=404, detail="Image not found for this product")

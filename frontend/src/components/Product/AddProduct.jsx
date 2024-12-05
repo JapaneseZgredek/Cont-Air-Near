@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button, Form, Modal } from 'react-bootstrap';
-import { createProduct } from "../../services/api";
+import { createProduct, uploadProductImage } from "../../services/api";
 
 const AddProduct = ({ onAdd }) => {
     const [show, setShow] = useState(false);
@@ -8,6 +8,7 @@ const AddProduct = ({ onAdd }) => {
     const [price, setPrice] = useState('');
     const [weight, setWeight] = useState('');
     //const [idPort, setIdPort] = useState('');
+    const [imageFile, setImageFile] = useState(null);
     const [error, setError] = useState(null);
 
     const handleSubimt = async (e) => {
@@ -19,14 +20,23 @@ const AddProduct = ({ onAdd }) => {
                 weight: parseFloat(weight)
                 //, id_port: parseInt(idPort)
             });
+              // if image was chosen - uploading it
+            if (imageFile) {
+                await uploadProductImage(newProduct.id_product, imageFile);
+            }
             onAdd(newProduct);
             setShow(false);
             setName('');
             setPrice('');
             setWeight('');
+            setImageFile(null);
         } catch (err) {
             setError('Failed to create product')
         }
+    };
+
+    const handleImageChange = (e) => {
+        setImageFile(e.target.files[0]);
     };
 
     return (
@@ -77,6 +87,15 @@ const AddProduct = ({ onAdd }) => {
                                 placeholder="Enter port ID"
                             />
                         </Form.Group>*/}
+
+                        <Form.Group className="mb-3">
+                            <Form.Label>Product Image</Form.Label>
+                            <Form.Control
+                                type="file"
+                                accept="image/*"
+                                onChange={handleImageChange}
+                            />
+                        </Form.Group>
 
                         <Button varian="success" type="submit">Add Product</Button>
                     </Form>

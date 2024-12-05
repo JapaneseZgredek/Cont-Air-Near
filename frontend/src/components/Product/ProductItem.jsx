@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Button, Modal } from 'react-bootstrap';
-import { deleteProduct , fetchProductImage } from '../../services/api';
+import { deleteProduct , fetchProductImage, deleteProductImage } from '../../services/api';
 import UpdateProduct from "./UpdateProduct";
 import Order_productButton from "../Order_product/Order_productButton";
 
@@ -15,6 +15,7 @@ const ProductItem = ({product, onUpdate, onDelete }) => {
             await deleteProduct(product.id_product);
             onDelete(product.id_product);
             setShowConfirm(false);
+            deleteProductImage(product.id_product);
         } catch (error) {
             console.error('Failed to delete product: ', error);
         }
@@ -26,23 +27,24 @@ const ProductItem = ({product, onUpdate, onDelete }) => {
 
     const closeUpdateModal = () =>{
         setShowUpdateModal(false);
+        loadImage();
     };
 
-  useEffect(() => {
     const loadImage = async () => {
-      try {
-            setLoadingImage(true);
-            const url = await fetchProductImage(product.id_product);
-            setImageUrl(url);
-        } catch (error) {
-            console.error("Failed to load product image", error);
-            setImageUrl(null);
-        } finally {
-            setLoadingImage(false);
-        }
-    };
+        try {
+              setLoadingImage(true);
+              const url = await fetchProductImage(product.id_product);
+              setImageUrl(url);
+          } catch (error) {
+              console.error("Failed to load product image", error);
+              setImageUrl(null);
+          } finally {
+              setLoadingImage(false);
+          }
+      };
 
-    loadImage();
+    useEffect(() => {
+        loadImage();
     }, [product.id_product]);
 
 
