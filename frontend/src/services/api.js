@@ -197,17 +197,6 @@ export const uploadProductImage = async (id_product, file) => {
   return data;
 };
 
-export const deleteProductImage = async (id_product) => {
-  const response = await fetch(`http://localhost:8000/api/products/image/${id_product}`, {
-    method: 'DELETE',
-  });
-  if (!response.ok) {
-    throw new Error('Failed to delete product image');
-  }
-  const data = await response.json();
-  return data;
-};
-
 //Orders table related
 
 export const fetchOrders = async () => {

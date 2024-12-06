@@ -5,7 +5,9 @@ from backend.database import get_db
 from backend.logging_config import logger
 from pydantic import BaseModel
 from typing import List, Optional
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, StreamingResponse
+import base64
+from io import BytesIO
 import os
 from pathlib import Path
 
@@ -16,12 +18,14 @@ class ProductCreate(BaseModel):
     name: str
     price: float
     weight: float
+    image: str
     #id_port: int
 
 class ProductUpdate(BaseModel):
     name: Optional[str] = None
     price: Optional[float] = None
     weight: Optional[float] = None
+    image: Optional[str] = None
     #id_port: Optional[int] = None
 
 class ProductRead(BaseModel):
@@ -29,6 +33,7 @@ class ProductRead(BaseModel):
     name: str
     price: float
     weight: float
+    image: str
     #id_port: int
 
     class Config:
@@ -72,6 +77,8 @@ def update_product(id_product: int, product: ProductUpdate, db: Session = Depend
         db_product.price = product.price
     if product.weight is not None:
         db_product.weight = product.weight
+    if product.image is not None:
+        db_product.image = product.image
     if product.id_port is not None:
         db_product.id_port = product.id_port
 
@@ -99,38 +106,38 @@ def delete_product(id_product: int, db: Session = Depends(get_db)):
     }
 
 @router.get("/products/image/{id_product}", response_model=ProductRead)
-def get_image(id_product: int):
-    filename = f"product_{id_product}.jpg"
-    filepath = uploads_dir / filename
-    if os.path.exists(filepath):
-        return FileResponse(filepath)
+def get_image(id_product: int, db: Session = Depends(get_db)):
+    db_product = db.query(Product).filter(Product.id_product == id_product).first()
+    if db_product is None:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    if db_product.image:
+        try:
+            image_data = base64.b64decode(db_product.image)
+            image_io = BytesIO(image_data)
+            return StreamingResponse(image_io, media_type="image/jpeg")
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Failed to decode image for product {id_product}: {e}")
+
     else:
         missing_filepath = uploads_dir / 'missing.jpg'
         if os.path.exists(missing_filepath):
             return FileResponse(missing_filepath)
         else:
-            raise HTTPException(status_code=404, detail="Image not found for this product, and missing.jpg is also missing.")
+            raise HTTPException(status_code=404, detail="Image not found and missing.jpg is also missing.")
 
 @router.post("/products/image/{id_product}")
-async def upload_image(id_product: int, file: UploadFile = File(...)):
-    filename = f"product_{id_product}.jpg"
-    filepath = uploads_dir / filename
-
+async def upload_image(id_product: int, file: UploadFile = File(...), db: Session = Depends(get_db)):
     try:
-        uploads_dir.mkdir(parents=True, exist_ok=True)
-        with open(filepath, "wb") as buffer:
-            buffer.write(await file.read())
-
-        return {"message": "Image for product with id:{id_product} uploaded successfully."}
+        file_content = await file.read()
+        converted_image = base64.b64encode(file_content).decode("utf-8")
+        
+        db_product = db.query(Product).filter(Product.id_product == id_product).first()
+        if db_product is None:
+            raise HTTPException(status_code=404, detail="Product not found")
+        db_product.image = converted_image
+        db.commit()
+        return {"message": f"Image for product with id {id_product} uploaded and saved successfully in Base64."}
     except Exception as e:
+        db.rollback()
         raise HTTPException(status_code=500, detail=f"Failed to upload image for product {id_product}: {e}")
-    
-@router.delete("/products/image/{id_product}")
-def delete_image(id_product: int):
-    filename = f"product_{id_product}.jpg"
-    filepath = uploads_dir / filename
-    if os.path.exists(filepath):
-        os.remove(filepath)
-        return {"detail": "Image deleted successfully"}
-    else:
-        raise HTTPException(status_code=404, detail="Image not found for this product")

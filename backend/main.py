@@ -6,7 +6,7 @@ from backend.routes import ship, operation, port, product, order, client, order_
 from backend.logging_config import logger
 from fastapi.middleware.cors import CORSMiddleware
 
-# Base.metadata.drop_all(bind=engine)   <- to drop tables
+#Base.metadata.drop_all(bind=engine)   # to drop tables
 
 Base.metadata.create_all(bind=engine)   # to create them
 

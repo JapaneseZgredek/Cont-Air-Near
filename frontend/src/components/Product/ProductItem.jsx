@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Button, Modal } from 'react-bootstrap';
-import { deleteProduct , fetchProductImage, deleteProductImage } from '../../services/api';
+import { deleteProduct , fetchProductImage } from '../../services/api';
 import UpdateProduct from "./UpdateProduct";
 import Order_productButton from "../Order_product/Order_productButton";
 
@@ -15,7 +15,6 @@ const ProductItem = ({product, onUpdate, onDelete }) => {
             await deleteProduct(product.id_product);
             onDelete(product.id_product);
             setShowConfirm(false);
-            deleteProductImage(product.id_product);
         } catch (error) {
             console.error('Failed to delete product: ', error);
         }

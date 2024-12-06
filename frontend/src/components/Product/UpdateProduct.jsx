@@ -1,14 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Form, Modal } from 'react-bootstrap';
-import { updateProduct, uploadProductImage, deleteProductImage } from '../../services/api';
+import { updateProduct, uploadProductImage } from '../../services/api';
 
 const UpdateProduct = ({ product, show, onHide, onUpdate }) => {
   const [name, setName] = useState(product.name);
   const [price, setPrice] = useState(product.price);
   const [weight, setWeight] = useState(product.weight);
+  const [image, setImage] = useState(product.image ? "present" : "");
   //const [idPort, setIdPort] = useState(product.id_port);
   const [imageFile, setImageFile] = useState(null);
   const [deleteImage, setDeleteImage] = useState(false);
+  const [error, setError] = useState(null);
+
+  const maxImageWidth = 512;
+  const maxImageHeight = 512;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,18 +28,22 @@ const UpdateProduct = ({ product, show, onHide, onUpdate }) => {
      };
     
     try {
+      if (imageFile) {
+        await checkImageDimensions(imageFile);
+      }
+      if (deleteImage) {
+        updatedProduct.image="";
+      }
       const result = await updateProduct(updatedProduct);
       // if new image was chosen - uploading it
       if (imageFile) {
         await uploadProductImage(product.id_product, imageFile);
       }
-      if (deleteImage) {
-        await deleteProductImage(result.id_product);
-      }
+      setImage(deleteImage ? "" : "present");
       onUpdate(result);
       onHide();
     } catch (error) {
-      console.error('Failed to update product:', error);
+      setError('Failed to update product: '+ error);
     }
   };
 
@@ -45,6 +54,25 @@ const UpdateProduct = ({ product, show, onHide, onUpdate }) => {
   const handleDeleteImageChange = (e) => {
     setDeleteImage(e.target.checked);
   };
+
+  const checkImageDimensions = (file) => {
+    return new Promise((resolve, reject) => {
+        const validTypes = ['image/jpeg', 'image/png'];
+        if (!validTypes.includes(file.type)) {
+            return reject("\nInvalid file type. Allowed types: "+validTypes);
+        }
+        const img = new Image();
+        img.onload = () => {
+            if (img.width > maxImageWidth || img.height > maxImageHeight) {
+                reject("\nImage dimensions must not exceed "+maxImageWidth+"x"+maxImageHeight+" pixels.");
+            } else {
+                resolve();
+            }
+        };
+        img.onerror = () => reject("\nFailed to load image.");
+        img.src = URL.createObjectURL(file);
+    });
+  };  
 
   useEffect(() => {
     setImageFile(null);
@@ -57,6 +85,8 @@ const UpdateProduct = ({ product, show, onHide, onUpdate }) => {
         <Modal.Title>Update Product</Modal.Title>
       </Modal.Header>
       <Modal.Body>
+        {/*TODO move style to css*/}
+        {error && <p style={{ color: 'red'}}>{error}</p>}
         <Form onSubmit={handleSubmit}>
           <Form.Group className="mb-3">
             <Form.Label>Product Name</Form.Label>
@@ -104,14 +134,15 @@ const UpdateProduct = ({ product, show, onHide, onUpdate }) => {
             />
           </Form.Group>
           
-          {/*TODO dodać warunek sprawdzajacy czy już ma obrazek */}
-          <Form.Check
-            type="checkbox"
-            label="Delete Image"
-            checked={deleteImage}
-            onChange={handleDeleteImageChange}
-            className="mb-3"
-          />
+          {!(image === "" || imageFile) && (
+            <Form.Check
+              type="checkbox"
+              label="Delete Image"
+              checked={deleteImage}
+              onChange={handleDeleteImageChange}
+              className="mb-3"
+            />
+          )}
           
 
           <Button variant="success" type="submit">

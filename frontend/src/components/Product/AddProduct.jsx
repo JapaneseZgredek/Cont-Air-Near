@@ -11,13 +11,20 @@ const AddProduct = ({ onAdd }) => {
     const [imageFile, setImageFile] = useState(null);
     const [error, setError] = useState(null);
 
+    const maxImageWidth = 512;
+    const maxImageHeight = 512;
+
     const handleSubimt = async (e) => {
         e.preventDefault();
         try {
+            if (imageFile) {
+                await checkImageDimensions(imageFile);
+            }
             const newProduct = await createProduct({
                 name, 
                 price: parseFloat(price), 
-                weight: parseFloat(weight)
+                weight: parseFloat(weight),
+                image: ""
                 //, id_port: parseInt(idPort)
             });
               // if image was chosen - uploading it
@@ -31,12 +38,31 @@ const AddProduct = ({ onAdd }) => {
             setWeight('');
             setImageFile(null);
         } catch (err) {
-            setError('Failed to create product')
+            setError('Failed to create product'+err)
         }
     };
 
     const handleImageChange = (e) => {
         setImageFile(e.target.files[0]);
+    };
+
+    const checkImageDimensions = (file) => {
+        return new Promise((resolve, reject) => {
+            const validTypes = ['image/jpeg', 'image/png'];
+            if (!validTypes.includes(file.type)) {
+                return reject("\nInvalid file type. Allowed types: "+validTypes);
+            }
+            const img = new Image();
+            img.onload = () => {
+                if (img.width > maxImageWidth || img.height > maxImageHeight) {
+                    reject("\nImage dimensions must not exceed "+maxImageWidth+"x"+maxImageHeight+" pixels.");
+                } else {
+                    resolve();
+                }
+            };
+            img.onerror = () => reject("\nFailed to load image.");
+            img.src = URL.createObjectURL(file);
+        });
     };
 
     return (
