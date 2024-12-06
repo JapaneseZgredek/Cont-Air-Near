@@ -16,13 +16,11 @@ class Order(Base):
     date_of_order = Column(DateTime, default=datetime.now, nullable=False)
     status = Column(Enum(OrderStatus), default=OrderStatus.PENDING, nullable=False)
     id_port = Column(Integer, ForeignKey('port.id_port'), nullable=False)
-    # TO DO: Add id_client when Client table is available
-    # id_client = Column(Integer, ForeignKey('client.id_client'), nullable=True)
+    id_client = Column(Integer, ForeignKey('client.id_client'), nullable=True)
 
     port = relationship("Port", back_populates="orders")
-
-    # TO DO: Add relationship with Client when the Client model is available
-    # client = relationship("Client", back_populates="orders")
+    client = relationship("Client", back_populates="orders")
+    order_histories = relationship("OrderHistory", back_populates="order")
 
     order_products=relationship("Order_product", back_populates="order")
 

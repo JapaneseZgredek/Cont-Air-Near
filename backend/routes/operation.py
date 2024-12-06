@@ -6,6 +6,9 @@ from backend.database import get_db
 from backend.logging_config import logger
 from pydantic import BaseModel
 from typing import List, Optional
+from ..models import Ship, Port, User
+from .user import get_current_user
+
 
 router = APIRouter()
 
@@ -33,59 +36,109 @@ class OperationRead(BaseModel):
     id_port: int
 
     class Config:
-        from_attributes = True
+        orm_mode = True     # Add   -> wszystko hula trzeba tak dla delete operacji bo inaczej nie zadziała
+        # from_attributes = True        # musi być na orm_mode inaczej auth nie przejdzie
 
-@router.get("/operations", response_model=List[OperationRead])
-def get_all_operations(db: Session = Depends(get_db)):
-    logger.info("Getting all operations")
-    operations = db.query(Operation).all()
+#Dodać authentykacje
+@router.get("/operations/port/{id_port}", response_model=List[OperationRead])
+def get_operations_by_port(id_port: int, db: Session = Depends(get_db)):
+    operations = db.query(Operation).filter(Operation.id_port == id_port).all()
+    if not operations:
+        raise HTTPException(status_code=404, detail=f"No operations found for port with id: {id_port}")
+    return operations
+
+#Dodać authentykacje
+@router.get("/operations/ship/{id_ship}", response_model=List[OperationRead])
+def get_operations_by_ship(id_ship: int, db: Session = Depends(get_db)):
+    operations = db.query(Operation).filter(Operation.id_ship == id_ship).all()
+    if not operations:
+        raise HTTPException(status_code=404, detail=f"No operations found for ship with id: {id_ship}")
     return operations
 
 @router.get("/operations/{id_operation}", response_model=OperationRead)
-def read_operation(id_operation: int, db: Session = Depends(get_db)):
-    logger.info(f"Reading operation with id: {id_operation}")
-    #operation = db.query(Operation).get(id_operation)
-    db_operation = db.query(Operation).filter(Operation.id_operation == id_operation).first()
-    if db_operation is None:
-        logger(f"Operation with id: {id_operation} not found")
-        raise HTTPException(status_code=404, detail="Operation not found")
-    return db_operation
+def get_operation(
+    id_operation: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)
+):
+    logger.info(f"Fetching operation with ID {id_operation}")
+    operation = db.query(Operation).filter(Operation.id_operation == id_operation).first()
+    if not operation:
+        raise HTTPException(
+            status_code=404, detail="Operation not found"
+        )
+    return operation
+
+@router.get("/operations", response_model=List[OperationRead])
+def get_all_operations(
+    db: Session = Depends(get_db), current_user=Depends(get_current_user)
+):
+    logger.info("Fetching all operations")
+    operations = db.query(Operation).all()
+    if not operations:
+        raise HTTPException(
+            status_code=404, detail="No operations found"
+        )
+    return operations
 
 @router.post("/operations", response_model=OperationRead)
-def create_operation(operation: OperationCreate, db: Session = Depends(get_db)):
+def create_operation(
+    operation: OperationCreate, db: Session = Depends(get_db), current_user=Depends(get_current_user)
+):
     logger.info(f"Creating operation: {operation}")
-    db_operation = Operation(**operation.dict())
+
+    # Ship
+    ship = db.query(Ship).filter(Ship.id_ship == operation.id_ship).first()
+    if not ship:
+        logger.error(f"Ship with ID {operation.id_ship} not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Ship not found"
+        )
+
+    # Port
+    port = db.query(Port).filter(Port.id_port == operation.id_port).first()
+    if not port:
+        logger.error(f"Port with ID {operation.id_port} not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Port not found"
+        )
+
+    # Operation
+    db_operation = Operation(
+        name_of_operation=operation.name_of_operation,
+        operation_type=operation.operation_type,
+        date_of_operation=operation.date_of_operation or datetime.now(),
+        id_ship=operation.id_ship,
+        id_port=operation.id_port,
+    )
     db.add(db_operation)
     db.commit()
     db.refresh(db_operation)
     return db_operation
 
-@router.put("/operations/{id_operation}", response_model=OperationRead)
-def update_operation(id_operation: int, operation: OperationUpdate, db: Session = Depends(get_db)):
-    logger.info(f"Updating operation: {operation}")
-    db_operation = db.query(Operation).filter(Operation.id_operation == id_operation).first()
-    if db_operation is None:
-        logger(f"Operation with id: {id_operation} not found")
-        raise HTTPException(status_code=404, detail="Operation not found")
 
-    if operation.name_of_operation is not None:
-        db_operation.name_of_operation = operation.name_of_operation
-    if operation.operation_type is not None:
-        db_operation.operation_type = operation.operation_type
-    if operation.date_of_operation is not None:
-        db_operation.date_of_operation = operation.date_of_operation
-    if operation.id_ship is not None:
-        db_operation.id_ship = operation.id_ship
-    if operation.id_port is not None:
-        db_operation.id_port = operation.id_port
+@router.put("/operations/{id_operation}", response_model=OperationRead)
+def update_operation(
+    id_operation: int,
+    operation: OperationUpdate,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+    logger.info(f"Updating operation with ID {id_operation}")
+    db_operation = db.query(Operation).filter(Operation.id_operation == id_operation).first()
+    if not db_operation:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Operation not found"
+        )
+
+    for field, value in operation.dict(exclude_unset=True).items():
+        setattr(db_operation, field, value)
 
     db.commit()
     db.refresh(db_operation)
-
     return db_operation
 
+
 @router.delete("/operations/{id_operation}", response_model=dict)
-def delete_operation(id_operation: int, db: Session = Depends(get_db)):
+def delete_operation(id_operation: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     logger.info(f"Deleting operation with id: {id_operation}")
     db_operation = db.query(Operation).filter(Operation.id_operation == id_operation).first()
     if db_operation is None:
@@ -94,4 +147,5 @@ def delete_operation(id_operation: int, db: Session = Depends(get_db)):
     db.delete(db_operation)
     db.commit()
     return {"message": "Operation deleted successfully",
-            "operation": OperationRead.from_orm(db_operation)}
+            }
+    # "operation": OperationRead.from_orm(db_operation)}

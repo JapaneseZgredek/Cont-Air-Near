@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { Card, Button, Modal } from 'react-bootstrap';
 import { deletePort } from '../../services/api';
 import UpdatePort from "./UpdatePort";
+import OperationsButton from "../Operation/OperationsButton";
+import OrdersButton from "../Order/OrdersButton";
+import ProductButton from "../Product/ProductButton";
 
 const PortItem = ({ port, onUpdate, onDelete }) => {
     const [showConfirm, setShowConfirm] = useState(false);
@@ -35,6 +38,9 @@ const PortItem = ({ port, onUpdate, onDelete }) => {
                         <Card.Text>Country: {port.country}</Card.Text>
                     </div>
                     <div>
+                        <ProductButton className="me-2" portId={port.id_port} portName={port.name}/>
+                        <OperationsButton className="me-2" portId={port.id_port} portName={port.name}/>
+                        <OrdersButton portId={port.id_port} portName={port.name} />
                         <Button variant="warning" className="me-2" onClick={openUpdateModal}>Update</Button>
                         <Button variant="danger" onClick={() => setShowConfirm(true)}>Delete</Button>
                     </div>

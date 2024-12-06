@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Card, Button, Modal } from 'react-bootstrap';
 import { deleteShip } from '../../services/api';
 import UpdateShip from "./UpdateShip";
+import OperationsButton from "../Operation/OperationsButton";
 
 const ShipItem = ({ ship, onUpdate, onDelete }) => {
     const [showConfirm, setShowConfirm] = useState(false);
@@ -34,6 +35,7 @@ const ShipItem = ({ ship, onUpdate, onDelete }) => {
                     <Card.Text>Capacity: {ship.capacity}</Card.Text>
                 </div>
                 <div>
+                    <OperationsButton shipId={ship.id_ship} shipName={ship.name} />
                     <Button variant="warning" className="me-2" onClick={openUpdateModal}>Update</Button>
                     <Button variant="danger" onClick={() => setShowConfirm(true)}>Delete</Button>
                 </div>

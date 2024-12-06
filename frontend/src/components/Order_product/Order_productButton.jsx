@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {Button, Modal, ModalBody, Spinner, Table} from 'react-bootstrap';
-import {fetchOrders_productsByOrder, fetchOrders_productsByProduct, fetchProducts} from "../../services/api";
+import {fetchOrders_productsByOrder, fetchOrders_productsByProduct, fetchOrders_products, fetchProducts} from "../../services/api";
 
 function Order_productsButton({orderId, productId, productName}) {
     if (!orderId && !productId) {
@@ -15,7 +15,6 @@ function Order_productsButton({orderId, productId, productName}) {
     const openModal = async () => {
         setLoading(true);
         try {
-            
             let order_productsData;
             if (orderId) {
                 order_productsData = await fetchOrders_productsByOrder(orderId);
