@@ -149,6 +149,31 @@ export const updateProduct = async (product) => {
   });
 };
 
+export const fetchProductImage = async (id_product) => {
+  const response = await fetch(`http://localhost:8000/api/products/image/${id_product}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch product image');
+  }
+  // response converted to Blob object
+  const imageBlob = await response.blob();
+  const imageUrl = URL.createObjectURL(imageBlob);
+  return imageUrl;
+};
+
+export const uploadProductImage = async (id_product, file) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  const response = await fetch(`http://localhost:8000/api/products/image/${id_product}`, {
+    method: 'POST',
+    body: formData
+  });
+  if (!response.ok) {
+    throw new Error('Failed to upload product '+id_product+' image');
+  }
+  const data = await response.json();
+  return data;
+};
+
 //Orders table related
 
 export const fetchOrders = async () => {

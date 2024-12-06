@@ -1,11 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, Form, Modal } from 'react-bootstrap';
-import { updateProduct } from '../../services/api';
+import { updateProduct, uploadProductImage } from '../../services/api';
 
 const UpdateProduct = ({ product, show, onHide, onUpdate }) => {
   const [name, setName] = useState(product.name);
   const [price, setPrice] = useState(product.price);
   const [weight, setWeight] = useState(product.weight);
+  const [image, setImage] = useState(product.image ? "present" : "");
+  const [imageFile, setImageFile] = useState(null);
+  const [deleteImage, setDeleteImage] = useState(false);
+  const [error, setError] = useState(null);
+  const maxImageWidth = 512;
+  const maxImageHeight = 512;
   const [validationErrors, setValidationErrors] = useState({});
 
   const validateInputs = () => {
@@ -32,15 +38,59 @@ const UpdateProduct = ({ product, show, onHide, onUpdate }) => {
       price, 
       weight
      };
+    
     try {
+      if (imageFile) {
+        await checkImageDimensions(imageFile);
+      }
+      if (deleteImage) {
+        updatedProduct.image="";
+      }
       const result = await updateProduct(updatedProduct);
+      // if new image was chosen - uploading it
+      if (imageFile) {
+        await uploadProductImage(product.id_product, imageFile);
+      }
+      setImage(deleteImage ? "" : "present");
       onUpdate(result);
       onHide();
       setValidationErrors({});
     } catch (error) {
-      console.error('Failed to update product:', error);
+      setError('Failed to update product: '+ error);
     }
   };
+
+  const handleImageChange = (e) => {
+    setImageFile(e.target.files[0]);
+  };
+
+  const handleDeleteImageChange = (e) => {
+    setDeleteImage(e.target.checked);
+  };
+
+  const checkImageDimensions = (file) => {
+    return new Promise((resolve, reject) => {
+        const validTypes = ['image/jpeg', 'image/png'];
+        if (!validTypes.includes(file.type)) {
+            return reject("\nInvalid file type. Allowed types: "+validTypes);
+        }
+        const img = new Image();
+        img.onload = () => {
+            if (img.width > maxImageWidth || img.height > maxImageHeight) {
+                reject("\nImage dimensions must not exceed "+maxImageWidth+"x"+maxImageHeight+" pixels.");
+            } else {
+                resolve();
+            }
+        };
+        img.onerror = () => reject("\nFailed to load image.");
+        img.src = URL.createObjectURL(file);
+    });
+  };  
+
+  useEffect(() => {
+    setImageFile(null);
+    setDeleteImage(false);
+  }, [product]);
 
   return (
     <Modal show={show} onHide={onHide}>
@@ -48,6 +98,8 @@ const UpdateProduct = ({ product, show, onHide, onUpdate }) => {
         <Modal.Title>Update Product</Modal.Title>
       </Modal.Header>
       <Modal.Body>
+        {/*TODO move style to css*/}
+        {error && <p style={{ color: 'red'}}>{error}</p>}
         <Form onSubmit={handleSubmit}>
           <Form.Group className="mb-3">
             <Form.Label>Product Name</Form.Label>
@@ -88,6 +140,27 @@ const UpdateProduct = ({ product, show, onHide, onUpdate }) => {
               {validationErrors.weight}
             </Form.Control.Feedback>
           </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Label>Product Image</Form.Label>
+            <Form.Control
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+            />
+          </Form.Group>
+          
+          {!(image === "" || imageFile) && (
+            <Form.Check
+              type="checkbox"
+              label="Delete Image"
+              checked={deleteImage}
+              onChange={handleDeleteImageChange}
+              className="mb-3"
+            />
+          )}
+          
+
           <Button variant="success" type="submit">
             Save Changes
           </Button>
