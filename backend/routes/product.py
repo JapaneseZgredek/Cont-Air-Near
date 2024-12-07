@@ -12,20 +12,20 @@ class ProductCreate(BaseModel):
     name: str
     price: float
     weight: float
-    #id_port: int
+    id_port: int
 
 class ProductUpdate(BaseModel):
     name: Optional[str] = None
     price: Optional[float] = None
     weight: Optional[float] = None
-    #id_port: Optional[int] = None
+    id_port: Optional[int] = None
 
 class ProductRead(BaseModel):
     id_product: int
     name: str
     price: float
     weight: float
-    #id_port: int
+    id_port: int
 
     class Config:
         from_attributes = True
