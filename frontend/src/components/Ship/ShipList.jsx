@@ -3,15 +3,19 @@ import ShipItem from './ShipItem';
 import AddShip from './AddShip';
 import { fetchShips } from '../../services/api';
 import { Container } from 'react-bootstrap';
+import SearchAndFilterBar from '../SearchAndFilterBar'; // 🆕 Import komponentu do wyszukiwania i filtrowania
 
 const ShipList = () => {
     const [ships, setShips] = useState([]);
+    const [filteredShips, setFilteredShips] = useState([]);
+    const [searchInColumn, setSearchInColumn] = useState('');
     const [error, setError] = useState(null);
 
     const loadShips = async () => {
         try {
             const data = await fetchShips();
             setShips(data);
+            setFilteredShips(data);
         } catch (err) {
             setError('Failed to load ships');
         }
@@ -23,19 +27,48 @@ const ShipList = () => {
 
     const handleAddShip = (newShip) => {
         setShips((prevShips) => [...prevShips, newShip]);
+        setFilteredShips((prevShips) => [...prevShips, newShip]);
     };
 
-    const handleUpdateShip = (updateShip) => {
+    const handleUpdateShip = (updatedShip) => {
         setShips((prevShips) =>
             prevShips.map((ship) =>
-                ship.id_ship === updateShip.id_ship ? updateShip : ship
+                ship.id_ship === updatedShip.id_ship ? updatedShip : ship
+            )
+        );
+        setFilteredShips((prevShips) =>
+            prevShips.map((ship) =>
+                ship.id_ship === updatedShip.id_ship ? updatedShip : ship
             )
         );
     };
 
     const handleDeleteShip = (id) => {
         setShips((prevShips) => prevShips.filter((ship) => ship.id_ship !== id));
-    }
+        setFilteredShips((prevShips) => prevShips.filter((ship) => ship.id_ship !== id)); // 🆕 Usunięcie z filtrowanej listy
+    };
+
+    const handleSearch = (searchTerm) => {
+        if (!searchTerm) {
+            setFilteredShips(ships);
+        } else if (searchInColumn) {
+            const filtered = ships.filter(ship =>
+                ship[searchInColumn] && ship[searchInColumn].toString().toLowerCase().includes(searchTerm.toLowerCase())
+            );
+            setFilteredShips(filtered);
+        } else {
+            const filtered = ships.filter(ship =>
+                Object.values(ship).some(value =>
+                    value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+                )
+            );
+            setFilteredShips(filtered);
+        }
+    };
+
+    const handleSearchInChange = (column) => {
+        setSearchInColumn(column);
+    };
 
     return (
         <Container>
@@ -43,9 +76,24 @@ const ShipList = () => {
                 <h2>Ship List</h2>
                 <AddShip onAdd={handleAddShip} />
             </div>
-            {error && <p style={{ color: 'red'}}>{error}</p>}
-            {ships.length > 0 ? (
-                ships.map((ship) => <ShipItem key={ship.id_ship} ship={ship} onDelete={handleDeleteShip} onUpdate={handleUpdateShip}/>)
+
+            <SearchAndFilterBar
+                onSearch={handleSearch}
+                onSearchInChange={handleSearchInChange}
+                onSortChange={() => {}}
+                filterOptions={['name', 'capacity']}
+            />
+
+            {error && <p style={{ color: 'red' }}>{error}</p>}
+            {filteredShips.length > 0 ? (
+                filteredShips.map((ship) => (
+                    <ShipItem
+                        key={ship.id_ship}
+                        ship={ship}
+                        onDelete={handleDeleteShip}
+                        onUpdate={handleUpdateShip}
+                    />
+                ))
             ) : (
                 <p>No ships available.</p>
             )}

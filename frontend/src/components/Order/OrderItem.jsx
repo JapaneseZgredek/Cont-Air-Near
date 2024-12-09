@@ -4,10 +4,12 @@ import { deleteOrder } from '../../services/api';
 import OrderUpdate from './OrderUpdate';
 import Order_productButton from "../Order_product/Order_productButton";
 import OrderHistoryButton from "../OrderHistory/OrderHistoryButton";
+import GenericDetailModal from "../GenericDetailModal";
 
 const OrderItem = ({ order, onUpdate, onDelete }) => {
     const [showConfirm, setShowConfirm] = useState(false);
     const [showUpdateModal, setShowUpdateModal] = useState(false);
+    const [showDetailModal, setShowDetailModal] = useState(false);
 
     const handleDelete = async () => {
         try {
@@ -32,7 +34,13 @@ const OrderItem = ({ order, onUpdate, onDelete }) => {
             <Card className="mb-3">
                 <Card.Body className="d-flex justify-content-between align-items-center">
                     <div>
-                        <Card.Title>Order ID: {order.id_order}</Card.Title>
+                        <Card.Title
+                            className="clickable"
+                            onClick={() => setShowDetailModal(true)}
+                            style={{ cursor: 'pointer', textDecoration: 'underline' }}
+                        >
+                            Order ID: {order.id_order}
+                        </Card.Title>
                         <Card.Text>Status: {order.status}</Card.Text>
                         <Card.Text>Port ID: {order.id_port}</Card.Text>
                     </div>
@@ -55,6 +63,14 @@ const OrderItem = ({ order, onUpdate, onDelete }) => {
                     <Button variant="danger" onClick={handleDelete}>Yes, delete</Button>
                 </Modal.Footer>
             </Modal>
+
+            <GenericDetailModal
+                show={showDetailModal}
+                onHide={() => setShowDetailModal(false)}
+                title={`Order: ${order.id_order}`}
+                details={order}
+            />
+
 
             <OrderUpdate
                 order={order}
