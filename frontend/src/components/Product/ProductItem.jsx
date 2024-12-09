@@ -3,10 +3,12 @@ import { Card, Button, Modal } from 'react-bootstrap';
 import { deleteProduct } from '../../services/api';
 import UpdateProduct from "./UpdateProduct";
 import Order_productButton from "../Order_product/Order_productButton";
+import GenericDetailModal from "../GenericDetailModal";
 
 const ProductItem = ({product, onUpdate, onDelete }) => {
     const [showConfirm, setShowConfirm] = useState(false);
     const [showUpdateModal, setShowUpdateModal] = useState(false);
+    const [showDetailModal, setShowDetailModal] = useState(false);
 
     const handleDelete = async () => {
         try{
@@ -31,10 +33,16 @@ const ProductItem = ({product, onUpdate, onDelete }) => {
             <Card className="mb-3">
                 <Card.Body className="d-flex justify-content-between align-items-center">
                     <div>
-                        <Card.Title>{product.name}</Card.Title>
+                        <Card.Title
+                            className="clickable"
+                            onClick={() => setShowDetailModal(true)}
+                            style={{ cursor: 'pointer', textDecoration: 'underline' }}
+                        >
+                            {product.name}
+                        </Card.Title>
                         <Card.Text>Price: {product.price}</Card.Text>
                         <Card.Text>Weight: {product.weight}</Card.Text>
-                        {/*<Card.Text>Port ID: {product.id_port}</Card.Text>*/}
+                        <Card.Text>Port ID: {product.id_port}</Card.Text>
                     </div>
                     <div>
                         <Button variant="warning" className="me-2" onClick={openUpdateModal}>Update</Button>
@@ -56,6 +64,13 @@ const ProductItem = ({product, onUpdate, onDelete }) => {
                     <Button variant="danger" onClick={handleDelete}>Yes, delete</Button>
                 </Modal.Footer>
             </Modal>
+
+            <GenericDetailModal
+                show={showDetailModal}
+                onHide={() => setShowDetailModal(false)}
+                title={`Product: ${product.name}`}
+                details={product}
+            />
 
             <UpdateProduct
                 product={product}
