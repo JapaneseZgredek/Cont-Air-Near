@@ -3,6 +3,7 @@ import { Card, Button, Modal } from 'react-bootstrap';
 import { deleteProduct } from '../../services/api';
 import UpdateProduct from "./UpdateProduct";
 import Order_productButton from "../Order_product/Order_productButton";
+import '../../styles/List.css';
 
 const ProductItem = ({product, onUpdate, onDelete }) => {
     const [showConfirm, setShowConfirm] = useState(false);
@@ -28,18 +29,21 @@ const ProductItem = ({product, onUpdate, onDelete }) => {
 
     return(
         <>
-            <Card className="mb-3">
-                <Card.Body className="d-flex justify-content-between align-items-center">
-                    <div>
-                        <Card.Title>{product.name}</Card.Title>
+            <Card className="item-card">
+                <Card.Body>
+                    <Card.Title>{product.name}</Card.Title>
+                    {/* Kontener dla tekstów */}
+                    <div className="item-texts">
                         <Card.Text>Price: {product.price}</Card.Text>
                         <Card.Text>Weight: {product.weight}</Card.Text>
                         {/*<Card.Text>Port ID: {product.id_port}</Card.Text>*/}
                     </div>
-                    <div>
-                        <Button variant="warning" className="me-2" onClick={openUpdateModal}>Update</Button>
+
+                    {/* Kontener dla przycisków */}
+                    <div className="item-buttons">
                         <Button variant="danger" onClick={() => setShowConfirm(true)}>Delete</Button>
-                        <Order_productButton productId={product.id_product} productName={product.name}/>
+                        <Button variant="warning" className="me-2" onClick={openUpdateModal}>Update</Button>
+                        <Order_productButton productId={product.id_product} productName={product.name} />
                     </div>
                 </Card.Body>
             </Card>
@@ -64,7 +68,7 @@ const ProductItem = ({product, onUpdate, onDelete }) => {
                 onUpdate={onUpdate}
             />
         </>
-    )
+    );
 };
 
 export default ProductItem;

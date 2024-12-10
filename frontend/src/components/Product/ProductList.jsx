@@ -3,6 +3,7 @@ import ProductItem from './ProductItem';
 import AddProduct from './AddProduct';
 import { fetchProducts } from '../../services/api';
 import { Container } from 'react-bootstrap';
+import '../../styles/List.css';
 
 const ProductList = () => {
     const [products, setProducts] = useState([]);
@@ -43,13 +44,16 @@ const ProductList = () => {
                 <h2>Product List</h2>
                 <AddProduct onAdd={handleAddProduct} />
             </div>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
+            <hr className="product-list-divider" /> {/*linia podzialu*/}
+            {error && <p className="err-field">{"Err: "+error}</p>}
+            <div className="list">
             {products.length > 0 ? (
                 products.map((product) => (
                     <ProductItem key={product.id_product} product={product} onDelete={handleDeleteProduct} onUpdate={handleUpdateProduct}/>))
             ) : (
                 <p>No products available.</p>
             )}
+            </div>
         </Container>
     );
 };
