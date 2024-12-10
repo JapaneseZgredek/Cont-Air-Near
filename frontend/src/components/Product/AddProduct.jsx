@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Form, Modal } from 'react-bootstrap';
-import { createProduct, fetchPorts } from "../../services/api"; // Importujemy funkcje API
+import { createProduct, fetchPorts, uploadProductImage } from "../../services/api";
 
 const AddProduct = ({ onAdd }) => {
     const [show, setShow] = useState(false);
     const [name, setName] = useState('');
     const [price, setPrice] = useState('');
     const [weight, setWeight] = useState('');
+    const [imageFile, setImageFile] = useState(null);
     const [idPort, setIdPort] = useState('');
     const [ports, setPorts] = useState([]);
     const [error, setError] = useState(null);
@@ -22,6 +23,9 @@ const AddProduct = ({ onAdd }) => {
         return errors;
     };
 
+    const maxImageWidth = 512;
+    const maxImageHeight = 512;
+
     // Funkcja obsługująca dodanie nowego produktu
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -32,15 +36,24 @@ const AddProduct = ({ onAdd }) => {
         }
 
         try {
+            if (imageFile) {
+                await checkImageDimensions(imageFile);
+            }
             const newProduct = await createProduct({
-                name,
-                price: parseFloat(price),
+                name, 
+                price: parseFloat(price), 
                 weight: parseFloat(weight),
                 id_port: parseInt(idPort),
+                image: ""
             });
+              // if image was chosen - uploading it
+            if (imageFile) {
+                await uploadProductImage(newProduct.id_product, imageFile);
+            }
             onAdd(newProduct);
             resetForm();
             setShow(false);
+
         } catch (err) {
             setError('Failed to create product');
         }
@@ -52,6 +65,7 @@ const AddProduct = ({ onAdd }) => {
         setPrice('');
         setWeight('');
         setIdPort('');
+        setImageFile(null);
         setValidationErrors({});
     };
 
@@ -63,6 +77,32 @@ const AddProduct = ({ onAdd }) => {
         } catch (err) {
             setError("Failed to load ports");
         }
+    };
+
+    
+    // Funkcja przypisująca wybrany obrazek do zmiennej
+    const handleImageChange = (e) => {
+        setImageFile(e.target.files[0]);
+    };
+
+    //  Funkcja sprawdzająca czy wybrany obrazek jest właściwego formatu
+    const checkImageDimensions = (file) => {
+        return new Promise((resolve, reject) => {
+            const validTypes = ['image/jpeg', 'image/png'];
+            if (!validTypes.includes(file.type)) {
+                return reject("\nInvalid file type. Allowed types: "+validTypes);
+            }
+            const img = new Image();
+            img.onload = () => {
+                if (img.width > maxImageWidth || img.height > maxImageHeight) {
+                    reject("\nImage dimensions must not exceed "+maxImageWidth+"x"+maxImageHeight+" pixels.");
+                } else {
+                    resolve();
+                }
+            };
+            img.onerror = () => reject("\nFailed to load image.");
+            img.src = URL.createObjectURL(file);
+        });
     };
 
     useEffect(() => {
@@ -126,6 +166,15 @@ const AddProduct = ({ onAdd }) => {
                             </Form.Control.Feedback>
                         </Form.Group>
 
+                        {/* Pole wyboru obrazka */}
+                        <Form.Group className="mb-3">
+                            <Form.Label>Product Image</Form.Label>
+                            <Form.Control
+                                type="file"
+                                accept="image/*"
+                                onChange={handleImageChange}
+                            />
+                        </Form.Group>
                         {/* Pole wyboru portu */}
                         <Form.Group className="mb-3">
                             <Form.Label>Port</Form.Label>

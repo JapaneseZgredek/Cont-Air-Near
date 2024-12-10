@@ -12,6 +12,7 @@ class Product(Base):
     weight = Column(Float, nullable=False)
     created_at = Column(DateTime, default=datetime.now())
     updated_at = Column(DateTime, default=datetime.now(), onupdate=datetime.now())
+    image = Column(String, nullable=True)
     id_port = Column(Integer, ForeignKey('port.id_port'), nullable=False)
 
     port = relationship("Port", back_populates="products")
