@@ -89,7 +89,7 @@ const OrderAdd = ({ onAdd }) => {
                             </Form.Select>
                         </Form.Group>
                         <Form.Group className="mb-3">
-                            <Form.Label>Port ID</Form.Label>
+                            <Form.Label>Port</Form.Label>
                             <Form.Control
                                 as="select"
                                 required
