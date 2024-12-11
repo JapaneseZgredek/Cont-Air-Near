@@ -1,0 +1,9 @@
+/* Styl tła dla całej strony */
+.listing-page {
+    background-image: url('graphics/site_background.png'); /* Ścieżka do obrazka */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat; /* Zapobiega powtarzaniu tła */
+    background-attachment: fixed;
+    min-height: 100vh; /* Ustawia minimalną wysokość na 100% wysokości okna */
+}
