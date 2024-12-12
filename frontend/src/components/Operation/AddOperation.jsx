@@ -7,7 +7,7 @@ import { fetchPorts } from '../../services/api';
 const AddOperation = ({ onAdd }) => {
     const [show, setShow] = useState(false);
     const [nameOfOperation, setNameOfOperation] = useState('');
-    const [operationType, setOperationType] = useState('at_bay');
+    const [operationType, setOperationType] = useState('AT_BAY');
     const [dateOfOperation, setDateOfOperation] = useState('');
     const [idShip, setIdShip] = useState('');
     const [idPort, setIdPort] = useState('');
@@ -43,7 +43,8 @@ const handleSubmit = async (e) => {
         const newOperation = await createOperation({
             name_of_operation: nameOfOperation,
             operation_type: operationType,
-            date_of_operation: dateOfOperation || new Date().toISOString(),
+            // date_of_operation: dateOfOperation || new Date().toISOString(),
+            date_of_operation: dateOfOperation,
             id_ship: parseInt(idShip),
             id_port: parseInt(idPort),
         });
@@ -117,8 +118,8 @@ const handleSubmit = async (e) => {
                                   <option value="TRANSFER">Transfer</option>
                                   <option value="DEPARTURE">Departure</option>
                                   <option value="ARRIVAL">Arrival</option>
-                                  <option value="loading">Cargo Loading</option>
-                                  <option value="discharge">Cargo Discharge</option>
+                                  <option value="CARGO_LOADING">Cargo Loading</option>
+                                  <option value="CARGO_DISCHARGE">Cargo Discharge</option>
                                 </Form.Select>
                         </Form.Group>
 

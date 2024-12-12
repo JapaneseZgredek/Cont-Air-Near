@@ -99,17 +99,17 @@ def create_operation(
     logger.info(f"Received operation payload: {operation.dict()}")
 
     # #verify
-    # existing_operation = db.query(Operation).filter(
-    #     Operation.name_of_operation == operation.name_of_operation,
-    #     Operation.id_ship == operation.id_ship,
-    #     Operation.id_port == operation.id_port,
-    # ).first()
-    #
-    # if existing_operation:
-    #     raise HTTPException(
-    #         status_code=status.HTTP_400_BAD_REQUEST,
-    #         detail="Duplicate operation detected",
-    #     )
+    existing_operation = db.query(Operation).filter(
+        Operation.name_of_operation == operation.name_of_operation,
+        Operation.id_ship == operation.id_ship,
+        Operation.id_port == operation.id_port,
+    ).first()
+
+    if existing_operation:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Duplicate operation detected",
+        )
 
     # Ship validation
     ship = db.query(Ship).filter(Ship.id_ship == operation.id_ship).first()
