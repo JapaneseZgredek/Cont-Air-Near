@@ -276,27 +276,48 @@ export const fetchOrders_productsByProduct = async (product_id) => {
 };
 
 export const fetchClients = async () => {
-  return await fetchProtectedData(`/api/clients`);
+    try {
+        await verifyRoles(['ADMIN']);
+        return await fetchProtectedData(`/api/clients`);
+    } catch (error) {
+        console.error("Role verification failed:", error.message);
+        throw error;
+    }
 };
 
 export const createClient = async (client) => {
-  return await fetchProtectedData(`/api/clients`, {
-    method: 'POST',
-    body: JSON.stringify(client),
-  });
+    try {
+        await verifyRoles(['ADMIN']);
+        return await fetchProtectedData(`/api/clients`, {
+            method: 'POST',
+            body: JSON.stringify(client),
+        });
+    } catch (error) {
+        console.error("Role verification failed:", error.message);
+        throw error;
+    }
 };
 
-export const deleteClient = async (id) => {
-    return await fetchProtectedData(`/api/clients/${id}`, {
-    method: 'DELETE',
-  });
+
+export const deleteClient = async (id_client) => {
+    try {
+        await verifyRoles(['ADMIN']); // Explicitly define roles
+        return await fetchProtectedData(`/api/clients/${id_client}`, {
+            method: 'DELETE',
+        });
+    } catch (error) {
+        console.error("Role verification failed:", error.message);
+        throw error;
+    }
 };
+
 
 export const updateClient = async (client) => {
-  return await fetchProtectedData(`/api/clients/${client.id_client}`, {
-    method: 'PUT',
-    body: JSON.stringify(client),
-  });
+    await verifyRoles(['EMPLOYEE', 'ADMIN']);
+    return await fetchProtectedData(`/api/clients/${client.id_client}`, {
+        method: 'PUT',
+        body: JSON.stringify(client),
+    });
 };
 
 // Login

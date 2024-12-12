@@ -7,7 +7,7 @@ from backend.logging_config import logger
 from backend.utils.role_validation import check_user_role
 from pydantic import BaseModel
 from typing import List, Optional
-from ..models import Ship, Port, User, UserRole
+from ..models import Ship, Port, UserRole
 from .user import get_current_user
 
 router = APIRouter()
