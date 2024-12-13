@@ -109,6 +109,7 @@ const AddClient = ({ onAdd }) => {
                             <Form.Label>Email</Form.Label>
                             <Form.Control
                                 type="text"
+                                // type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 placeholder="Enter email"

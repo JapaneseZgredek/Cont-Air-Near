@@ -7,8 +7,11 @@ from backend.models.order_product import Order_product
 from backend.models.port import Port
 from backend.database import get_db
 from backend.logging_config import logger
+from backend.utils.role_validation import check_user_role
 from pydantic import BaseModel
 from typing import List, Optional
+from .user import get_current_user
+from ..models import UserRole
 
 router = APIRouter()
 
@@ -36,7 +39,11 @@ class PortRead(BaseModel):
 
 
 @router.get("/ports", response_model=List[PortRead])
-def get_all_ports(db: Session = Depends(get_db)):
+def get_all_ports(
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    check_user_role(current_user, [UserRole.EMPLOYEE, UserRole.ADMIN])
     logger.info("Getting all ports")
     ports = db.query(Port).all()
     return ports

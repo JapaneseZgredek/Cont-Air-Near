@@ -57,7 +57,11 @@ def read_client(id_client: int, db: Session = Depends(get_db), current_user=Depe
 
 
 @router.post("/clients", response_model=ClientRead)
-def create_client(client: ClientCreate, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+def create_client(
+    client: ClientCreate,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
     check_user_role(current_user, [UserRole.ADMIN])
     logger.info(f"Creating new client: {client}")
     assert client.telephone_number is None or isinstance(client.telephone_number, int), "phone_no should be nullable or an integer"

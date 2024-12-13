@@ -286,15 +286,20 @@ export const fetchClients = async () => {
 };
 
 export const createClient = async (client) => {
+    await verifyRoles(['ADMIN']);
     try {
-        await verifyRoles(['ADMIN']);
-        return await fetchProtectedData(`/api/clients`, {
-            method: 'POST',
-            body: JSON.stringify(client),
+        console.log("Making POST request to /api/clients with payload:", client);
+        const response = await axios.post(`${API_URL}/api/clients`, client, {
+            headers: {
+                Authorization: `Bearer ${getAuthToken()}`,
+                'Content-Type': 'application/json',
+            },
         });
+        console.log("Response from /api/clients:", response.data);
+        return await response.data;
     } catch (error) {
-        console.error("Role verification failed:", error.message);
-        throw error;
+        console.error("Error in createClient:", error.response?.data || error.message);
+        throw error.response?.data || new Error("Failed to create client");
     }
 };
 
@@ -311,13 +316,22 @@ export const deleteClient = async (id_client) => {
     }
 };
 
-
 export const updateClient = async (client) => {
-    await verifyRoles(['EMPLOYEE', 'ADMIN']);
-    return await fetchProtectedData(`/api/clients/${client.id_client}`, {
-        method: 'PUT',
-        body: JSON.stringify(client),
-    });
+    await verifyRoles(['ADMIN']);
+    try {
+        console.log("Making PUT request to /api/clients with payload:", client);
+        const response = await axios.put(`${API_URL}/api/clients/${client.id_client}`, client, {
+            headers: {
+                Authorization: `Bearer ${getAuthToken()}`,
+                'Content-Type': 'application/json',
+            },
+        });
+        console.log("Response from /api/clients:", response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error in updateClient:", error.response?.data || error.message);
+        throw error.response?.data || new Error("Failed to update client");
+    }
 };
 
 // Login
