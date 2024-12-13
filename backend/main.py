@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from pathlib import Path
 from backend.database import engine, Base
-from backend.routes import ship, operation, port, product, order, client, order_history, order_product, user
+from backend.routes import ship, operation, port, product, order, client, order_history, order_product, user, cart
 from backend.logging_config import logger
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -28,6 +28,7 @@ app.include_router(client.router, prefix='/api')
 app.include_router(order.router, prefix='/api')
 app.include_router(order_product.router, prefix='/api')
 app.include_router(order_history.router, prefix='/api')
+app.include_router(cart.router, prefix='/api')
 
 #Users routers
 app.include_router(user.router, prefix='/api')

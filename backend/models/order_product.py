@@ -3,7 +3,7 @@ from backend.database import Base
 from sqlalchemy.orm import relationship
 
 class Order_product(Base):
-    __tablename__ = 'orders_products'
+    __tablename__ = 'order_products'
     id_order = Column(Integer, ForeignKey('order.id_order'), primary_key=True, nullable=False)
     id_product = Column(Integer, ForeignKey('product.id_product'), primary_key=True, nullable=False)
     quantity = Column(Integer, nullable=False)
