@@ -5,6 +5,9 @@ from backend.database import get_db
 from backend.logging_config import logger
 from pydantic import BaseModel
 from typing import List, Optional
+from .user import get_current_user
+from ..models import UserRole
+from ..utils.role_validation import check_user_role
 
 router = APIRouter()
 
@@ -35,14 +38,16 @@ class ClientRead(BaseModel):
 
 
 @router.get("/clients", response_model=List[ClientRead])
-def get_all_clients(db: Session = Depends(get_db)):
+def get_all_clients(db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    check_user_role(current_user, [UserRole.ADMIN])
     logger.info("Getting all clients")
     clients = db.query(Client).all()
     return clients
 
 
 @router.get("/clients/{id_client}", response_model=ClientRead)
-def read_client(id_client: int, db: Session = Depends(get_db)):
+def read_client(id_client: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    check_user_role(current_user, [UserRole.ADMIN])
     logger.info(f"Reading client with id: {id_client}")
     db_client = db.query(Client).filter(Client.id_client == id_client).first()
     if db_client is None:
@@ -52,7 +57,12 @@ def read_client(id_client: int, db: Session = Depends(get_db)):
 
 
 @router.post("/clients", response_model=ClientRead)
-def create_client(client: ClientCreate, db: Session = Depends(get_db)):
+def create_client(
+    client: ClientCreate,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    check_user_role(current_user, [UserRole.ADMIN])
     logger.info(f"Creating new client: {client}")
     assert client.telephone_number is None or isinstance(client.telephone_number, int), "phone_no should be nullable or an integer"
     db_client = Client(**client.dict())
@@ -62,7 +72,8 @@ def create_client(client: ClientCreate, db: Session = Depends(get_db)):
     return db_client
 
 @router.put("/clients/{id_client}", response_model=ClientRead)
-def update_client(id_client: int, client: ClientUpdate, db: Session = Depends(get_db)):
+def update_client(id_client: int, client: ClientUpdate, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    check_user_role(current_user, [UserRole.ADMIN])
     logger.info(f"Updating client with id: {id_client}")
     db_client = db.query(Client).filter(Client.id_client == id_client).first()
     if db_client is None:
@@ -84,7 +95,8 @@ def update_client(id_client: int, client: ClientUpdate, db: Session = Depends(ge
 
 
 @router.delete("/clients/{id_client}", response_model=dict)
-def delete_client(id_client: int, db: Session = Depends(get_db)):
+def delete_client(id_client: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    check_user_role(current_user, [UserRole.ADMIN])
     logger.info(f"Deleting client with id: {id_client}")
     db_client = db.query(Client).filter(Client.id_client == id_client).first()
     if db_client is None:

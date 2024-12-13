@@ -5,10 +5,10 @@ import enum
 from backend.database import Base
 
 class UserRole(enum.Enum):
-    GUEST = "guest"
-    CLIENT = "client"
-    EMPLOYEE = "employee"
-    ADMIN = "admin"
+    GUEST = "GUEST"
+    CLIENT = "CLIENT"
+    EMPLOYEE = "EMPLOYEE"
+    ADMIN = "ADMIN"
 
 class User(Base):
     __tablename__ = 'user'
