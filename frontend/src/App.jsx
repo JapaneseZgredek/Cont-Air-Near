@@ -33,7 +33,7 @@ const App = () => {
                 <Route
                     path="/ships"
                     element={
-                        <ProtectedRoute>
+                        <ProtectedRoute requiredRoles={['EMPLOYEE', 'ADMIN']}>
                             <ShipPage />
                         </ProtectedRoute>
                     }
@@ -68,7 +68,7 @@ const App = () => {
                 <Route
                     path="/ports"
                     element={
-                        <ProtectedRoute>
+                        <ProtectedRoute requiredRoles={['CLIENT','EMPLOYEE', 'ADMIN']}>
                             <PortPage />
                         </ProtectedRoute>
                     }
@@ -83,6 +83,15 @@ const App = () => {
                 />
                 <Route
                     path="/clients"
+                    element={
+                        <ProtectedRoute requiredRoles={['ADMIN']}>
+                            <ClientPage />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/users"
                     element={
                         <ProtectedRoute requiredRoles={['ADMIN']}>
                             <ClientPage />

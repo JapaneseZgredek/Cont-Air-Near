@@ -14,7 +14,7 @@ const ProtectedRoute = ({ requiredRoles, children }) => {
     return children;
   } catch (error) {
     console.error("Access denied. Redirecting to unauthorized page.");
-    return <Navigate to="/unauthorized" />;
+    return <Navigate to="/login" />;  //albo zrobic unauthorized ale to bez sensu
   }
 };
 

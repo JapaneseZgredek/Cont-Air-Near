@@ -50,7 +50,12 @@ def get_all_ports(
 
 
 @router.get("/ports/{id_port}", response_model=PortRead)
-def read_port(id_port: int, db: Session = Depends(get_db)):
+def read_port(
+    id_port: int,
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    check_user_role(current_user, [UserRole.EMPLOYEE, UserRole.ADMIN])
     logger.info(f"Reading port with id: {id_port}")
     db_port = db.query(Port).filter(Port.id_port == id_port).first()
     if db_port is None:
@@ -60,7 +65,12 @@ def read_port(id_port: int, db: Session = Depends(get_db)):
 
 
 @router.post("/ports", response_model=PortRead)
-def create_port(port: PortCreate, db: Session = Depends(get_db)):
+def create_port(
+    port: PortCreate,
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+    ):
+    check_user_role(current_user, [UserRole.EMPLOYEE, UserRole.ADMIN])
     logger.info(f"Creating port: {port}")
     db_port = Port(**port.dict())
     db.add(db_port)
@@ -70,7 +80,13 @@ def create_port(port: PortCreate, db: Session = Depends(get_db)):
 
 
 @router.put("/ports/{id_port}", response_model=PortRead)
-def update_port(id_port: int, port: PortUpdate, db: Session = Depends(get_db)):
+def update_port(
+    id_port: int,
+    port: PortUpdate,
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    check_user_role(current_user, [UserRole.EMPLOYEE, UserRole.ADMIN])
     logger.info(f"Updating port with id: {id_port}")
     db_port = db.query(Port).filter(Port.id_port == id_port).first()
     if db_port is None:
@@ -90,7 +106,12 @@ def update_port(id_port: int, port: PortUpdate, db: Session = Depends(get_db)):
 
 
 @router.delete("/ports/{id_port}", response_model=dict)
-def delete_port(id_port: int, db: Session = Depends(get_db)):
+def delete_port(
+    id_port: int,
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    check_user_role(current_user, [UserRole.EMPLOYEE, UserRole.ADMIN])
     logger.info(f"Deleting port with id: {id_port}")
     db_port = db.query(Port).filter(Port.id_port == id_port).first()
     if db_port is None:
