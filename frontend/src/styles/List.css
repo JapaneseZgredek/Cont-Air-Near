@@ -19,6 +19,7 @@
 /* Tytuł itemu */
 .grid-item-card .card-title,
 .straight-item-card .card-title{
+    width: 250px;
     font-family: 'Montserrat', sans-serif;
     font-size: 1.5rem;
     font-weight: bold;
