@@ -7,6 +7,4 @@ from .client import Client
 from .order_history import OrderHistory
 from .order_product import Order_product
 
-
-# Login/Register users related
-from .user import User, UserRole
+from .client import UserRole

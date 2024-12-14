@@ -8,7 +8,7 @@ from backend.logging_config import logger
 from pydantic import BaseModel
 from typing import List, Optional
 
-from .user import get_current_user
+from .client import get_current_client
 from ..models import UserRole
 from backend.utils.role_validation import check_user_role
 router = APIRouter()
@@ -36,9 +36,9 @@ class ShipRead(BaseModel):
 def create_ship(
     ship: ShipCreate,
     db: Session = Depends(get_db),
-    current_user = Depends(get_current_user)
+    current_client = Depends(get_current_client)
 ):
-    check_user_role(current_user, [UserRole.EMPLOYEE, UserRole.ADMIN])
+    check_user_role(current_client, [UserRole.EMPLOYEE, UserRole.ADMIN])
     logger.info(f"Creating new ship: {ship}")
     db_ship = Ship(**ship.dict())
     db.add(db_ship)

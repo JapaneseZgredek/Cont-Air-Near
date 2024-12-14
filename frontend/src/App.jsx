@@ -89,15 +89,6 @@ const App = () => {
                         </ProtectedRoute>
                     }
                 />
-
-                <Route
-                    path="/users"
-                    element={
-                        <ProtectedRoute requiredRoles={['ADMIN']}>
-                            <ClientPage />
-                        </ProtectedRoute>
-                    }
-                />
             </Routes>
         </Router>
     );

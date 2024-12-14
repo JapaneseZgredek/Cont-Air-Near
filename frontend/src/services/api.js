@@ -57,14 +57,14 @@ export const deleteShip = async (ship_id) => {
 export const updateShip = async (ship) => {
     await verifyRoles(['EMPLOYEE','ADMIN']);
     try {
-        console.log("Making PUT request to /api/clients with payload:", ship);
+        console.log("Making PUT request to /api/ships with payload:", ship);
         const response = await axios.put(`${API_URL}/api/ships/${ship.id_ship}`, ship, {
             headers: {
                 Authorization: `Bearer ${getAuthToken()}`,
                 'Content-Type': 'application/json',
             },
         });
-        console.log("Response from /api/clients:", response.data);
+        console.log("Response from /api/ships:", response.data);
         return response.data;
     } catch (error) {
         console.error("Error in updateShip:", error.response?.data || error.message);
@@ -423,21 +423,19 @@ export const updateClient = async (client) => {
 };
 
 // Login
-export const loginUser = async (credentials) => {
-  const response = await axios.post(`${API_URL}/api/users/login`, credentials);
+
+export const loginClient = async (credentials) => {
+  const response = await axios.post(`${API_URL}/api/clients/login`, credentials);
   const { access_token, role } = response.data;
-  localStorage.setItem('token', access_token);
-  localStorage.setItem('role', role); // Ensure role is stored
+  localStorage.setItem("token", access_token);
+  localStorage.setItem("role", role);
   return response.data;
 };
-
 // Register
-export const registerUser = async (userData) => {
-  const response = await axios.post(`${API_URL}/api/users`, userData);
+export const registerClient = async (clientData) => {
+  const response = await axios.post(`${API_URL}/api/clients`, clientData);
   return response.data;
 };
-
-
 
 // Role Verification
 
@@ -466,7 +464,7 @@ export const registerUser = async (userData) => {
 //   }
 // };
 
-export const fetchCurrentUser = async () => {
+export const fetchCurrentClient = async () => {
   const token = localStorage.getItem('token');
   if (!token) {
     console.error("Authentication token not found in localStorage.");
@@ -474,24 +472,24 @@ export const fetchCurrentUser = async () => {
   }
 
   try {
-    const response = await axios.get(`${API_URL}/api/users/me`, {
+    const response = await axios.get(`${API_URL}/api/clients/me`, {
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
     });
-    console.log("User details fetched:", response.data); // Debug response
-    return response.data; // Ensure this contains { role }
+    console.log("Client details fetched:", response.data);
+    return response.data;
   } catch (error) {
     if (error.response?.status === 404) {
-      console.warn("/api/users/me endpoint not found. Falling back to localStorage.");
+      console.warn("/api/clients/me endpoint not found. Falling back to localStorage.");
       const role = localStorage.getItem('role');
       if (!role) {
         throw new Error("Role information is missing. Please log in.");
       }
-      return { role }; // Minimal fallback response
+      return { role };
     }
-    console.error("Error fetching current user details:", error.message);
+    console.error("Error fetching current client details:", error.message);
     throw error;
   }
 };
@@ -500,22 +498,23 @@ export const fetchCurrentUser = async () => {
 
 export const verifyRoles = async (requiredRoles) => {
   try {
-    const currentUser = await fetchCurrentUser();
-    const { role } = currentUser;
+    const currentClient = await fetchCurrentClient();
+    const { role } = currentClient;
 
     if (!role) {
-      throw new Error("User role is undefined. Please check the backend or localStorage.");
+      throw new Error("Client role is undefined. Please check the backend or localStorage.");
     }
 
-    console.log(`User role: ${role}, Required roles: ${requiredRoles.join(', ')}`); // Debug
+    console.log(`Client role: ${role}, Required roles: ${requiredRoles.join(', ')}`); // Debug
     if (!requiredRoles.includes(role)) {
       throw new Error(
-        `Access denied. User role: ${role}, Required: ${requiredRoles.join(', ')}`
+        `Access denied. Client role: ${role}, Required: ${requiredRoles.join(', ')}`
       );
     }
     return true;
   } catch (error) {
     console.error("Role verification failed:", error.message);
+
     throw error;
   }
 };

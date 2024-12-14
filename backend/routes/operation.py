@@ -8,7 +8,7 @@ from backend.utils.role_validation import check_user_role
 from pydantic import BaseModel
 from typing import List, Optional
 from ..models import Ship, Port, UserRole
-from .user import get_current_user
+from .client import get_current_client
 
 router = APIRouter()
 
@@ -42,9 +42,9 @@ class OperationRead(BaseModel):
 def get_operations_by_port(
     id_port: int,
     db: Session = Depends(get_db),
-    current_user=Depends(get_current_user)
+    current_client=Depends(get_current_client)
 ):
-    check_user_role(current_user, [UserRole.EMPLOYEE, UserRole.ADMIN])  # Validate roles
+    check_user_role(current_client, [UserRole.EMPLOYEE, UserRole.ADMIN])  # Validate roles
     operations = db.query(Operation).filter(Operation.id_port == id_port).all()
     if not operations:
         raise HTTPException(status_code=404, detail=f"No operations found for port with id: {id_port}")
@@ -54,9 +54,9 @@ def get_operations_by_port(
 def get_operations_by_ship(
     id_ship: int,
     db: Session = Depends(get_db),
-    current_user=Depends(get_current_user)
+    current_client=Depends(get_current_client)
 ):
-    check_user_role(current_user, [UserRole.EMPLOYEE, UserRole.ADMIN])  # Validate roles
+    check_user_role(current_client, [UserRole.EMPLOYEE, UserRole.ADMIN])  # Validate roles
     operations = db.query(Operation).filter(Operation.id_ship == id_ship).all()
     if not operations:
         raise HTTPException(status_code=404, detail=f"No operations found for ship with id: {id_ship}")
@@ -66,9 +66,9 @@ def get_operations_by_ship(
 def get_operation(
     id_operation: int,
     db: Session = Depends(get_db),
-    current_user=Depends(get_current_user)
+    current_client=Depends(get_current_client)
 ):
-    check_user_role(current_user, [UserRole.EMPLOYEE, UserRole.ADMIN])  # Validate roles
+    check_user_role(current_client, [UserRole.EMPLOYEE, UserRole.ADMIN])  # Validate roles
     logger.info(f"Fetching operation with ID {id_operation}")
     operation = db.query(Operation).filter(Operation.id_operation == id_operation).first()
     if not operation:
@@ -78,9 +78,9 @@ def get_operation(
 @router.get("/operations", response_model=List[OperationRead])
 def get_all_operations(
     db: Session = Depends(get_db),
-    current_user=Depends(get_current_user)
+    current_client=Depends(get_current_client)
 ):
-    check_user_role(current_user, [UserRole.EMPLOYEE, UserRole.ADMIN])  # Validate roles
+    check_user_role(current_client, [UserRole.EMPLOYEE, UserRole.ADMIN])  # Validate roles
     logger.info("Fetching all operations")
     operations = db.query(Operation).all()
     if not operations:
@@ -91,9 +91,9 @@ def get_all_operations(
 def create_operation(
     operation: OperationCreate,
     db: Session = Depends(get_db),
-    current_user=Depends(get_current_user)
+    current_client=Depends(get_current_client)
 ):
-    check_user_role(current_user, [UserRole.EMPLOYEE, UserRole.ADMIN])  # Role validation
+    check_user_role(current_client, [UserRole.EMPLOYEE, UserRole.ADMIN])  # Role validation
 
     # Payload logger
     logger.info(f"Received operation payload: {operation.dict()}")
@@ -150,9 +150,9 @@ def update_operation(
     id_operation: int,
     operation: OperationUpdate,
     db: Session = Depends(get_db),
-    current_user=Depends(get_current_user),
+    current_client=Depends(get_current_client),
 ):
-    check_user_role(current_user, [UserRole.EMPLOYEE, UserRole.ADMIN])
+    check_user_role(current_client, [UserRole.EMPLOYEE, UserRole.ADMIN])
     logger.info(f"Updating operation with ID {id_operation}")
     db_operation = db.query(Operation).filter(Operation.id_operation == id_operation).first()
     if not db_operation:
@@ -169,9 +169,9 @@ def update_operation(
 def delete_operation(
     id_operation: int,
     db: Session = Depends(get_db),
-    current_user=Depends(get_current_user)
+    current_client=Depends(get_current_client)
 ):
-    check_user_role(current_user, [UserRole.EMPLOYEE, UserRole.ADMIN])
+    check_user_role(current_client, [UserRole.EMPLOYEE, UserRole.ADMIN])
     logger.info(f"Deleting operation with id: {id_operation}")
     db_operation = db.query(Operation).filter(Operation.id_operation == id_operation).first()
     if db_operation is None:

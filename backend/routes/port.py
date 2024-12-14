@@ -10,7 +10,7 @@ from backend.logging_config import logger
 from backend.utils.role_validation import check_user_role
 from pydantic import BaseModel
 from typing import List, Optional
-from .user import get_current_user
+from .client import get_current_client
 from ..models import UserRole
 
 router = APIRouter()
@@ -41,9 +41,9 @@ class PortRead(BaseModel):
 @router.get("/ports", response_model=List[PortRead])
 def get_all_ports(
     db: Session = Depends(get_db),
-    current_user = Depends(get_current_user)
+    current_client = Depends(get_current_client)
 ):
-    check_user_role(current_user, [UserRole.EMPLOYEE, UserRole.ADMIN])
+    check_user_role(current_client, [UserRole.EMPLOYEE, UserRole.ADMIN])
     logger.info("Getting all ports")
     ports = db.query(Port).all()
     return ports
@@ -53,9 +53,9 @@ def get_all_ports(
 def read_port(
     id_port: int,
     db: Session = Depends(get_db),
-    current_user = Depends(get_current_user)
+    current_client = Depends(get_current_client)
 ):
-    check_user_role(current_user, [UserRole.EMPLOYEE, UserRole.ADMIN])
+    check_user_role(current_client, [UserRole.EMPLOYEE, UserRole.ADMIN])
     logger.info(f"Reading port with id: {id_port}")
     db_port = db.query(Port).filter(Port.id_port == id_port).first()
     if db_port is None:
@@ -68,9 +68,9 @@ def read_port(
 def create_port(
     port: PortCreate,
     db: Session = Depends(get_db),
-    current_user = Depends(get_current_user)
+    current_client = Depends(get_current_client)
     ):
-    check_user_role(current_user, [UserRole.EMPLOYEE, UserRole.ADMIN])
+    check_user_role(current_client, [UserRole.EMPLOYEE, UserRole.ADMIN])
     logger.info(f"Creating port: {port}")
     db_port = Port(**port.dict())
     db.add(db_port)
@@ -84,9 +84,9 @@ def update_port(
     id_port: int,
     port: PortUpdate,
     db: Session = Depends(get_db),
-    current_user = Depends(get_current_user)
+    current_client = Depends(get_current_client)
 ):
-    check_user_role(current_user, [UserRole.EMPLOYEE, UserRole.ADMIN])
+    check_user_role(current_client, [UserRole.EMPLOYEE, UserRole.ADMIN])
     logger.info(f"Updating port with id: {id_port}")
     db_port = db.query(Port).filter(Port.id_port == id_port).first()
     if db_port is None:
@@ -109,9 +109,9 @@ def update_port(
 def delete_port(
     id_port: int,
     db: Session = Depends(get_db),
-    current_user = Depends(get_current_user)
+    current_client = Depends(get_current_client)
 ):
-    check_user_role(current_user, [UserRole.EMPLOYEE, UserRole.ADMIN])
+    check_user_role(current_client, [UserRole.EMPLOYEE, UserRole.ADMIN])
     logger.info(f"Deleting port with id: {id_port}")
     db_port = db.query(Port).filter(Port.id_port == id_port).first()
     if db_port is None:

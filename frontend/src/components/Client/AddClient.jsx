@@ -30,6 +30,7 @@ const AddClient = ({ onAdd }) => {
 
         return errors;
     }
+
     const handleSubmit = async (e) => {
     e.preventDefault();
     const errors = validateInputs();
