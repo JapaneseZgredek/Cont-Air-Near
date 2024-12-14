@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { Card, Button, Modal } from 'react-bootstrap';
 import { deleteOperation } from '../../services/api';
 import UpdateOperation from "./UpdateOperation";
+import GenericDetailModal from "../GenericDetailModal";
 
 const OperationItem = ({ operation, onUpdate, onDelete }) => {
     const [showConfirm, setShowConfirm] = useState(false);
     const [showUpdateModal, setShowUpdateModal] = useState(false);
+    const [showDetailModal, setShowDetailModal] = useState(false);
 
     const handleDelete = async () => {
         try {
@@ -30,7 +32,13 @@ const OperationItem = ({ operation, onUpdate, onDelete }) => {
             <Card className="mb-3">
                 <Card.Body className="d-flex justify-content-between align-items-center">
                     <div>
-                        <Card.Title>{operation.name_of_operation}</Card.Title>
+                        <Card.Title
+                            className="clickable"
+                            onClick={() => setShowDetailModal(true)}
+                            style={{ cursor: 'pointer', textDecoration: 'underline' }}
+                        >
+                            {operation.name_of_operation}
+                        </Card.Title>
                         <Card.Text>Type: {operation.operation_type}</Card.Text>
                         <Card.Text>Date: {new Date(operation.date_of_operation).toLocaleString()}</Card.Text>
                         <Card.Text>Ship ID: {operation.id_ship}</Card.Text>
@@ -55,6 +63,13 @@ const OperationItem = ({ operation, onUpdate, onDelete }) => {
                     <Button variant="danger" onClick={handleDelete}>Yes, delete</Button>
                 </Modal.Footer>
             </Modal>
+
+            <GenericDetailModal
+                show={showDetailModal}
+                onHide={() => setShowDetailModal(false)}
+                title={`Operation: ${operation.name_of_operation}`}
+                details={operation}
+            />
 
             <UpdateOperation
                 operation={operation}

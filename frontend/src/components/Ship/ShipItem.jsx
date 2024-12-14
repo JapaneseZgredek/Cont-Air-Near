@@ -3,10 +3,12 @@ import { Card, Button, Modal } from 'react-bootstrap';
 import { deleteShip } from '../../services/api';
 import UpdateShip from "./UpdateShip";
 import OperationsButton from "../Operation/OperationsButton";
+import GenericDetailModal from "../GenericDetailModal";
 
 const ShipItem = ({ ship, onUpdate, onDelete }) => {
     const [showConfirm, setShowConfirm] = useState(false);
     const [showUpdatedModal, setShowUpdateModal] = useState(false);
+    const [showDetailModal, setShowDetailModal] = useState(false);
 
     const handleDelete = async () => {
         try {
@@ -31,7 +33,13 @@ const ShipItem = ({ ship, onUpdate, onDelete }) => {
         <Card className="mb-3">
             <Card.Body className="d-flex justify-content-between align-items-center">
                 <div>
-                    <Card.Title>{ship.name}</Card.Title>
+                    <Card.Title
+                        className="clickable"
+                        onClick={() => setShowDetailModal(true)}
+                        style={{ cursor: 'pointer', textDecoration: 'underline' }}
+                    >
+                        {ship.name}
+                    </Card.Title>
                     <Card.Text>Capacity: {ship.capacity}</Card.Text>
                 </div>
                 <div>
@@ -54,6 +62,13 @@ const ShipItem = ({ ship, onUpdate, onDelete }) => {
                 <Button variant="danger" onClick={handleDelete}>Yes, delete</Button>
             </Modal.Footer>
         </Modal>
+
+        <GenericDetailModal
+            show={showDetailModal}
+            onHide={() => setShowDetailModal(false)}
+            title={`Ship: ${ship.name}`}
+            details={ship}
+        />
 
         <UpdateShip
             ship={ship}

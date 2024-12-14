@@ -4,6 +4,7 @@ import { deleteProduct , fetchProductImage } from '../../services/api';
 import UpdateProduct from "./UpdateProduct";
 import Order_productButton from "../Order_product/Order_productButton";
 import '../../styles/List.css';
+import GenericDetailModal from "../GenericDetailModal";
 
 const ProductItem = ({product, onUpdate, onDelete }) => {
     const [showConfirm, setShowConfirm] = useState(false);
@@ -11,6 +12,7 @@ const ProductItem = ({product, onUpdate, onDelete }) => {
     const [imageUrl, setImageUrl] = useState(null);
     const [loadingImage, setLoadingImage] = useState(true);
     const [displayType, setDisplayType] = useState("grid");
+    const [showDetailModal, setShowDetailModal] = useState(false);
 
     const handleDelete = async () => {
         try{
@@ -52,12 +54,18 @@ const ProductItem = ({product, onUpdate, onDelete }) => {
     return(
         <>
             <Card className={`${displayType}-item-card`}>
-                    <Card.Title>{product.name}</Card.Title>
+                    <Card.Title
+                            className="clickable"
+                            onClick={() => setShowDetailModal(true)}
+                            style={{ cursor: 'pointer', textDecoration: 'underline' }}
+                        >
+                            {product.name}
+                        </Card.Title>
                     {/* Kontener dla tekstów */}
                     <div className="item-texts">
                         <Card.Text>Price: {product.price}</Card.Text>
                         <Card.Text>Weight: {product.weight}</Card.Text>
-                        {/*<Card.Text>Port ID: {product.id_port}</Card.Text>*/}
+                        <Card.Text>Port ID: {product.id_port}</Card.Text>
                     </div>
 
                     {/* Obrazek */}
@@ -95,6 +103,13 @@ const ProductItem = ({product, onUpdate, onDelete }) => {
                     <Button variant="danger" onClick={handleDelete}>Yes, delete</Button>
                 </Modal.Footer>
             </Modal>
+
+            <GenericDetailModal
+                show={showDetailModal}
+                onHide={() => setShowDetailModal(false)}
+                title={`Product: ${product.name}`}
+                details={product}
+            />
 
             <UpdateProduct
                 product={product}

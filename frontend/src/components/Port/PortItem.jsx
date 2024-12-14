@@ -5,10 +5,12 @@ import UpdatePort from "./UpdatePort";
 import OperationsButton from "../Operation/OperationsButton";
 import OrdersButton from "../Order/OrdersButton";
 import ProductButton from "../Product/ProductButton";
+import GenericDetailModal from "../GenericDetailModal";
 
 const PortItem = ({ port, onUpdate, onDelete }) => {
     const [showConfirm, setShowConfirm] = useState(false);
     const [showUpdateModal, setShowUpdateModal] = useState(false);
+    const [showDetailModal, setShowDetailModal] = useState(false);
 
     const handleDelete = async () => {
         try {
@@ -31,7 +33,13 @@ const PortItem = ({ port, onUpdate, onDelete }) => {
     return (
         <>
             <Card className="straight-item-card">
-                <Card.Title>{port.name}</Card.Title>
+                <Card.Title
+                            className="clickable"
+                            onClick={() => setShowDetailModal(true)}
+                            style={{ cursor: 'pointer', textDecoration: 'underline' }}
+                        >
+                            {port.name}
+                        </Card.Title>
                     <div className="item-texts">
                         <Card.Text>Location: {port.location}</Card.Text>
                         <Card.Text>Country: {port.country}</Card.Text>
@@ -57,6 +65,14 @@ const PortItem = ({ port, onUpdate, onDelete }) => {
                     <Button variant="danger" onClick={handleDelete}>Yes, delete</Button>
                 </Modal.Footer>
             </Modal>
+
+
+            <GenericDetailModal
+                show={showDetailModal}
+                onHide={() => setShowDetailModal(false)}
+                title={`Port: ${port.name}`}
+                details={port}
+            />
 
             <UpdatePort
                 port={port}
