@@ -3,6 +3,7 @@ import PortItem from './PortItem';
 import AddPort from './AddPort';
 import { fetchPorts } from '../../services/api';
 import { Container } from 'react-bootstrap';
+import '../../styles/List.css';
 
 const PortList = () => {
     const [ports, setPorts] = useState([]);
@@ -40,16 +41,19 @@ const PortList = () => {
     return (
         <Container>
             <div className="d-flex justify-content-between mb-3">
-                <h2>Port List</h2>
+                <h2>Ports</h2>
                 <AddPort onAdd={handleAddPort} />
             </div>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
+            <hr className="divider" /> {/*linia podzialu*/}
+            {error && <p className="err-field">{"Err: "+error}</p>}
+            <div className="straight-list">
             {ports.length > 0 ? (
                 ports.map((port) => (
                     <PortItem key={port.id_port} port={port} onDelete={handleDeletePort} onUpdate={handleUpdatePort}/>))
             ) : (
                 <p>No ports available.</p>
             )}
+            </div>
         </Container>
     );
 };

@@ -8,6 +8,7 @@ import '../../styles/List.css';
 const ProductList = () => {
     const [products, setProducts] = useState([]);
     const [error, setError] = useState(null);
+    const [displayType, setDisplayType] = useState("grid");
 
     const loadProducts = async () => {
         try {
@@ -41,12 +42,12 @@ const ProductList = () => {
     return (
         <Container>
             <div className="d-flex justify-content-between mb-3">
-                <h2>Product List</h2>
+                <h2>Products</h2>
                 <AddProduct onAdd={handleAddProduct} />
             </div>
-            <hr className="product-list-divider" /> {/*linia podzialu*/}
+            <hr className="divider" /> {/*linia podzialu*/}
             {error && <p className="err-field">{"Err: "+error}</p>}
-            <div className="list">
+            <div className={`${displayType}-list`}>
             {products.length > 0 ? (
                 products.map((product) => (
                     <ProductItem key={product.id_product} product={product} onDelete={handleDeleteProduct} onUpdate={handleUpdateProduct}/>))

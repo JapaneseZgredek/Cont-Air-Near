@@ -10,6 +10,7 @@ const ProductItem = ({product, onUpdate, onDelete }) => {
     const [showUpdateModal, setShowUpdateModal] = useState(false);
     const [imageUrl, setImageUrl] = useState(null);
     const [loadingImage, setLoadingImage] = useState(true);
+    const [displayType, setDisplayType] = useState("grid");
 
     const handleDelete = async () => {
         try{
@@ -50,8 +51,7 @@ const ProductItem = ({product, onUpdate, onDelete }) => {
 
     return(
         <>
-            <Card className="item-card">
-                <Card.Body>
+            <Card className={`${displayType}-item-card`}>
                     <Card.Title>{product.name}</Card.Title>
                     {/* Kontener dla tekstów */}
                     <div className="item-texts">
@@ -60,27 +60,27 @@ const ProductItem = ({product, onUpdate, onDelete }) => {
                         {/*<Card.Text>Port ID: {product.id_port}</Card.Text>*/}
                     </div>
 
-                    {/* Kontener dla przycisków */}
-                    <div className="item-buttons">
+                    {/* Obrazek */}
+                    <div>
                         {loadingImage ? (
-                            <div>Loading image...</div>
+                            <div className="loading-message">Loading image...</div>
                         ) : imageUrl ? (
                             <img 
+                                className="item-image" 
                                 src={imageUrl} 
                                 alt={`Product_${product.id_product}`} 
-                                style={{ maxWidth: '200px', maxHeight: '200px', objectFit: 'cover' }} 
-                                //TODO replace inline style by creating CSS
-                                />
+                            />
                         ) : (
-                            <div>Missing image</div>
+                            <div className="missing-image">Missing image</div>
                         )}
                     </div>
-                    <div>
+
+                    {/* Kontener dla przycisków */}
+                    <div className="item-buttons">
                         <Button variant="danger" onClick={() => setShowConfirm(true)}>Delete</Button>
-                        <Button variant="warning" className="me-2" onClick={openUpdateModal}>Update</Button>
+                        <Button variant="warning" onClick={openUpdateModal}>Update</Button>
                         <Order_productButton productId={product.id_product} productName={product.name} />
                     </div>
-                </Card.Body>
             </Card>
 
             <Modal show={showConfirm} onHide={() => setShowConfirm(false)}>
