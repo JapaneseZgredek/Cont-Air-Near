@@ -45,6 +45,7 @@ const AddShip = ({ onAdd }) => {
             // if image was chosen - uploading it
             if (imageFile) {
                 await uploadShipImage(newShip.id_ship, imageFile);
+                newShip.image = "image_added";
             }
             onAdd(newShip);
             setShow(false);

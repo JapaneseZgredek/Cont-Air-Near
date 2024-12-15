@@ -50,7 +50,7 @@ const OrderItem = ({ order, onUpdate, onDelete }) => {
                     </div>
 
                     {/* Kontener dla przycisków */}
-                    <div>
+                    <div className="item-buttons">
                         <Order_productButton orderId={order.id_order}/>
                         <Button variant="warning" className="me-2" onClick={openUpdateModal}>Update</Button>
                         <Button variant="danger" onClick={() => setShowConfirm(true)}>Delete</Button>
