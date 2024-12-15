@@ -39,9 +39,8 @@ class ClientUpdate(BaseModel):
     address: Optional[str] = None
     telephone_number: Optional[int] = None
     email: Optional[str] = None
-    # logon_name: str
-    # password: str
-    # dodac potem ewentualnie w panelu admina/usera wtedy to uzyc
+    logon_name: str
+    password: str
 
 class ClientRead(BaseModel):
     id_client: int
