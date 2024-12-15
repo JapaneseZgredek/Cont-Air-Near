@@ -41,6 +41,7 @@ class ClientUpdate(BaseModel):
     email: Optional[str] = None
     logon_name: str
     password: str
+    role: UserRole
 
 class ClientRead(BaseModel):
     id_client: int
@@ -148,32 +149,36 @@ def update_client(
     current_client=Depends(get_current_client)
 ):
     check_user_role(current_client, [UserRole.ADMIN])
-    logger.info(f"Updating client with id: {id_client}")
+    logger.info(f"Updating client with ID: {id_client}")
+
     db_client = db.query(Client).filter(Client.id_client == id_client).first()
     if db_client is None:
-        logger.warning(f"Client with id: {id_client} not found")
-        raise HTTPException(status_code=404, detail="Client not found")
-    if not db_client:
-        logger.warning(f"Client with id: {id_client} not found")
+        logger.warning(f"Client with ID: {id_client} not found")
         raise HTTPException(status_code=404, detail="Client not found")
 
-    if db.query(Client).filter((Client.logon_name == client.logon_name) | (Client.email == client.email)).filter(
-        Client.id_client != id_client
-    ).first():
+    # Prevent duplicate logon_name or email
+    if db.query(Client).filter(
+        (Client.logon_name == client.logon_name) | (Client.email == client.email)
+    ).filter(Client.id_client != id_client).first():
         raise HTTPException(status_code=400, detail="Username or email already exists")
 
-    if client.name is not None:
+    # Update fields if provided
+    if client.name:
         db_client.name = client.name
-    if client.address is not None:
+    if client.address:
         db_client.address = client.address
-    if client.telephone_number is not None:
+    if client.telephone_number:
         db_client.telephone_number = client.telephone_number
-    if client.email is not None:
+    if client.email:
         db_client.email = client.email
-    db_client.logon_name = client.logon_name
-    db_client.email = client.email
-    db_client.password = bcrypt.hashpw(client.password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+    if client.logon_name:
+        db_client.logon_name = client.logon_name
+    if client.password:
+        db_client.password = bcrypt.hashpw(client.password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+    if client.role:
+        db_client.role = client.role
 
+    logger.info(f"Updated client fields: {client.dict(exclude_unset=True)}")
     db.commit()
     db.refresh(db_client)
     return db_client
