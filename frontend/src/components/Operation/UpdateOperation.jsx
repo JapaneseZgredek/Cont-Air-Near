@@ -104,13 +104,13 @@ const UpdateOperation = ({ operation, show, onHide, onUpdate }) => {
               value={operationType}
               onChange={(e) => setOperationType(e.target.value)}
             >
-              <option value="at_bay">At Bay</option>
-              <option value="transport">Transport</option>
-              <option value="transfer">Transfer</option>
-              <option value="departure">Departure</option>
-              <option value="arrival">Arrival</option>
-              <option value="loading">Cargo Loading</option>
-              <option value="discharge">Cargo Discharge</option>
+              <option value="AT_BAY">At Bay</option>
+              <option value="TRANSPORT">Transport</option>
+              <option value="TRANSFER">Transfer</option>
+              <option value="DEPARTURE">Departure</option>
+              <option value="ARRIVAL">Arrival</option>
+              <option value="CARGO_LOADING">Cargo Loading</option>
+              <option value="CARGO_DISCHARGE">Cargo Discharge</option>
             </Form.Control>
           </Form.Group>
           <Form.Group className="mb-3">
