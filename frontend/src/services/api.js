@@ -83,6 +83,11 @@ export async function fetchOperationsByShip(shipId) {
   return await fetchProtectedData(`/api/operations/ship/${shipId}`);
 }
 
+// export const fetchOperations = async () => {
+//   await verifyRoles(['EMPLOYEE', 'ADMIN']);
+//   return await fetchProtectedData(`/api/operations/`);
+// };
+
 export const fetchOperations = async () => {
   await verifyRoles(['EMPLOYEE', 'ADMIN']);
   return await fetchProtectedData(`/api/operations/`);
@@ -427,8 +432,8 @@ export const updateClient = async (client) => {
 export const loginClient = async (credentials) => {
   const response = await axios.post(`${API_URL}/api/clients/login`, credentials);
   const { access_token, role } = response.data;
-  localStorage.setItem("token", access_token);
-  localStorage.setItem("role", role);
+  localStorage.setItem('token', access_token);
+  localStorage.setItem('role', role);
   return response.data;
 };
 // Register
@@ -464,10 +469,39 @@ export const registerClient = async (clientData) => {
 //   }
 // };
 
+// export const fetchCurrentClient = async () => {
+//   const token = localStorage.getItem('token');
+//   if (!token) {
+//     console.error("Authentication token not found in localStorage.");
+//     throw new Error("Authentication required. Please log in.");
+//   }
+//
+//   try {
+//     const response = await axios.get(`${API_URL}/api/clients/me`, {
+//       headers: {
+//         Authorization: `Bearer ${token}`,
+//         'Content-Type': 'application/json',
+//       },
+//     });
+//     console.log("Client details fetched:", response.data);
+//     return response.data;
+//   } catch (error) {
+//     if (error.response?.status === 404) {
+//       console.warn("/api/clients/me endpoint not found. Falling back to localStorage.");
+//       const role = localStorage.getItem('role');
+//       if (!role) {
+//         throw new Error("Role information is missing. Please log in.");
+//       }
+//       return { role };
+//     }
+//     console.error("Error fetching current client details:", error.message);
+//     throw error;
+//   }
+// };
+
 export const fetchCurrentClient = async () => {
   const token = localStorage.getItem('token');
   if (!token) {
-    console.error("Authentication token not found in localStorage.");
     throw new Error("Authentication required. Please log in.");
   }
 
@@ -478,23 +512,12 @@ export const fetchCurrentClient = async () => {
         'Content-Type': 'application/json',
       },
     });
-    console.log("Client details fetched:", response.data);
     return response.data;
   } catch (error) {
-    if (error.response?.status === 404) {
-      console.warn("/api/clients/me endpoint not found. Falling back to localStorage.");
-      const role = localStorage.getItem('role');
-      if (!role) {
-        throw new Error("Role information is missing. Please log in.");
-      }
-      return { role };
-    }
-    console.error("Error fetching current client details:", error.message);
+    console.error("Error fetching current client details:", error.response?.data || error.message);
     throw error;
   }
 };
-
-
 
 export const verifyRoles = async (requiredRoles) => {
   try {

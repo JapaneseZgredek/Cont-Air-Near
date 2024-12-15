@@ -69,27 +69,46 @@ def authenticate_client(logon_name: str, password: str, db: Session):
         return None
     return client
 
+# def create_access_token(data: dict):
+#     to_encode = data.copy()
+#     expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+#     to_encode.update({"exp": expire})
+#     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
 def create_access_token(data: dict):
     to_encode = data.copy()
     expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
-def get_current_client(
-        token: str = Depends(oauth2_scheme),
-        db: Session = Depends(get_db)
-):
+# def get_current_client(
+#         token: str = Depends(oauth2_scheme),
+#         db: Session = Depends(get_db)
+# ):
+#     try:
+#         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+#         id_client = payload.get("sub")
+#         if not id_client:
+#             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+#         client = db.query(Client).filter(Client.id_client == int(id_client)).first()
+#         if not client:
+#             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Client not found")
+#         return client
+#     except JWTError:
+#         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token validation failed")
+
+def get_current_client(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         id_client = payload.get("sub")
         if not id_client:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token: Missing 'sub' claim")
         client = db.query(Client).filter(Client.id_client == int(id_client)).first()
         if not client:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Client not found")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Client not found")
         return client
-    except JWTError:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token validation failed")
+    except JWTError as e:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"Token validation failed: {str(e)}")
 
 
 #CRUD TABELE OG z wcześniej:
@@ -100,6 +119,9 @@ def get_all_clients(db: Session = Depends(get_db), current_client=Depends(get_cu
     clients = db.query(Client).all()
     return clients
 
+@router.get("/clients/me", response_model=ClientRead)
+def get_current_client_info(current_client: Client = Depends(get_current_client)):
+    return current_client
 
 @router.get("/clients/{id_client}", response_model=ClientRead)
 def read_client(id_client: int, db: Session = Depends(get_db), current_client=Depends(get_current_client)):
@@ -135,22 +157,24 @@ def create_client(
     db.refresh(db_client)
     return db_client
 
+# @router.post("/clients/login")
+# def login_client(
+#     client: ClientLogin,
+#     db: Session = Depends(get_db)
+# ):
+#     db_client = authenticate_client(client.logon_name, client.password, db)
+#     if not db_client:
+#         raise HTTPException(status_code=401, detail="Invalid username or password")
+#     token = create_access_token({"sub": str(db_client.id_client)})
+#     return {"access_token": token, "token_type": "bearer", "role": db_client.role.value}
+
 @router.post("/clients/login")
-def login_client(
-    client: ClientLogin,
-    db: Session = Depends(get_db)
-):
+def login_client(client: ClientLogin, db: Session = Depends(get_db)):
     db_client = authenticate_client(client.logon_name, client.password, db)
     if not db_client:
         raise HTTPException(status_code=401, detail="Invalid username or password")
     token = create_access_token({"sub": str(db_client.id_client)})
     return {"access_token": token, "token_type": "bearer", "role": db_client.role.value}
-
-@router.get("/clients/me", response_model=ClientRead)
-def get_current_client_info(
-        current_client: Client = Depends(get_current_client)
-):
-    return current_client
 
 @router.put("/clients/{id_client}", response_model=ClientRead)
 def update_client(

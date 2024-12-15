@@ -75,17 +75,24 @@ def get_operation(
         raise HTTPException(status_code=404, detail="Operation not found")
     return operation
 
+# @router.get("/operations", response_model=List[OperationRead])
+# def get_all_operations(
+#     db: Session = Depends(get_db),
+#     current_client=Depends(get_current_client)
+# ):
+#     check_user_role(current_client, [UserRole.EMPLOYEE, UserRole.ADMIN])  # Validate roles
+#     logger.info("Fetching all operations")
+#     operations = db.query(Operation).all()
+#     if not operations:
+#         raise HTTPException(status_code=404, detail="No operations found")
+#     return operations
+
 @router.get("/operations", response_model=List[OperationRead])
-def get_all_operations(
-    db: Session = Depends(get_db),
-    current_client=Depends(get_current_client)
-):
-    check_user_role(current_client, [UserRole.EMPLOYEE, UserRole.ADMIN])  # Validate roles
-    logger.info("Fetching all operations")
+def get_all_operations(db: Session = Depends(get_db), current_client=Depends(get_current_client)):
+    check_user_role(current_client, [UserRole.ADMIN, UserRole.EMPLOYEE])
     operations = db.query(Operation).all()
-    if not operations:
-        raise HTTPException(status_code=404, detail="No operations found")
     return operations
+
 
 @router.post("/operations", response_model=OperationRead)
 def create_operation(
