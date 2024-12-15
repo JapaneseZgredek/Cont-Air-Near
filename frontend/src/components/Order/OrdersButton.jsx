@@ -56,6 +56,7 @@ function OrdersButton({portId, portName, clientId, clientName}) {
                                     <th>#</th>
                                     <th>Date of Order</th>
                                     <th>Status</th>
+                                    <th>Description</th>
                                     <th>Port ID</th>
                                     <th>Client ID</th>
                                 </tr>
@@ -66,6 +67,7 @@ function OrdersButton({portId, portName, clientId, clientName}) {
                                     <td>{index + 1}</td>
                                     <td>{new Date(op.date_of_order).toLocaleString()}</td>
                                     <td>{op.status}</td>
+                                    <td>{op.description}</td>
                                     <td>{portName ? portName : op.id_port}</td>
                                     <td>{clientName ? clientName : op.id_client}</td>
                                 </tr>
