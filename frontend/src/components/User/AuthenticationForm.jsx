@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { registerClient, loginClient } from '../../services/api';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const AuthenticationForm = () => {
-  const [isLogin, setIsLogin] = useState(true);
+  const navigate = useNavigate();
+  const location = useLocation(); // To get the current route
+  const [isLogin, setIsLogin] = useState(location.pathname === '/login'); // Determine if it's login or register
+
   const [formData, setFormData] = useState({
     logonName: '',
     password: '',
@@ -12,15 +15,23 @@ const AuthenticationForm = () => {
     address: '',
     telephone_number: ''
   });
+
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState('');
-  const navigate = useNavigate();
 
+  // Handle switching between forms and updating the URL
   const switchForm = () => {
     setIsLogin(!isLogin);
     setFormData({ logonName: '', password: '', email: '', name: '', address: '', telephone_number: '' });
     setErrors({});
     setMessage('');
+
+    // Update the URL based on the form being shown
+    if (isLogin) {
+      navigate('/register'); // Switch to /register when in login form
+    } else {
+      navigate('/login'); // Switch to /login when in register form
+    }
   };
 
   const validateForm = () => {
@@ -32,7 +43,6 @@ const AuthenticationForm = () => {
       if (!formData.email) newErrors.email = 'Email is required';
       if (!formData.name) newErrors.name = 'Name is required';
       if (!formData.address) newErrors.address = 'Address is required';
-
       if (!formData.telephone_number) {
         newErrors.telephone_number = 'Telephone number is required';
       } else if (!/^[0-9]{7,15}$/.test(formData.telephone_number)) {
@@ -53,14 +63,11 @@ const AuthenticationForm = () => {
 
     try {
       if (isLogin) {
-        const credentials = {
-          logon_name: formData.logonName,
-          password: formData.password,
-        };
+        const credentials = { logon_name: formData.logonName, password: formData.password };
         const response = await loginClient(credentials);
         localStorage.setItem('token', response.access_token);
         setMessage('Login successful! Redirecting...');
-        setTimeout(() => navigate('/'), 1000);
+        setTimeout(() => navigate('/'), 1000); // Redirect to home page after login
       } else {
         const newClient = {
           logon_name: formData.logonName,
@@ -68,11 +75,17 @@ const AuthenticationForm = () => {
           email: formData.email,
           name: formData.name,
           address: formData.address,
-          telephone_number: parseInt(formData.telephone_number, 10),
+          telephone_number: parseInt(formData.telephone_number, 10)
         };
         const response = await registerClient(newClient);
-        setMessage(`Registration successful for user: ${response.logon_name}`);
-        setIsLogin(true);
+        setMessage('Registration successful! Please log in with your username.');
+
+        // Wait for 2 seconds before transitioning to the login form
+        setTimeout(() => {
+          setIsLogin(true); // Switch to login form after successful registration
+          setMessage(''); // Clear the registration message
+          navigate('/login'); // Redirect to login page
+        }, 3500);
       }
       setErrors({});
     } catch (err) {
