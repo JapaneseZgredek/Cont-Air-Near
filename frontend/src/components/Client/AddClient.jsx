@@ -1,131 +1,172 @@
-import React, { useState } from 'react';
-import { Button, Form, Modal } from 'react-bootstrap';
+import React, { useState } from "react";
+import { Button, Form, Modal, Spinner } from "react-bootstrap";
 import { createClient } from "../../services/api";
 
-const AddClient = ({ onAdd }) => {
-    const [show, setShow] = useState(false);
-    const [name, setName] = useState('');
-    const [address, setAddress] = useState('');
-    const [telephone_number, setTelephone_number] = useState('');
-    const [email, setEmail] = useState('');
-    const [error, setError] = useState(null);
-    const [validationErrors, setValidationErrors] = useState({});
+const AddClient = ({ show, onHide, onAdd }) => {
+  const [name, setName] = useState("");
+  const [address, setAddress] = useState("");
+  const [telephone_number, setTelephoneNumber] = useState("");
+  const [email, setEmail] = useState("");
+  const [logon_name, setLogonName] = useState("");
+  const [role, setRole] = useState("");
+  const [password, setPassword] = useState("");
+  const [validationErrors, setValidationErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const validateInputs = () => {
+    const errors = {};
 
-    const validateInputs = () => {
-        const errors = {};
-
-        if (!name.trim()) errors.name = "Name is required.";
-        if (!address.trim()) errors.address = "Address is required";
-        if (!telephone_number.trim()) {
-            errors.telephone_number = "Telephone number is required."
-        } else if (!/^\d{7,15}$/.test(telephone_number)) {
-            errors.telephone_number = "Telephone number must be at least 7 digits"
-        }
-        if (!email.trim()) {
-            errors.email = "Email is required.";
-        } else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)) {
-            errors.email = "Invalid email format."
-        }
-
-        return errors;
+    if (!name.trim()) errors.name = "Name is required.";
+    if (!address.trim()) errors.address = "Address is required.";
+    if (!telephone_number) {
+      errors.telephone_number = "Telephone number is required.";
+    } else if (!/^\d{7,15}$/.test(telephone_number)) {
+      errors.telephone_number = "Telephone number must be 7-15 digits.";
     }
+    if (!email.trim()) {
+      errors.email = "Email is required.";
+    } else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)) {
+      errors.email = "Invalid email format.";
+    }
+    if (!logon_name.trim()) errors.logon_name = "Logon name is required.";
+    if (!role) errors.role = "Role selection is required.";
+    if (!password.trim()) errors.password = "Password is required.";
 
-    const handleSubmit = async (e) => {
+    return errors;
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const errors = validateInputs();
     if (Object.keys(errors).length > 0) {
-        setValidationErrors(errors);
-        return;
+      setValidationErrors(errors);
+      return;
     }
-    try {
-        const newClient = await createClient({
-            name,
-            address,
-            telephone_number: telephone_number ? parseInt(telephone_number) : null,
-            email
-        });
-        onAdd(newClient);
-        setShow(false);
-        setName('');
-        setAddress('');
-        setTelephone_number('');
-        setEmail('');
-        setValidationErrors({});
-    } catch (err) {
-        setError('Failed to create client');
-    }
-};
 
-    return (
-        <>
-            <Button variant="primary" onClick={() => setShow(true)}>Add Client</Button>
-            <Modal show={show} onHide={() => setShow(false)}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Add New Client</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    {error && <p style={{ color: 'red' }}>{error}</p>}
-                    <Form onSubmit={handleSubmit}>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Client Name</Form.Label>
-                            <Form.Control
-                                type="text"
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
-                                placeholder="Enter name"
-                                isInvalid={!!validationErrors.name}
-                            />
-                            <Form.Control.Feedback type="invalid">
-                                {validationErrors.name}
-                            </Form.Control.Feedback>
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Address</Form.Label>
-                            <Form.Control
-                                type="text"
-                                value={address}
-                                onChange={(e) => setAddress(e.target.value)}
-                                placeholder="Enter address"
-                                isInvalid={!!validationErrors.address}
-                            />
-                            <Form.Control.Feedback type="invalid">
-                                {validationErrors.address}
-                            </Form.Control.Feedback>
-                        </Form.Group>
-			            <Form.Group className="mb-3">
-                            <Form.Label>Telephone_number</Form.Label>
-                            <Form.Control
-                                type="number"
-                                value={telephone_number}
-                                onChange={(e) => setTelephone_number(e.target.value)}
-                                placeholder="Enter telephone_number"
-                                isInvalid={!!validationErrors.telephone_number}
-                            />
-                            <Form.Control.Feedback type="invalid">
-                                {validationErrors.telephone_number}
-                            </Form.Control.Feedback>
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Email</Form.Label>
-                            <Form.Control
-                                type="text"
-                                // type="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                placeholder="Enter email"
-                                isInvalid={!!validationErrors.email}
-                            />
-                            <Form.Control.Feedback type="invalid">
-                                {validationErrors.email}
-                            </Form.Control.Feedback>
-                        </Form.Group>
-                        <Button variant="success" type="submit">Add Client</Button>
-                    </Form>
-                </Modal.Body>
-            </Modal>
-        </>
-    );
+    setIsSubmitting(true);
+    const newClient = {
+      name,
+      address,
+      telephone_number: parseInt(telephone_number),
+      email,
+      logon_name,
+      role,
+      password,
+    };
+
+    try {
+      const result = await createClient(newClient);
+      if (onAdd) onAdd(result); // Call onAdd if provided
+      if (onHide) onHide(); // Close modal
+      setValidationErrors({});
+    } catch (error) {
+      console.error("Failed to add client:", error);
+      setValidationErrors({ server: error.response?.data?.detail || "Failed to add client" });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <Modal show={show} onHide={onHide}>
+      <Modal.Header closeButton>
+        <Modal.Title>Add Client</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <Form onSubmit={handleSubmit}>
+          <Form.Group className="mb-3">
+            <Form.Label>Client Name</Form.Label>
+            <Form.Control
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Enter name"
+              isInvalid={!!validationErrors.name}
+            />
+            <Form.Control.Feedback type="invalid">{validationErrors.name}</Form.Control.Feedback>
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>Email</Form.Label>
+            <Form.Control
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter a valid email address"
+              isInvalid={!!validationErrors.email}
+            />
+            <Form.Control.Feedback type="invalid">{validationErrors.email}</Form.Control.Feedback>
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>Telephone Number</Form.Label>
+            <Form.Control
+              type="tel"
+              value={telephone_number}
+              onChange={(e) => setTelephoneNumber(e.target.value)}
+              placeholder="Enter telephone number"
+              isInvalid={!!validationErrors.telephone_number}
+            />
+            <Form.Control.Feedback type="invalid">
+              {validationErrors.telephone_number}
+            </Form.Control.Feedback>
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>Address</Form.Label>
+            <Form.Control
+              type="text"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              placeholder="Enter address"
+              isInvalid={!!validationErrors.address}
+            />
+            <Form.Control.Feedback type="invalid">{validationErrors.address}</Form.Control.Feedback>
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>Logon Name</Form.Label>
+            <Form.Control
+              type="text"
+              value={logon_name}
+              onChange={(e) => setLogonName(e.target.value)}
+              placeholder="Enter logon name"
+              isInvalid={!!validationErrors.logon_name}
+            />
+            <Form.Control.Feedback type="invalid">{validationErrors.logon_name}</Form.Control.Feedback>
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>Role</Form.Label>
+            <Form.Select
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              isInvalid={!!validationErrors.role}
+            >
+              <option value="">Select role</option>
+              <option value="GUEST">Guest</option>
+              <option value="CLIENT">Client</option>
+              <option value="EMPLOYEE">Employee</option>
+              <option value="ADMIN">Admin</option>
+            </Form.Select>
+            <Form.Control.Feedback type="invalid">{validationErrors.role}</Form.Control.Feedback>
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>Password</Form.Label>
+            <Form.Control
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter password"
+              isInvalid={!!validationErrors.password}
+            />
+            <Form.Control.Feedback type="invalid">{validationErrors.password}</Form.Control.Feedback>
+          </Form.Group>
+          {validationErrors.server && (
+            <div className="text-danger mb-3">{validationErrors.server}</div>
+          )}
+          <Button variant="success" type="submit" disabled={isSubmitting}>
+            {isSubmitting ? <Spinner animation="border" size="sm" /> : "Add Client"}
+          </Button>
+        </Form>
+      </Modal.Body>
+    </Modal>
+  );
 };
 
 export default AddClient;

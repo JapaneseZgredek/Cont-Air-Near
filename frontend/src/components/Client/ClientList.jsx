@@ -2,11 +2,12 @@ import React, { useEffect, useState } from 'react';
 import ClientItem from './ClientItem';
 import AddClient from './AddClient';
 import { fetchClients } from '../../services/api';
-import { Container } from 'react-bootstrap';
+import { Container, Button } from 'react-bootstrap';
 
 const ClientList = () => {
     const [clients, setClients] = useState([]);
     const [error, setError] = useState(null);
+    const [showAddClientModal, setShowAddClientModal] = useState(false);
 
     const loadClients = async () => {
         try {
@@ -23,6 +24,7 @@ const ClientList = () => {
 
     const handleAddClient = (newClient) => {
         setClients((prevClients) => [...prevClients, newClient]);
+        setShowAddClientModal(false);
     };
 
     const handleUpdateClient = (updatedClient) => {
@@ -41,7 +43,9 @@ const ClientList = () => {
         <Container>
             <div className="d-flex justify-content-between mb-3">
                 <h2>Client List</h2>
-                <AddClient onAdd={handleAddClient} />
+                <Button variant="primary" onClick={() => setShowAddClientModal(true)}>
+                    Add Client
+                </Button>
             </div>
             {error && <p style={{ color: 'red' }}>{error}</p>}
             {clients.length > 0 ? (
@@ -56,6 +60,11 @@ const ClientList = () => {
             ) : (
                 <p>No clients available.</p>
             )}
+            <AddClient
+                show={showAddClientModal}
+                onHide={() => setShowAddClientModal(false)}
+                onAdd={handleAddClient}
+            />
         </Container>
     );
 };
