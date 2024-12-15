@@ -4,12 +4,14 @@ import AddOperation from './AddOperation';
 import { fetchOperations } from '../../services/api';
 import { Container } from 'react-bootstrap';
 import SearchAndFilterBar from '../SearchAndFilterBar';
+import '../../styles/List.css';
 
 const OperationList = () => {
     const [operations, setOperations] = useState([]);
     const [filteredOperations, setFilteredOperations] = useState([]);
     const [searchInColumn, setSearchInColumn] = useState('');
     const [error, setError] = useState(null);
+    const [displayType, setDisplayType] = useState("straight");
 
     const loadOperations = async () => {
         try {
@@ -73,9 +75,11 @@ const OperationList = () => {
     return (
         <Container>
             <div className="d-flex justify-content-between mb-3">
-                <h2>Operation List</h2>
+                <h2>Operations</h2>
                 <AddOperation onAdd={handleAddOperation} />
             </div>
+            <hr className="divider" /> {/*linia podzialu*/}
+            
 
             <SearchAndFilterBar
                 onSearch={handleSearch}
@@ -84,9 +88,9 @@ const OperationList = () => {
                 filterOptions={['name of operation', 'operation type', 'date of operation', 'id ship', 'id port']}
             />
 
-            {error ? (
-                <p style={{ color: 'red' }}>{error}</p>
-            ) : filteredOperations.length > 0 ? (
+            {error && <p className="err-field">{"Err: "+error}</p>}
+            <div className={`${displayType}-list`}>
+            {filteredOperations.length > 0 ? (
                 filteredOperations.map((operation) => (
                     <OperationItem
                         key={operation.id_operation}
@@ -98,6 +102,7 @@ const OperationList = () => {
             ) : (
                 <p>No operations available.</p>
             )}
+            </div>
         </Container>
     );
 };

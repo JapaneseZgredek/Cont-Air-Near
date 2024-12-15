@@ -3,16 +3,16 @@ import { Card, Button, Modal } from 'react-bootstrap';
 import { deleteProduct , fetchProductImage } from '../../services/api';
 import UpdateProduct from "./UpdateProduct";
 import Order_productButton from "../Order_product/Order_productButton";
-import '../../styles/List.css';
 import GenericDetailModal from "../GenericDetailModal";
+import '../../styles/List.css';
 
 const ProductItem = ({product, onUpdate, onDelete }) => {
     const [showConfirm, setShowConfirm] = useState(false);
     const [showUpdateModal, setShowUpdateModal] = useState(false);
     const [imageUrl, setImageUrl] = useState(null);
     const [loadingImage, setLoadingImage] = useState(true);
-    const [displayType, setDisplayType] = useState("grid");
     const [showDetailModal, setShowDetailModal] = useState(false);
+    const [displayType, setDisplayType] = useState("grid");
 
     const handleDelete = async () => {
         try{
@@ -63,9 +63,9 @@ const ProductItem = ({product, onUpdate, onDelete }) => {
                         </Card.Title>
                     {/* Kontener dla tekstów */}
                     <div className="item-texts">
-                        <Card.Text>Price: {product.price}</Card.Text>
-                        <Card.Text>Weight: {product.weight}</Card.Text>
-                        <Card.Text>Port ID: {product.id_port}</Card.Text>
+                        <a>Price: {product.price}</a>
+                        <a>Weight: {product.weight}</a>
+                        <a>Port ID: {product.id_port}</a>
                     </div>
 
                     {/* Obrazek */}
@@ -85,9 +85,9 @@ const ProductItem = ({product, onUpdate, onDelete }) => {
 
                     {/* Kontener dla przycisków */}
                     <div className="item-buttons">
-                        <Button variant="danger" onClick={() => setShowConfirm(true)}>Delete</Button>
-                        <Button variant="warning" onClick={openUpdateModal}>Update</Button>
                         <Order_productButton productId={product.id_product} productName={product.name} />
+                        <Button variant="warning" onClick={openUpdateModal}>Update</Button>
+                        <Button variant="danger" onClick={() => setShowConfirm(true)}>Delete</Button>
                     </div>
             </Card>
 

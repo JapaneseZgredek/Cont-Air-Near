@@ -3,8 +3,8 @@ import ProductItem from './ProductItem';
 import AddProduct from './AddProduct';
 import { fetchProducts } from '../../services/api';
 import { Container } from 'react-bootstrap';
-import '../../styles/List.css';
 import SearchAndFilterBar from '../SearchAndFilterBar';
+import '../../styles/List.css';
 
 const ProductList = () => {
     const [products, setProducts] = useState([]);

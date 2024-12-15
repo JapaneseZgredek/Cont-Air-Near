@@ -4,12 +4,14 @@ import AddShip from './AddShip';
 import { fetchShips } from '../../services/api';
 import { Container } from 'react-bootstrap';
 import SearchAndFilterBar from '../SearchAndFilterBar'; // 🆕 Import komponentu do wyszukiwania i filtrowania
+import '../../styles/List.css';
 
 const ShipList = () => {
     const [ships, setShips] = useState([]);
     const [filteredShips, setFilteredShips] = useState([]);
     const [searchInColumn, setSearchInColumn] = useState('');
     const [error, setError] = useState(null);
+    const [displayType, setDisplayType] = useState("grid");
 
     const loadShips = async () => {
         try {
@@ -73,9 +75,10 @@ const ShipList = () => {
     return (
         <Container>
             <div className="d-flex justify-content-between mb-3">
-                <h2>Ship List</h2>
+                <h2>Ships</h2>
                 <AddShip onAdd={handleAddShip} />
             </div>
+            <hr className="divider" /> {/*linia podzialu*/}
 
             <SearchAndFilterBar
                 onSearch={handleSearch}
@@ -84,7 +87,8 @@ const ShipList = () => {
                 filterOptions={['name', 'capacity']}
             />
 
-            {error && <p style={{ color: 'red' }}>{error}</p>}
+            {error && <p className="err-field">{"Err: "+error}</p>}
+            <div className={`${displayType}-list`}>
             {filteredShips.length > 0 ? (
                 filteredShips.map((ship) => (
                     <ShipItem
@@ -97,6 +101,7 @@ const ShipList = () => {
             ) : (
                 <p>No ships available.</p>
             )}
+            </div>
         </Container>
     )
 }

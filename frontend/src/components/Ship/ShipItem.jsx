@@ -4,11 +4,13 @@ import { deleteShip } from '../../services/api';
 import UpdateShip from "./UpdateShip";
 import OperationsButton from "../Operation/OperationsButton";
 import GenericDetailModal from "../GenericDetailModal";
+import '../../styles/List.css';
 
 const ShipItem = ({ ship, onUpdate, onDelete }) => {
     const [showConfirm, setShowConfirm] = useState(false);
     const [showUpdatedModal, setShowUpdateModal] = useState(false);
     const [showDetailModal, setShowDetailModal] = useState(false);
+    const [displayType, setDisplayType] = useState("grid");
 
     const handleDelete = async () => {
         try {
@@ -30,24 +32,31 @@ const ShipItem = ({ ship, onUpdate, onDelete }) => {
 
     return (
         <>
-        <Card className="mb-3">
-            <Card.Body className="d-flex justify-content-between align-items-center">
-                <div>
-                    <Card.Title
-                        className="clickable"
-                        onClick={() => setShowDetailModal(true)}
-                        style={{ cursor: 'pointer', textDecoration: 'underline' }}
-                    >
-                        {ship.name}
-                    </Card.Title>
-                    <Card.Text>Capacity: {ship.capacity}</Card.Text>
+        <Card className={`${displayType}-item-card`}>
+                <Card.Title
+                    className="clickable"
+                    onClick={() => setShowDetailModal(true)}
+                    style={{ cursor: 'pointer', textDecoration: 'underline' }}
+                >
+                    {ship.name}
+                </Card.Title>
+
+                {/* Kontener dla tekstów */}
+                <div className="item-texts">    
+                    <a>Capacity: {ship.capacity}</a>
                 </div>
-                <div>
+
+                {/* Obrazek 
+                TODO
+                
+                */}
+
+                {/* Kontener dla przycisków */}
+                <div className="item-buttons">
                     <OperationsButton shipId={ship.id_ship} shipName={ship.name} />
-                    <Button variant="warning" className="me-2" onClick={openUpdateModal}>Update</Button>
+                    <Button variant="warning" onClick={openUpdateModal}>Update</Button>
                     <Button variant="danger" onClick={() => setShowConfirm(true)}>Delete</Button>
                 </div>
-            </Card.Body>
         </Card>
 
         <Modal show={showConfirm} onHide={() => setShowConfirm(false)}>

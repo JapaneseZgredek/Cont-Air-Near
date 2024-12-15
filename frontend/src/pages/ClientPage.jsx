@@ -4,7 +4,7 @@ import ClientList from '../components/Client/ClientList';
 
 const ClientPage = () => {
   return (
-    <div>
+    <div className='listing-page'>
       <NavbarComponent />
       <ClientList />
     </div>

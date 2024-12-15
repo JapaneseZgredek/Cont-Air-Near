@@ -3,10 +3,12 @@ import Order_productItem from './Order_productItem';
 import Order_productAdd from './Order_productAdd';
 import { fetchOrders_products } from '../../services/api';
 import { Container } from 'react-bootstrap';
+import '../../styles/List.css';
 
 const Order_productList = () => {
     const [order_products, setOrder_products] = useState([]);
     const [error, setError] = useState(null);
+    const [displayType, setDisplayType] = useState("straight");
 
     const loadOrder_products = async () => {
         try {
@@ -47,7 +49,10 @@ const Order_productList = () => {
                 <h2>Order_product List</h2>
                 <Order_productAdd onAdd={handleAddOrder_product} />
             </div>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
+            <hr className="divider" /> {/*linia podzialu*/}
+
+            {error && <p className="err-field">{"Err: "+error}</p>}
+            <div className={`${displayType}-list`}>
             {order_products.length > 0 ? (
                 order_products.map((order_product) => (
                     <Order_productItem
@@ -60,6 +65,7 @@ const Order_productList = () => {
             ) : (
                 <p>No order_products available.</p>
             )}
+            </div>
         </Container>
     );
 };

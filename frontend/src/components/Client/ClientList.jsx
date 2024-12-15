@@ -4,6 +4,7 @@ import AddClient from './AddClient';
 import SearchAndFilterBar from "../SearchAndFilterBar";
 import { fetchClients } from '../../services/api';
 import { Container, Button } from 'react-bootstrap';
+import '../../styles/List.css';
 
 const ClientList = () => {
     const [clients, setClients] = useState([]);
@@ -12,6 +13,7 @@ const ClientList = () => {
     const filterOptions = ['name', 'address', 'telephone number', 'email'];
     const [searchInColumn, setSearchInColumn] = useState('');
     const [showAddClientModal, setShowAddClientModal] = useState(false);
+    const [displayType, setDisplayType] = useState("straight");
 
     const loadClients = async () => {
         try {
@@ -78,11 +80,12 @@ const ClientList = () => {
     return (
         <Container>
             <div className="d-flex justify-content-between mb-3">
-                <h2>Client List</h2>
+                <h2>Clients</h2>
                 <Button variant="primary" onClick={() => setShowAddClientModal(true)}>
                     Add Client
                 </Button>
             </div>
+            <hr className="divider" /> {/*linia podzialu*/}
 
             <SearchAndFilterBar
                 onSearch={handleSearch}
@@ -90,8 +93,9 @@ const ClientList = () => {
                 onSortChange={handleSortChange}
                 filterOptions={filterOptions}
             />
-
-            {error && <p style={{ color: 'red' }}>{error}</p>}
+            
+            {error && <p className="err-field">{"Err: "+error}</p>}
+            <div className={`${displayType}-list`}>
             {filteredClients.length > 0 ? (
                 filteredClients.map((client) => (
                     <ClientItem
@@ -109,6 +113,7 @@ const ClientList = () => {
                 onHide={() => setShowAddClientModal(false)}
                 onAdd={handleAddClient}
             />
+            </div>
         </Container>
     );
 };

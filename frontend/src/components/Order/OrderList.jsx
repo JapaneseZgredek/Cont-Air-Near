@@ -4,12 +4,14 @@ import OrderAdd from './OrderAdd';
 import { fetchOrders } from '../../services/api';
 import { Container } from 'react-bootstrap';
 import SearchAndFilterBar from '../SearchAndFilterBar';
+import '../../styles/List.css';
 
 const OrderList = () => {
     const [orders, setOrders] = useState([]);
     const [filteredOrders, setFilteredOrders] = useState([]);
     const [searchInColumn, setSearchInColumn] = useState('');
     const [error, setError] = useState(null);
+    const [displayType, setDisplayType] = useState("straight");
 
     const loadOrders = async () => {
         try {
@@ -50,9 +52,11 @@ const OrderList = () => {
     return (
         <Container>
             <div className="d-flex justify-content-between mb-3">
-                <h2>Order List</h2>
+                <h2>Orders</h2>
                 <OrderAdd onAdd={(newOrder) => setOrders(prev => [...prev, newOrder])} />
             </div>
+            <hr className="divider" /> {/*linia podzialu*/}
+
 
             <SearchAndFilterBar
                 onSearch={handleSearch}
@@ -61,7 +65,8 @@ const OrderList = () => {
                 filterOptions={['id_order', 'status', 'id_port']}
             />
 
-            {error && <p style={{ color: 'red' }}>{error}</p>}
+            {error && <p className="err-field">{"Err: "+error}</p>}
+            <div className={`${displayType}-list`}>
             {filteredOrders.length > 0 ? (
                 filteredOrders.map((order) => (
                     <OrderItem
@@ -76,6 +81,7 @@ const OrderList = () => {
             ) : (
                 <p>No orders available.</p>
             )}
+            </div>
         </Container>
     );
 };

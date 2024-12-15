@@ -4,11 +4,13 @@ import { deleteOrder } from '../../services/api';
 import OrderUpdate from './OrderUpdate';
 import Order_productButton from "../Order_product/Order_productButton";
 import GenericDetailModal from "../GenericDetailModal";
+import '../../styles/List.css';
 
 const OrderItem = ({ order, onUpdate, onDelete }) => {
     const [showConfirm, setShowConfirm] = useState(false);
     const [showUpdateModal, setShowUpdateModal] = useState(false);
     const [showDetailModal, setShowDetailModal] = useState(false);
+    const [displayType, setDisplayType] = useState("straight");
 
     const handleDelete = async () => {
         try {
@@ -30,27 +32,29 @@ const OrderItem = ({ order, onUpdate, onDelete }) => {
 
     return (
         <>
-            <Card className="mb-3">
-                <Card.Body className="d-flex justify-content-between align-items-center">
-                    <div>
-                        <Card.Title
-                            className="clickable"
-                            onClick={() => setShowDetailModal(true)}
-                            style={{ cursor: 'pointer', textDecoration: 'underline' }}
-                        >
-                            Order ID: {order.id_order}
-                        </Card.Title>
-                        <Card.Text>Status: {order.status}</Card.Text>
-                        <Card.Text>Description: {order.description}</Card.Text>
-                        <Card.Text>Port ID: {order.id_port}</Card.Text>
-                        <Card.Text>Client ID: {order.id_client}</Card.Text>
+            <Card className={`${displayType}-item-card`}>
+                    <Card.Title
+                        className="clickable"
+                        onClick={() => setShowDetailModal(true)}
+                        style={{ cursor: 'pointer', textDecoration: 'underline' }}
+                    >
+                        Order ID: {order.id_order}
+                    </Card.Title>
+
+                    {/* Kontener dla tekstów */}
+                    <div className="item-texts">
+                        <a>Status: {order.status}</a>
+                        <a>Description: {order.description}</a>
+                        <a>Port ID: {order.id_port}</a>
+                        <a>Client ID: {order.id_client}</a>
                     </div>
+
+                    {/* Kontener dla przycisków */}
                     <div>
+                        <Order_productButton orderId={order.id_order}/>
                         <Button variant="warning" className="me-2" onClick={openUpdateModal}>Update</Button>
                         <Button variant="danger" onClick={() => setShowConfirm(true)}>Delete</Button>
-                        <Order_productButton orderId={order.id_order}/>
                     </div>
-                </Card.Body>
             </Card>
 
             <Modal show={showConfirm} onHide={() => setShowConfirm(false)}>

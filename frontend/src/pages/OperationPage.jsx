@@ -4,7 +4,7 @@ import OperationList from '../components/Operation/OperationList';
 
 const OperationPage = () => {
   return (
-    <div>
+    <div className='listing-page'>
       <NavbarComponent />
       <OperationList />
     </div>

@@ -89,9 +89,9 @@
     justify-content:center;
     flex-wrap: wrap;
 }
-.straight-item-card .item-texts > div {
-    display: inline-block;
-    margin: 0;
+.straight-item-card .item-texts{
+    width: 500px;
+    justify-content: space-between;
 }
 
 /*podział na grid i straight listy*/
