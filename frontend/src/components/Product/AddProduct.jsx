@@ -49,6 +49,7 @@ const AddProduct = ({ onAdd }) => {
               // if image was chosen - uploading it
             if (imageFile) {
                 await uploadProductImage(newProduct.id_product, imageFile);
+                newProduct.image = "image_added";
             }
             onAdd(newProduct);
             resetForm();

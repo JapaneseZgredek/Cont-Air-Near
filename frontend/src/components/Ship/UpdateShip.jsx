@@ -1,10 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, Form, Modal } from 'react-bootstrap';
-import { updateShip } from '../../services/api';
+import { updateShip, uploadShipImage } from '../../services/api';
 
 const UpdateShip = ({ ship, show, onHide, onUpdate }) => {
   const [name, setName] = useState(ship.name);
   const [capacity, setCapacity] = useState(ship.capacity);
+  const [image, setImage] = useState(ship.image ? "present" : "");
+  const [imageFile, setImageFile] = useState(null);
+  const [deleteImage, setDeleteImage] = useState(false);
+  const maxImageWidth = 512;
+  const maxImageHeight = 512;
   const [validationErrors, setValidationErrors] = useState({});
 
   const validateInputs = () => {
@@ -30,13 +35,56 @@ const UpdateShip = ({ ship, show, onHide, onUpdate }) => {
 
     const updatedShip = { ...ship, name, capacity };
     try {
+      if (imageFile) {
+        await checkImageDimensions(imageFile);
+      }
+      if (deleteImage) {
+        updatedShip.image="";
+      }
       const result = await updateShip(updatedShip);
+      // if new image was chosen - uploading it
+      if (imageFile) {
+        await uploadShipImage(ship.id_ship, imageFile);
+      }
+      setImage(deleteImage ? "" : "present");
       onUpdate(result);
       onHide();
     } catch (error) {
       console.error('Failed to update ship:', error);
     }
   };
+
+  const handleImageChange = (e) => {
+    setImageFile(e.target.files[0]);
+  };
+
+  const handleDeleteImageChange = (e) => {
+    setDeleteImage(e.target.checked);
+  };
+
+  const checkImageDimensions = (file) => {
+    return new Promise((resolve, reject) => {
+        const validTypes = ['image/jpeg', 'image/png'];
+        if (!validTypes.includes(file.type)) {
+            return reject("\nInvalid file type. Allowed types: "+validTypes);
+        }
+        const img = new Image();
+        img.onload = () => {
+            if (img.width > maxImageWidth || img.height > maxImageHeight) {
+                reject("\nImage dimensions must not exceed "+maxImageWidth+"x"+maxImageHeight+" pixels.");
+            } else {
+                resolve();
+            }
+        };
+        img.onerror = () => reject("\nFailed to load image.");
+        img.src = URL.createObjectURL(file);
+    });
+  };  
+
+  useEffect(() => {
+    setImageFile(null);
+    setDeleteImage(false);
+  }, [ship]);
 
   return (
     <Modal show={show} onHide={onHide}>
@@ -71,6 +119,28 @@ const UpdateShip = ({ ship, show, onHide, onUpdate }) => {
               {validationErrors.capacity}
             </Form.Control.Feedback>
           </Form.Group>
+
+          {(!deleteImage) && (
+          <Form.Group className="mb-3">
+            <Form.Label>Ship Image</Form.Label>
+            <Form.Control
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+            />
+          </Form.Group>
+          )}
+
+          {!(image === "" || imageFile) && (
+            <Form.Check
+              type="checkbox"
+              label="Delete Image"
+              checked={deleteImage}
+              onChange={handleDeleteImageChange}
+              className="mb-3"
+            />
+          )}
+
           <Button variant="success" type="submit">
             Save Changes
           </Button>

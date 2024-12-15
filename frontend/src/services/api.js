@@ -72,6 +72,31 @@ export const updateShip = async (ship) => {
     }
 };
 
+export const fetchShipImage = async (id_ship) => {
+    const response = await fetch(`http://localhost:8000/api/ships/image/${id_ship}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch ship image');
+    }
+    // response converted to Blob object
+    const imageBlob = await response.blob();
+    const imageUrl = URL.createObjectURL(imageBlob);
+    return imageUrl;
+  };
+  
+  export const uploadShipImage = async (id_ship, file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await fetch(`http://localhost:8000/api/ships/image/${id_ship}`, {
+      method: 'POST',
+      body: formData
+    });
+    if (!response.ok) {
+      throw new Error('Failed to upload ship '+id_ship+' image');
+    }
+    const data = await response.json();
+    return data;
+  };
+
 // Operation table related
 export async function fetchOperationsByPort(portId) {
     await verifyRoles(['EMPLOYEE', 'ADMIN']);

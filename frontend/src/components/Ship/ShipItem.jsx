@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, Button, Modal } from 'react-bootstrap';
-import { deleteShip } from '../../services/api';
+import { deleteShip, fetchShipImage } from '../../services/api';
 import UpdateShip from "./UpdateShip";
 import OperationsButton from "../Operation/OperationsButton";
 import GenericDetailModal from "../GenericDetailModal";
@@ -9,6 +9,8 @@ import '../../styles/List.css';
 const ShipItem = ({ ship, onUpdate, onDelete }) => {
     const [showConfirm, setShowConfirm] = useState(false);
     const [showUpdatedModal, setShowUpdateModal] = useState(false);
+    const [imageUrl, setImageUrl] = useState(null);
+    const [loadingImage, setLoadingImage] = useState(true);
     const [showDetailModal, setShowDetailModal] = useState(false);
     const [displayType, setDisplayType] = useState("grid");
 
@@ -28,7 +30,25 @@ const ShipItem = ({ ship, onUpdate, onDelete }) => {
 
     const closeUpdateModal = () => {
         setShowUpdateModal(false);
+        loadImage();
     }
+
+    const loadImage = async () => {
+        try {
+              setLoadingImage(true);
+              const url = await fetchShipImage(ship.id_ship);
+              setImageUrl(url);
+          } catch (error) {
+              console.error("Failed to load ship image", error);
+              setImageUrl(null);
+          } finally {
+              setLoadingImage(false);
+          }
+      };
+
+    useEffect(() => {
+        loadImage();
+    }, [ship.id_ship]);
 
     return (
         <>
@@ -46,10 +66,20 @@ const ShipItem = ({ ship, onUpdate, onDelete }) => {
                     <a>Capacity: {ship.capacity}</a>
                 </div>
 
-                {/* Obrazek 
-                TODO
-                
-                */}
+                {/* Obrazek */}
+                <div>
+                        {loadingImage ? (
+                            <div className="loading-message">Loading image...</div>
+                        ) : imageUrl ? (
+                            <img 
+                                className="item-image" 
+                                src={imageUrl} 
+                                alt={`Ship_${ship.id_ship}`} 
+                            />
+                        ) : (
+                            <div className="missing-image">Missing image</div>
+                        )}
+                    </div>
 
                 {/* Kontener dla przycisków */}
                 <div className="item-buttons">

@@ -141,6 +141,7 @@ const UpdateProduct = ({ product, show, onHide, onUpdate }) => {
             </Form.Control.Feedback>
           </Form.Group>
 
+          {(!deleteImage) && (
           <Form.Group className="mb-3">
             <Form.Label>Product Image</Form.Label>
             <Form.Control
@@ -149,6 +150,7 @@ const UpdateProduct = ({ product, show, onHide, onUpdate }) => {
               onChange={handleImageChange}
             />
           </Form.Group>
+          )}
           
           {!(image === "" || imageFile) && (
             <Form.Check

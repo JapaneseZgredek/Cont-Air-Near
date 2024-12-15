@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from backend.database import get_db
 import bcrypt
 
-#Base.metadata.drop_all(bind=engine)  ## <- to drop tables
+Base.metadata.drop_all(bind=engine)  ## <- to drop tables
 Base.metadata.create_all(bind=engine)   # to create them
 
 app = FastAPI()
