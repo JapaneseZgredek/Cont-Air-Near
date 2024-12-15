@@ -222,150 +222,325 @@ export const fetchProducts = async () => {
 };
 
 export const createProduct = async (product) => {
-  return await fetchProtectedData(`/api/products`, {
-    method: 'POST',
-    body: JSON.stringify(product)
-  });
+    await verifyRoles(['EMPLOYEE','ADMIN']);
+    try {
+        console.log("Making POST request to /api/products with payload:", product);
+        const response = await axios.post(`${API_URL}/api/products`, product, {
+            headers: {
+                Authorization: `Bearer ${getAuthToken()}`,
+                'Content-Type': 'application/json',
+            },
+        });
+        console.log("Response from /api/products:", response.data);
+        return await response.data;
+    } catch (error) {
+        console.error("Error in createProduct:", error.response?.data || error.message);
+        throw error.response?.data || new Error("Failed to create product");
+    }
 };
 
 export const deleteProduct = async (id_product) => {
-    return await fetchProtectedData(`/api/products/${id_product}`, {
-    method: 'DELETE',
-  });
+    try {
+        await verifyRoles(['EMPLOYEE','ADMIN']);
+        return await fetchProtectedData(`/api/products/${id_product}`, {
+            method: 'DELETE',
+        });
+    } catch (error) {
+        console.error("Role verification failed:", error.message);
+        throw error;
+    }
 };
 
 export const updateProduct = async (product) => {
-    return await fetchProtectedData(`/api/products/${product.id_product}`, {
-    method: 'PUT',
-    body: JSON.stringify(product),
-  });
+    await verifyRoles(['EMPLOYEE','ADMIN']);
+    try {
+        console.log("Making PUT request to /api/products with payload:", product);
+        const response = await axios.put(`${API_URL}/api/products/${product.id_product}`, product, {
+            headers: {
+                Authorization: `Bearer ${getAuthToken()}`,
+                'Content-Type': 'application/json',
+            },
+        });
+        console.log("Response from /api/products:", response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error in updateProduct:", error.response?.data || error.message);
+        throw error.response?.data || new Error("Failed to update ship");
+    }
 };
 
 //Orders table related
 
 export const fetchOrders = async () => {
-  return await fetchProtectedData(`/api/orders`);
+    await verifyRoles(['EMPLOYEE', 'ADMIN']);
+    return await fetchProtectedData(`/api/orders`);
 };
 
 export const fetchOrdersByPort = async (port_id) => {
+    await verifyRoles(['EMPLOYEE', 'ADMIN']);
     return await fetchProtectedData(`/api/orders/port/${port_id}`);
 }
 
 
 export const fetchOrdersByClient = async (client_id) => {
+    await verifyRoles(['EMPLOYEE', 'ADMIN']);
     return await fetchProtectedData(`/api/orders/client/${client_id}`);
 }
 
 
 export const createOrder = async (order) => {
-  return await fetchProtectedData(`/api/orders`, {
-    method: 'POST',
-    body: JSON.stringify(order),
-  });
+    await verifyRoles(['EMPLOYEE','ADMIN']);
+    try {
+        console.log("Making POST request to /api/orders with payload:", order);
+        const response = await axios.post(`${API_URL}/api/orders`, order, {
+            headers: {
+                Authorization: `Bearer ${getAuthToken()}`,
+                'Content-Type': 'application/json',
+            },
+        });
+        console.log("Response from /api/orders:", response.data);
+        return await response.data;
+    } catch (error) {
+        console.error("Error in createOrder:", error.response?.data || error.message);
+        throw error.response?.data || new Error("Failed to create order");
+    }
 };
 
 export const deleteOrder = async (id_order) => {
-  return await fetchProtectedData(`/api/orders/${id_order}`, {
-    method: 'DELETE',
-  });
+    try {
+        await verifyRoles(['EMPLOYEE','ADMIN']);
+        return await fetchProtectedData(`/api/orders/${id_order}`, {
+            method: 'DELETE',
+        });
+    } catch (error) {
+        console.error("Role verification failed:", error.message);
+        throw error;
+    }
 };
 
 export const updateOrder = async (order) => {
-  return await fetchProtectedData(`/api/orders/${order.id_order}`, {
-    method: 'PUT',
-    body: JSON.stringify(order),
-  });
+    await verifyRoles(['EMPLOYEE','ADMIN']);
+    try {
+        console.log("Making PUT request to /api/orders with payload:", order);
+        const response = await axios.put(`${API_URL}/api/orders/${order.id_order}`, order, {
+            headers: {
+                Authorization: `Bearer ${getAuthToken()}`,
+                'Content-Type': 'application/json',
+            },
+        });
+        console.log("Response from /api/orders:", response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error in updateOrder:", error.response?.data || error.message);
+        throw error.response?.data || new Error("Failed to update order");
+    }
 };
 
 export const fetchOrderById = async (id_order) => {
-  return await fetchProtectedData(`/api/orders/${id_order}`);
+    await verifyRoles(['EMPLOYEE', 'ADMIN']);
+    return await fetchProtectedData(`/api/orders/${id_order}`);
 };
 
 export const fetchOrderHistoriesByOrder = async (orderId) => {
-  const response = await fetch(`http://localhost:8000/api/order_histories/order/${orderId}`);
-  if (!response.ok) {
-    throw new Error(`Failed to fetch order histories for order id: ${orderId}`);
-  }
-  return response.json();
+    await verifyRoles(['EMPLOYEE', 'ADMIN']);
+    return await fetchProtectedData(`/api/order_histories/order/${orderId}`);
 };
 
-
 export const fetchOrderHistories = async () => {
-  return await fetchProtectedData(`/api/order_histories`);
+    await verifyRoles(['EMPLOYEE', 'ADMIN']);
+    return await fetchProtectedData(`/api/order_histories`);
 };
 
 export const createOrderHistory = async (orderHistory) => {
-  return await fetchProtectedData(`/api/order_histories`, {
-    method: 'POST',
-    body: JSON.stringify(orderHistory),
-  });
+    await verifyRoles(['EMPLOYEE', 'ADMIN']);
+    try {
+        console.log("Making POST request to /api/order_histories with payload:", orderHistory);
+        const response = await axios.post(`${API_URL}/api/order_histories`, orderHistory, {
+            headers: {
+                Authorization: `Bearer ${getAuthToken()}`,
+                'Content-Type': 'application/json',
+            },
+        });
+        console.log("Response from /api/order_histories:", response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error in createOrderHistory:", error.response?.data || error.message);
+        throw error.response?.data || new Error("Failed to create order history");
+    }
 };
+
 
 export const deleteOrderHistory = async (id_history) => {
-  return await fetchProtectedData(`/api/order_histories/${id_history}`, {
-    method: 'DELETE',
-  });
+    try {
+        await verifyRoles(['EMPLOYEE', 'ADMIN']);
+        console.log(`Attempting to delete order history with ID: ${id_history}`);
+        return await fetchProtectedData(`/api/order_histories/${id_history}`, {
+            method: 'DELETE',
+        });
+    } catch (error) {
+        console.error("Error in deleteOrderHistory:", error.response?.data || error.message);
+        throw error.response?.data || new Error(`Failed to delete order history with ID: ${id_history}`);
+    }
 };
+
 
 export const updateOrderHistory = async (orderHistory) => {
-    return await fetchProtectedData(`/api/order_histories/${orderHistory.id_history}`, {
-    method: 'PUT',
-    body: JSON.stringify(orderHistory),
-  });
+    await verifyRoles(['EMPLOYEE', 'ADMIN']);
+    try {
+        console.log("Making PUT request to /api/order_histories with payload:", orderHistory);
+        const response = await axios.put(`${API_URL}/api/order_histories/${orderHistory.id_history}`, orderHistory, {
+            headers: {
+                Authorization: `Bearer ${getAuthToken()}`,
+                'Content-Type': 'application/json',
+            },
+        });
+        console.log("Response from /api/order_histories:", response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error in updateOrderHistory:", error.response?.data || error.message);
+        throw error.response?.data || new Error("Failed to update order history");
+    }
 };
 
+
 export const fetchOrderHistoryById = async (id_history) => {
-  return await fetchProtectedData(`/api/order_histories/${id_history}`);
+        await verifyRoles(['EMPLOYEE', 'ADMIN']);
+        return await fetchProtectedData(`/api/order_histories/${id_history}`);
 };
 
 // Orders_products table related
 
 export const fetchOrders_products = async () => {
-  return await fetchProtectedData(`/api/orders_products`);
+    await verifyRoles(['EMPLOYEE', 'ADMIN']);
+    return await fetchProtectedData(`/api/orders_products`);
 };
 
 export const fetchOrders_productsByOrder = async (order_id) => {
-  const response = await fetch(`http://localhost:8000/api/orders_products/order/${order_id}`)
-  if (!response.ok) {
-    throw new Error(`Failed to fetch order_products for order id: ${order_id}`)
-  }
-  return response.json();
-}
+    await verifyRoles(['EMPLOYEE', 'ADMIN']);
+    try {
+        console.log(`Making GET request to /api/orders_products/order/${order_id}`);
+        const response = await axios.get(`${API_URL}/api/orders_products/order/${order_id}`, {
+            headers: {
+                Authorization: `Bearer ${getAuthToken()}`,
+                'Content-Type': 'application/json',
+            },
+        });
+        console.log(`Response from /api/orders_products/order/${order_id}:`, response.data);
+        return response.data;
+    } catch (error) {
+        console.error(`Error fetching orders_products for order id ${order_id}:`, error.response?.data || error.message);
+        throw error.response?.data || new Error(`Failed to fetch orders_products for order id: ${order_id}`);
+    }
+};
 
 export const fetchOrders_productsByProduct = async (product_id) => {
-  const response = await fetch(`http://localhost:8000/api/orders_products/product/${product_id}`)
-  if (!response.ok) {
-    throw new Error(`Failed to fetch order_products for product id: ${product_id}`)
-  }
-  return response.json();
-}
+    await verifyRoles(['EMPLOYEE', 'ADMIN']);
+    try {
+        console.log(`Making GET request to /api/orders_products/product/${product_id}`);
+        const response = await axios.get(`${API_URL}/api/orders_products/product/${product_id}`, {
+            headers: {
+                Authorization: `Bearer ${getAuthToken()}`,
+                'Content-Type': 'application/json',
+            },
+        });
+        console.log(`Response from /api/orders_products/product/${product_id}:`, response.data);
+        return response.data;
+    } catch (error) {
+        console.error(`Error fetching orders_products for product id ${product_id}:`, error.response?.data || error.message);
+        throw error.response?.data || new Error(`Failed to fetch orders_products for product id: ${product_id}`);
+    }
+};
+
 
 export const createOrder_product = async (order_product) => {
-  return await fetchProtectedData(`/api/orders_products`, {
-    method: 'POST',
-    body: JSON.stringify(order_product),
-  });
+    await verifyRoles(['EMPLOYEE', 'ADMIN']);
+    try {
+        console.log("Making POST request to /api/orders_products with payload:", order_product);
+        const response = await axios.post(`${API_URL}/api/orders_products`, order_product, {
+            headers: {
+                Authorization: `Bearer ${getAuthToken()}`,
+                'Content-Type': 'application/json',
+            },
+        });
+        console.log("Response from /api/orders_products:", response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error in createOrder_product:", error.response?.data || error.message);
+        throw error.response?.data || new Error("Failed to create order_product");
+    }
 };
 
 export const deleteOrder_product = async (id_order, id_product) => {
-  return await fetchProtectedData(`/api/orders_products/${id_order}_${id_product}`, {
-    method: 'DELETE',
-  });
+    await verifyRoles(['EMPLOYEE', 'ADMIN']);
+    try {
+        console.log(`Making DELETE request to /api/orders_products/${id_order}_${id_product}`);
+        const response = await axios.delete(`${API_URL}/api/orders_products/${id_order}_${id_product}`, {
+            headers: {
+                Authorization: `Bearer ${getAuthToken()}`,
+                'Content-Type': 'application/json',
+            },
+        });
+        console.log(`Response from DELETE /api/orders_products/${id_order}_${id_product}:`, response.data);
+        return response.data;
+    } catch (error) {
+        console.error(`Error in deleteOrder_product for ${id_order}_${id_product}:`, error.response?.data || error.message);
+        throw error.response?.data || new Error(`Failed to delete order_product with ID ${id_order}_${id_product}`);
+    }
 };
 
+
 export const updateOrder_product = async (order_product) => {
-    return await fetchProtectedData(`/api/orders_products/${order_product.id_order}_${order_product.id_product}`, {
-    method: 'PUT',
-    body: JSON.stringify(order_product),
-  });
+    await verifyRoles(['EMPLOYEE', 'ADMIN']);
+    try {
+        console.log(`Making PUT request to /api/orders_products/${order_product.id_order}_${order_product.id_product} with payload:`, order_product);
+        const response = await axios.put(`${API_URL}/api/orders_products/${order_product.id_order}_${order_product.id_product}`, order_product, {
+            headers: {
+                Authorization: `Bearer ${getAuthToken()}`,
+                'Content-Type': 'application/json',
+            },
+        });
+        console.log(`Response from PUT /api/orders_products/${order_product.id_order}_${order_product.id_product}:`, response.data);
+        return response.data;
+    } catch (error) {
+        console.error(`Error in updateOrder_product for ${order_product.id_order}_${order_product.id_product}:`, error.response?.data || error.message);
+        throw error.response?.data || new Error(`Failed to update order_product with ID ${order_product.id_order}_${order_product.id_product}`);
+    }
 };
 
 export const fetchOrders_productsByOrder_zapas = async (order_id) => {
-  return await fetchProtectedData(`/api/orders_products/order/${order_id}`);
+    await verifyRoles(['EMPLOYEE', 'ADMIN']);
+    try {
+        console.log(`Making GET request to /api/orders_products/order/${order_id}`);
+        const response = await axios.get(`${API_URL}/api/orders_products/order/${order_id}`, {
+            headers: {
+                Authorization: `Bearer ${getAuthToken()}`,
+                'Content-Type': 'application/json',
+            },
+        });
+        console.log(`Response from /api/orders_products/order/${order_id}:`, response.data);
+        return response.data;
+    } catch (error) {
+        console.error(`Error in fetchOrders_productsByOrder_zapas for order_id ${order_id}:`, error.response?.data || error.message);
+        throw error.response?.data || new Error(`Failed to fetch orders_products for order ID ${order_id}`);
+    }
 };
 
 export const fetchOrders_productsByProduct_zapas = async (product_id) => {
-    return await fetchProtectedData(`/api/orders_products/product/${product_id}`);
+    await verifyRoles(['EMPLOYEE', 'ADMIN']);
+    try {
+        console.log(`Making GET request to /api/orders_products/product/${product_id}`);
+        const response = await axios.get(`${API_URL}/api/orders_products/product/${product_id}`, {
+            headers: {
+                Authorization: `Bearer ${getAuthToken()}`,
+                'Content-Type': 'application/json',
+            },
+        });
+        console.log(`Response from /api/orders_products/product/${product_id}:`, response.data);
+        return response.data;
+    } catch (error) {
+        console.error(`Error in fetchOrders_productsByProduct_zapas for product_id ${product_id}:`, error.response?.data || error.message);
+        throw error.response?.data || new Error(`Failed to fetch orders_products for product ID ${product_id}`);
+    }
 };
 
 export const fetchClients = async () => {

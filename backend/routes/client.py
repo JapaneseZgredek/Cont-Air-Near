@@ -39,9 +39,9 @@ class ClientUpdate(BaseModel):
     address: Optional[str] = None
     telephone_number: Optional[int] = None
     email: Optional[str] = None
-    logon_name: str
-    password: str
-
+    # logon_name: str
+    # password: str
+    # dodac potem ewentualnie w panelu admina/usera wtedy to uzyc
 
 class ClientRead(BaseModel):
     id_client: int
@@ -57,7 +57,6 @@ class ClientLogin(BaseModel):
     password: str
 
     class Config:
-        # from_attributes = True
         orm_mode = True
         use_enum_values = True
 
@@ -69,33 +68,11 @@ def authenticate_client(logon_name: str, password: str, db: Session):
         return None
     return client
 
-# def create_access_token(data: dict):
-#     to_encode = data.copy()
-#     expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-#     to_encode.update({"exp": expire})
-#     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-
 def create_access_token(data: dict):
     to_encode = data.copy()
     expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-
-# def get_current_client(
-#         token: str = Depends(oauth2_scheme),
-#         db: Session = Depends(get_db)
-# ):
-#     try:
-#         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-#         id_client = payload.get("sub")
-#         if not id_client:
-#             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
-#         client = db.query(Client).filter(Client.id_client == int(id_client)).first()
-#         if not client:
-#             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Client not found")
-#         return client
-#     except JWTError:
-#         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token validation failed")
 
 def get_current_client(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     try:
@@ -109,7 +86,6 @@ def get_current_client(token: str = Depends(oauth2_scheme), db: Session = Depend
         return client
     except JWTError as e:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"Token validation failed: {str(e)}")
-
 
 #CRUD TABELE OG z wcześniej:
 @router.get("/clients", response_model=List[ClientRead])
@@ -156,17 +132,6 @@ def create_client(
     db.commit()
     db.refresh(db_client)
     return db_client
-
-# @router.post("/clients/login")
-# def login_client(
-#     client: ClientLogin,
-#     db: Session = Depends(get_db)
-# ):
-#     db_client = authenticate_client(client.logon_name, client.password, db)
-#     if not db_client:
-#         raise HTTPException(status_code=401, detail="Invalid username or password")
-#     token = create_access_token({"sub": str(db_client.id_client)})
-#     return {"access_token": token, "token_type": "bearer", "role": db_client.role.value}
 
 @router.post("/clients/login")
 def login_client(client: ClientLogin, db: Session = Depends(get_db)):

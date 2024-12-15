@@ -42,7 +42,7 @@ const App = () => {
                 <Route
                     path="/order_products"
                     element={
-                        <ProtectedRoute>
+                        <ProtectedRoute requiredRoles={['EMPLOYEE','ADMIN']}>
                             <Order_productPage />
                         </ProtectedRoute>
                     }
@@ -51,7 +51,7 @@ const App = () => {
                 <Route
                     path="/order_histories"
                     element={
-                        <ProtectedRoute>
+                        <ProtectedRoute requiredRoles={['EMPLOYEE','ADMIN']}>
                             <OrderHistoryPage />
                         </ProtectedRoute>
                     }
@@ -76,7 +76,7 @@ const App = () => {
                 <Route
                     path="/orders"
                     element={
-                        <ProtectedRoute>
+                        <ProtectedRoute requiredRoles={['EMPLOYEE','ADMIN']}>
                             <OrderPage />
                         </ProtectedRoute>
                     }
