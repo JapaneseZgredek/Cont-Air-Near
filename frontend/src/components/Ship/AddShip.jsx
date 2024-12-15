@@ -90,7 +90,7 @@ const AddShip = ({ onAdd }) => {
                     <Modal.Title>Add New Ship</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    {error && <p style={{ color: 'red'}}>{error}</p>}
+                    {error && <p className="err-field">{"Err: "+error}</p>}
                     <Form onSubmit={handleSubimt}>
                         <Form.Group className="mb-3">
                             <Form.Label>Ship Name</Form.Label>

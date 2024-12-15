@@ -6,16 +6,6 @@
     width: 66%; 
 }
 
-/* Styl dla komunikatu o błędzie */
-.err-field {
-    color: red;
-    font-size: 1rem;
-    font-weight: bold;
-    margin-top: 10px;
-    margin-bottom: 10px;
-    text-align: center;
-}
-
 /* Tytuł itemu */
 .grid-item-card .card-title,
 .straight-item-card .card-title{

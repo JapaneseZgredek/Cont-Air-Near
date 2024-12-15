@@ -99,7 +99,7 @@ const UpdateProduct = ({ product, show, onHide, onUpdate }) => {
       </Modal.Header>
       <Modal.Body>
         {/*TODO move style to css*/}
-        {error && <p style={{ color: 'red'}}>{error}</p>}
+        {error && <p className="err-field">{"Err: "+error}</p>}
         <Form onSubmit={handleSubmit}>
           <Form.Group className="mb-3">
             <Form.Label>Product Name</Form.Label>

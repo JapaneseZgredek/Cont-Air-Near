@@ -118,7 +118,7 @@ const AddProduct = ({ onAdd }) => {
                     <Modal.Title>Add New Product</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    {error && <p style={{ color: 'red' }}>{error}</p>}
+                    {error && <p className="err-field">{"Err: "+error}</p>}
                     <Form onSubmit={handleSubmit}>
                         {/* Pole dla nazwy produktu */}
                         <Form.Group className="mb-3">
