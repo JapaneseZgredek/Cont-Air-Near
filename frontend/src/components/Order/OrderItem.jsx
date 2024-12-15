@@ -10,20 +10,23 @@ const OrderItem = ({ order, onUpdate, onDelete }) => {
     const [showUpdateModal, setShowUpdateModal] = useState(false);
     const [showDetailModal, setShowDetailModal] = useState(false);
 
+    // Handle delete action
     const handleDelete = async () => {
         try {
-            await deleteOrder(order.id_order);
-            onDelete(order.id_order);
-            setShowConfirm(false);
+            await deleteOrder(order.id_order);  // Delete the order from the database
+            onDelete(order.id_order);  // Notify the parent to remove the order from the state
+            setShowConfirm(false);  // Close the confirmation modal
         } catch (error) {
             console.error('Failed to delete order:', error);
         }
     };
 
+    // Open the update modal
     const openUpdateModal = () => {
         setShowUpdateModal(true);
     };
 
+    // Close the update modal
     const closeUpdateModal = () => {
         setShowUpdateModal(false);
     };
@@ -48,11 +51,12 @@ const OrderItem = ({ order, onUpdate, onDelete }) => {
                     <div>
                         <Button variant="warning" className="me-2" onClick={openUpdateModal}>Update</Button>
                         <Button variant="danger" onClick={() => setShowConfirm(true)}>Delete</Button>
-                        <Order_productButton orderId={order.id_order}/>
+                        <Order_productButton orderId={order.id_order} />
                     </div>
                 </Card.Body>
             </Card>
 
+            {/* Confirm Deletion Modal */}
             <Modal show={showConfirm} onHide={() => setShowConfirm(false)}>
                 <Modal.Header closeButton>
                     <Modal.Title>Confirm Deletion</Modal.Title>
@@ -64,6 +68,7 @@ const OrderItem = ({ order, onUpdate, onDelete }) => {
                 </Modal.Footer>
             </Modal>
 
+            {/* Order Detail Modal */}
             <GenericDetailModal
                 show={showDetailModal}
                 onHide={() => setShowDetailModal(false)}
@@ -71,12 +76,12 @@ const OrderItem = ({ order, onUpdate, onDelete }) => {
                 details={order}
             />
 
-
+            {/* Order Update Modal */}
             <OrderUpdate
                 order={order}
                 show={showUpdateModal}
                 onHide={closeUpdateModal}
-                onUpdate={onUpdate}
+                onUpdate={onUpdate}  // Pass onUpdate to handle the update in the parent component
             />
         </>
     );
