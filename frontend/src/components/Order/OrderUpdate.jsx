@@ -10,6 +10,7 @@ const OrderUpdate = ({ order, show, onHide, onUpdate }) => {
     const [clients, setClients] = useState([]);
     const [error, setError] = useState(null);
     const [validationErrors, setValidationErrors] = useState({});
+    const [description, setDescription] = useState(order.description);
 
     const validateInputs = () => {
         const errors = {};
@@ -30,6 +31,7 @@ const OrderUpdate = ({ order, show, onHide, onUpdate }) => {
         const updatedOrder = {
             id_order: order.id_order,
             status,
+            description,
             id_port: parseInt(idPort),
             id_client: parseInt(idClient),
         };
@@ -86,6 +88,15 @@ const OrderUpdate = ({ order, show, onHide, onUpdate }) => {
                             <option value="delivered">Delivered</option>
                             <option value="cancelled">Cancelled</option>
                         </Form.Select>
+                    </Form.Group>
+                    <Form.Group className="mb-3">
+                        <Form.Label>Description</Form.Label>
+                        <Form.Control
+                            type="text"
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            placeholder="Update order description"
+                        />
                     </Form.Group>
                     <Form.Group className="mb-3">
                         <Form.Label>Port</Form.Label>

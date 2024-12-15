@@ -17,12 +17,14 @@ router = APIRouter()
 class OrderCreate(BaseModel):
     status: OrderStatus
     date_of_order: Optional[datetime] = None
+    description: Optional[str] = None
     id_port: int
     id_client: int
 
 class OrderUpdate(BaseModel):
     status: Optional[OrderStatus] = None
     date_of_order: Optional[datetime] = None
+    description: Optional[str] = None
     id_port: Optional[int] = None
     id_client: Optional[int] = None
 
@@ -30,6 +32,7 @@ class OrderRead(BaseModel):
     id_order: int
     status: OrderStatus
     date_of_order: datetime
+    description: Optional[str]
     id_port: int
     id_client: int
 
@@ -93,6 +96,8 @@ def update_order(id_order: int, order: OrderUpdate, db: Session = Depends(get_db
         db_order.status = order.status
     if order.date_of_order is not None:
         db_order.date_of_order = order.date_of_order
+    if order.description is not None:
+        db_order.description = order.description
     if order.id_client is not None:
         db_order.id_client = order.id_client
 

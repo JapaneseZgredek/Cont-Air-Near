@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, DateTime, Enum, ForeignKey
+from sqlalchemy import Column, Integer, DateTime, Enum, ForeignKey, String
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from backend.database import Base
@@ -15,14 +15,14 @@ class Order(Base):
     id_order = Column(Integer, primary_key=True, index=True, autoincrement=True)
     date_of_order = Column(DateTime, default=datetime.now, nullable=False)
     status = Column(Enum(OrderStatus), default=OrderStatus.PENDING, nullable=False)
+    description = Column(String(255), nullable=True)
     id_port = Column(Integer, ForeignKey('port.id_port'), nullable=False)
     id_client = Column(Integer, ForeignKey('client.id_client'), nullable=True)
 
     port = relationship("Port", back_populates="orders")
     client = relationship("Client", back_populates="orders")
-    order_histories = relationship("OrderHistory", back_populates="order")
 
-    order_products=relationship("Order_product", back_populates="order")
+    order_products = relationship("Order_product", back_populates="order")
 
     # Placeholder for total price calculation
     @property

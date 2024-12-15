@@ -8,7 +8,6 @@ import ClientPage from './pages/ClientPage';
 import HomePage from './pages/HomePage';
 import OrderPage from './pages/OrderPage';
 import Order_productPage from './pages/Order_productPage';
-import OrderHistoryPage from './pages/OrderHistoryPage';
 
 import ProtectedRoute from './components/ProtectedRoute';
 // Login Register + Navbar if we need that to be injected just as partial (in future*)
@@ -44,15 +43,6 @@ const App = () => {
                     element={
                         <ProtectedRoute>
                             <Order_productPage />
-                        </ProtectedRoute>
-                    }
-                />
-
-                <Route
-                    path="/order_histories"
-                    element={
-                        <ProtectedRoute>
-                            <OrderHistoryPage />
                         </ProtectedRoute>
                     }
                 />
