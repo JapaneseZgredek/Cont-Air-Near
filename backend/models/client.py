@@ -1,7 +1,14 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, Enum, ForeignKey
 from sqlalchemy.orm import declarative_base, relationship
-
 from backend.database import Base
+import enum
+
+
+class UserRole(enum.Enum):
+    GUEST = "GUEST"
+    CLIENT = "CLIENT"
+    EMPLOYEE = "EMPLOYEE"
+    ADMIN = "ADMIN"
 
 class Client(Base):
     __tablename__ = 'client'
@@ -10,5 +17,8 @@ class Client(Base):
     address = Column(String(255),nullable=False)
     telephone_number = Column(Integer)
     email = Column(String(255),nullable=False)
+    logon_name = Column(String(255),nullable=False)
+    password = Column(String(255),nullable=False)
+    role = Column(Enum(UserRole), default=UserRole.CLIENT)
 
     orders = relationship("Order", back_populates="client")

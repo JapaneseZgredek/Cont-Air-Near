@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import ClientItem from './ClientItem';
 import AddClient from './AddClient';
-import { fetchProducts } from '../../services/api';
+import { fetchClients } from '../../services/api';
 import { Container } from 'react-bootstrap';
 
 const ClientList = () => {
@@ -10,8 +10,7 @@ const ClientList = () => {
 
     const loadClients = async () => {
         try {
-            const response = await fetch('http://localhost:8000/api/clients');
-            const data = await response.json();
+            const data = await fetchClients();
             setClients(data);
         } catch (err) {
             setError('Failed to load clients');
@@ -47,7 +46,13 @@ const ClientList = () => {
             {error && <p style={{ color: 'red' }}>{error}</p>}
             {clients.length > 0 ? (
                 clients.map((client) => (
-                    <ClientItem key={client.id_client} client={client} onDelete={handleDeleteClient} onUpdate={handleUpdateClient}/>))
+                    <ClientItem
+                        key={client.id_client}
+                        client={client}
+                        onDelete={handleDeleteClient}
+                        onUpdate={handleUpdateClient}
+                    />
+                ))
             ) : (
                 <p>No clients available.</p>
             )}
