@@ -43,7 +43,6 @@ const handleSubmit = async (e) => {
         const newOperation = await createOperation({
             name_of_operation: nameOfOperation,
             operation_type: operationType,
-            // date_of_operation: dateOfOperation || new Date().toISOString(),
             date_of_operation: dateOfOperation,
             id_ship: parseInt(idShip),
             id_port: parseInt(idPort),
@@ -127,7 +126,7 @@ const handleSubmit = async (e) => {
                             <Form.Label>Date of Operation</Form.Label>
                             <Form.Control
                                 type="datetime-local"
-                                value={dateOfOperation || new Date().toISOString().slice(0, 16)}
+                                value={dateOfOperation}
                                 onChange={(e) => setDateOfOperation(e.target.value)}
                                 isInvalid={!!validationErrors.dateOfOperation}
                             />
