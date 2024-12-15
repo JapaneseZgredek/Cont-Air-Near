@@ -13,6 +13,9 @@ from pydantic import BaseModel, EmailStr
 from typing import List, Optional
 from backend.utils.role_validation import check_user_role
 
+from backend.models.debl.email_block_list import email_block_list
+from email_validator import validate_email, EmailNotValidError
+
 load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY", "default-fallback-key")
 ALGORITHM = "HS256"
@@ -109,12 +112,20 @@ def read_client(id_client: int, db: Session = Depends(get_db), current_client=De
         raise HTTPException(status_code=404, detail="Client not found")
     return db_client
 
-
+def is_disposable_email(email: str, db: Session) -> bool:
+    try:
+        validated_email = validate_email(email).email
+        domain = validated_email.split('@')[-1].lower()
+        return db.query(email_block_list).filter(email_block_list.domain == domain).first() is not None
+    except EmailNotValidError:
+        raise HTTPException(status_code=400, detail="Invalid email format")
 @router.post("/clients", response_model=ClientRead)
 def create_client(
     client: ClientCreate,
     db: Session = Depends(get_db),
 ):
+    if is_disposable_email(client.email, db):
+        raise HTTPException(status_code=400, detail="Disposable email addresses are not allowed")
     if db.query(Client).filter((Client.logon_name == client.logon_name) | (Client.email == client.email)).first():
         raise HTTPException(status_code=400, detail="Username or email already exists")
     logger.info(f"Creating new client: {client}")

@@ -9,6 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from backend.database import get_db
 import bcrypt
+from backend.utils.update_block_list import update_blocklist
 
 #Base.metadata.drop_all(bind=engine)  ## <- to drop tables
 Base.metadata.create_all(bind=engine)   # to create them
@@ -34,6 +35,8 @@ app.include_router(order_product.router, prefix='/api')
 
 @app.on_event('startup')
 async def startup_event():
+    #update_blocklist()  # Fetch and update the blocklist
+    #print("Email blocklist updated")
     logger.info("Server started")
     create_default_users()
 
