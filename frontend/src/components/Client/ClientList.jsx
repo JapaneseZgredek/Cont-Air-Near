@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import ClientItem from './ClientItem';
 import AddClient from './AddClient';
-import { Container } from 'react-bootstrap';
 import SearchAndFilterBar from "../SearchAndFilterBar";
+import { fetchClients } from '../../services/api';
+import { Container, Button } from 'react-bootstrap';
 
 const ClientList = () => {
     const [clients, setClients] = useState([]);
@@ -10,11 +11,11 @@ const ClientList = () => {
     const [filteredClients, setFilteredClients] = useState([]);
     const filterOptions = ['name', 'address', 'telephone number', 'email'];
     const [searchInColumn, setSearchInColumn] = useState('');
+    const [showAddClientModal, setShowAddClientModal] = useState(false);
 
     const loadClients = async () => {
         try {
-            const response = await fetch('http://localhost:8000/api/clients');
-            const data = await response.json();
+            const data = await fetchClients();
             setClients(data);
             setFilteredClients(data);
         } catch (err) {
@@ -28,6 +29,7 @@ const ClientList = () => {
 
     const handleAddClient = (newClient) => {
         setClients((prevClients) => [...prevClients, newClient]);
+        setShowAddClientModal(false);
     };
 
     const handleUpdateClient = (updatedClient) => {
@@ -77,7 +79,9 @@ const ClientList = () => {
         <Container>
             <div className="d-flex justify-content-between mb-3">
                 <h2>Client List</h2>
-                <AddClient onAdd={handleAddClient} />
+                <Button variant="primary" onClick={() => setShowAddClientModal(true)}>
+                    Add Client
+                </Button>
             </div>
 
             <SearchAndFilterBar
@@ -100,6 +104,11 @@ const ClientList = () => {
             ) : (
                 <p>No clients available.</p>
             )}
+            <AddClient
+                show={showAddClientModal}
+                onHide={() => setShowAddClientModal(false)}
+                onAdd={handleAddClient}
+            />
         </Container>
     );
 };

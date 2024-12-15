@@ -43,9 +43,6 @@ const NavbarComponent = () => {
                                 <LinkContainer to="/order_products">
                                     <Nav.Link>Order_products</Nav.Link>
                                 </LinkContainer>
-                                <LinkContainer to="/order_histories">
-                                    <Nav.Link>OrderHistory</Nav.Link>
-                                </LinkContainer>
                                 <LinkContainer to="/operations">
                                     <Nav.Link>Operations</Nav.Link>
                                 </LinkContainer>
