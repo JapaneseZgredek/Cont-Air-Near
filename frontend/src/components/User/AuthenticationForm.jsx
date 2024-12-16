@@ -25,18 +25,57 @@ const AuthenticationForm = () => {
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.logonName) newErrors.logonName = 'Login is required';
-    if (!formData.password) newErrors.password = 'Password is required';
 
+    // Regular Expressions
+    const loginRegex = /^[a-zA-Z0-9]{4,}$/;
+    const passwordRegex = /^.{8,}$/;
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,3}$/;
+    const nameRegex = /^[a-zA-Z ]{3,}$/;
+    const telephoneNumberRegex = /^[0-9]{7,15}$/;
+    const addressRegex = '';
+
+    // Login Name
+    if (!formData.logonName) {
+      newErrors.logonName = 'Login is required.';
+    } else if (!loginRegex.test(formData.logonName)) {
+      newErrors.logonName = 'Login must be at least 4 characters long and alphanumeric.';
+    }
+
+    // Password
+    if (!formData.password) {
+      newErrors.password = 'Password is required.';
+    } else if (!passwordRegex.test(formData.password)) {
+      newErrors.password = 'Password must be at least 8 characters long.';
+    }
+
+    // Register
     if (!isLogin) {
-      if (!formData.email) newErrors.email = 'Email is required';
-      if (!formData.name) newErrors.name = 'Name is required';
-      if (!formData.address) newErrors.address = 'Address is required';
+      // Email
+      if (!formData.email) {
+        newErrors.email = 'Email is required.';
+      } else if (!emailRegex.test(formData.email)) {
+        newErrors.email = 'Email must be a valid format (e.g., mail@domain.com).';
+      }
 
+      // Name
+      if (!formData.name) {
+        newErrors.name = 'Name is required.';
+      } else if (!nameRegex.test(formData.name)) {
+        newErrors.name = 'Name must be at least 3 letters long.';
+      }
+
+      // Address (rozbudować)
+      if (!formData.address) {
+        newErrors.address = 'Address is required.';
+      } else if (formData.address.length < 3) {
+        newErrors.address = 'Address must be at least 3 characters long.';
+      }
+
+      // Telephone
       if (!formData.telephone_number) {
-        newErrors.telephone_number = 'Telephone number is required';
-      } else if (!/^[0-9]{7,15}$/.test(formData.telephone_number)) {
-        newErrors.telephone_number = 'Telephone number must be 7-15 digits long';
+        newErrors.telephone_number = 'Telephone number is required.';
+      } else if (!telephoneNumberRegex.test(formData.telephone_number)) {
+        newErrors.telephone_number = 'Telephone number must be 7-15 digits long.';
       }
     }
 
