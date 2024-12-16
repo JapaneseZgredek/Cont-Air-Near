@@ -195,7 +195,7 @@ export const updatePort = async (port) => {
 
 export async function fetchProductsByPort(portId) {
   await verifyRoles(['EMPLOYEE', 'ADMIN']); //CLIENT?
-  return await fetchProtectedData(`api/products/port/${portId}`);
+  return await fetchProtectedData(`/api/products/port/${portId}`);
 }
 
 // Guest Table product do not add auth
