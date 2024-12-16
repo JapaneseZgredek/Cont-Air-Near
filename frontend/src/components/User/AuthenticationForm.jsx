@@ -32,7 +32,7 @@ const AuthenticationForm = () => {
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,3}$/;
     const nameRegex = /^[a-zA-Z ]{3,}$/;
     const telephoneNumberRegex = /^[0-9]{7,15}$/;
-    const addressRegex = '';
+    const addressRegex = /^[a-zA-Z ]{8,64}$/;
 
     // Login Name
     if (!formData.logonName) {
@@ -67,8 +67,8 @@ const AuthenticationForm = () => {
       // Address (rozbudować)
       if (!formData.address) {
         newErrors.address = 'Address is required.';
-      } else if (formData.address.length < 3) {
-        newErrors.address = 'Address must be at least 3 characters long.';
+      } else if (!addressRegex.test(formData.address)) {
+        newErrors.address = 'Address must be at least 8-64 characters long.';
       }
 
       // Telephone
