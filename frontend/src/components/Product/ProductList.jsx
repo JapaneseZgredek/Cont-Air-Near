@@ -13,7 +13,7 @@ const ProductList = () => {
     const [error, setError] = useState(null);
     const [displayType, setDisplayType] = useState("grid");
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(5);
+    const [itemsPerPage, setItemsPerPage] = useState(10);
 
     const loadProducts = async () => {
         try {
