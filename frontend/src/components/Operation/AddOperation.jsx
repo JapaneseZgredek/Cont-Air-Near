@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Form, Modal } from 'react-bootstrap';
-import { createOperation } from "../../services/api"; //
-import { fetchShips } from '../../services/api';
-import { fetchPorts } from '../../services/api';
+import { createOperation } from "../../services/api";
+import { fetchShips, fetchPorts } from '../../services/api';
 
 const AddOperation = ({ onAdd }) => {
     const [show, setShow] = useState(false);
@@ -23,42 +22,52 @@ const AddOperation = ({ onAdd }) => {
         if (!dateOfOperation) errors.dateOfOperation = "Date of operation is required.";
 
         return errors;
-    }
+    };
 
-const handleSubmit = async (e) => {
-    e.preventDefault();
+    const handleSubmit = async (e) => {
+        e.preventDefault();
 
-    // Prevent double Submit
-    if (error) return;
+        // Prevent double Submit
+        if (error) return;
 
-    const errors = validateInputs();
-    if (Object.keys(errors).length > 0) {
-        setValidationErrors(errors);
-        return;
-    }
+        const errors = validateInputs();
+        if (Object.keys(errors).length > 0) {
+            setValidationErrors(errors);
+            return;
+        }
 
-    try {
-        setError(null); // Clear previous errors
-        console.log("Sending payload to create operation");
-        const newOperation = await createOperation({
-            name_of_operation: nameOfOperation,
-            operation_type: operationType,
-            date_of_operation: dateOfOperation,
-            id_ship: parseInt(idShip),
-            id_port: parseInt(idPort),
-        });
-        console.log("Operation created:", newOperation);
-        onAdd(newOperation);
-        setShow(false);
-        setValidationErrors({});
-    } catch (err) {
-        console.error("Error creating operation:", err.message);
-        setError("Failed to create operation. Please try again.");
-    }
-};
+        try {
+            setError(null); // Clear previous errors
+            console.log("Sending payload to create operation");
+            const newOperation = await createOperation({
+                name_of_operation: nameOfOperation,
+                operation_type: operationType,
+                date_of_operation: dateOfOperation,
+                id_ship: parseInt(idShip),
+                id_port: parseInt(idPort),
+            });
+            console.log("Operation created:", newOperation);
+            onAdd(newOperation);
 
+            // Reset the form fields to initial values
+            resetForm();
+            setShow(false); // Close modal after successful submission
+            setValidationErrors({});
+        } catch (err) {
+            console.error("Error creating operation:", err.message);
+            setError("Failed to create operation. Please try again.");
+        }
+    };
 
-    //for ships/ports dropdown list
+    const resetForm = () => {
+        setNameOfOperation('');
+        setOperationType('AT_BAY');
+        setDateOfOperation('');
+        setIdShip('');
+        setIdPort('');
+    };
+
+    // For ships/ports dropdown list
     const [ships, setShips] = useState([]);
     const [ports, setPorts] = useState([]);
     const loadShips = async () => {
@@ -108,18 +117,18 @@ const handleSubmit = async (e) => {
 
                         <Form.Group className="mb-3">
                             <Form.Label>Operation Type</Form.Label>
-                                <Form.Select
-                                  value={operationType}
-                                  onChange={(e) => setOperationType(e.target.value)}
-                                >
-                                  <option value="AT_BAY">At Bay</option>
-                                  <option value="TRANSPORT">Transport</option>
-                                  <option value="TRANSFER">Transfer</option>
-                                  <option value="DEPARTURE">Departure</option>
-                                  <option value="ARRIVAL">Arrival</option>
-                                  <option value="CARGO_LOADING">Cargo Loading</option>
-                                  <option value="CARGO_DISCHARGE">Cargo Discharge</option>
-                                </Form.Select>
+                            <Form.Select
+                                value={operationType}
+                                onChange={(e) => setOperationType(e.target.value)}
+                            >
+                                <option value="AT_BAY">At Bay</option>
+                                <option value="TRANSPORT">Transport</option>
+                                <option value="TRANSFER">Transfer</option>
+                                <option value="DEPARTURE">Departure</option>
+                                <option value="ARRIVAL">Arrival</option>
+                                <option value="CARGO_LOADING">Cargo Loading</option>
+                                <option value="CARGO_DISCHARGE">Cargo Discharge</option>
+                            </Form.Select>
                         </Form.Group>
 
                         <Form.Group className="mb-3">
@@ -152,7 +161,6 @@ const handleSubmit = async (e) => {
                             </Form.Control.Feedback>
                         </Form.Group>
 
-
                         <Form.Group className="mb-3">
                             <Form.Label>Port</Form.Label>
                             <Form.Select
@@ -168,7 +176,7 @@ const handleSubmit = async (e) => {
                             <Form.Control.Feedback type="invalid">
                                 {validationErrors.idPort}
                             </Form.Control.Feedback>
-                         </Form.Group>
+                        </Form.Group>
 
                         <Button variant="success" type="submit">Add Operation</Button>
                     </Form>

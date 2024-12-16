@@ -1,34 +1,55 @@
 import React, { useEffect, useState } from 'react';
 import OrderItem from './OrderItem';
 import OrderAdd from './OrderAdd';
-import { fetchOrders } from '../../services/api';
+import { fetchOrders, fetchPorts, fetchClients } from '../../services/api';
 import { Container } from 'react-bootstrap';
 import SearchAndFilterBar from '../SearchAndFilterBar';
+import OrdersButton from './OrdersButton';
 
 const OrderList = () => {
     const [orders, setOrders] = useState([]);
     const [filteredOrders, setFilteredOrders] = useState([]);
+    const [ports, setPorts] = useState([]);
+    const [clients, setClients] = useState([]);
     const [searchInColumn, setSearchInColumn] = useState('');
     const [error, setError] = useState(null);
 
-    // Load orders initially
+    // Fetch orders, ports, and clients
     const loadOrders = async () => {
         try {
-            const data = await fetchOrders();
-            setOrders(data);
-            setFilteredOrders(data);
-            setError(null); // Clear error once orders are successfully loaded
+            const [ordersData, portsData, clientsData] = await Promise.all([
+                fetchOrders(),
+                fetchPorts(),
+                fetchClients(),
+            ]);
+
+            // Enrich the orders with port and client names
+            const enrichedOrders = ordersData.map(order => {
+                // Find the port and client names using the order's respective ids
+                const port = portsData.find(port => port.id_port === order.id_port);
+                const client = clientsData.find(client => client.id_client === order.id_client);
+
+                return {
+                    ...order,
+                    portname: port ? port.name : 'Unknown Port', // Default to 'Unknown Port' if not found
+                    clientname: client ? client.name : 'Unknown Client', // Default to 'Unknown Client' if not found
+                };
+            });
+
+            setOrders(enrichedOrders);
+            setFilteredOrders(enrichedOrders);
+            setPorts(portsData);
+            setClients(clientsData);
+            setError(null);
         } catch (err) {
             setError('Failed to load orders');
         }
     };
 
-    // Call loadOrders on component mount
     useEffect(() => {
         loadOrders();
     }, []);
 
-    // Handle search functionality
     const handleSearch = (searchTerm) => {
         if (!searchTerm) {
             setFilteredOrders(orders);
@@ -47,32 +68,28 @@ const OrderList = () => {
         }
     };
 
-    // Handle change in search column
     const handleSearchInChange = (column) => {
         setSearchInColumn(column);
     };
 
-    // Handle adding a new order
     const handleAddOrder = (newOrder) => {
-        setOrders((prevOrders) => [...prevOrders, newOrder]);  // Add the new order to the list
-        setFilteredOrders((prevOrders) => [...prevOrders, newOrder]);  // Update filtered orders as well
-        setError(null);  // Clear error if any new order is successfully added
+        setOrders((prevOrders) => [...prevOrders, newOrder]);
+        setFilteredOrders((prevOrders) => [...prevOrders, newOrder]);
+        setError(null);
     };
 
-    // Handle deleting an order
     const handleDeleteOrder = (id) => {
-        setOrders((prevOrders) => prevOrders.filter(order => order.id_order !== id));  // Delete order from the list
-        setFilteredOrders((prevOrders) => prevOrders.filter(order => order.id_order !== id));  // Update filtered orders
+        setOrders((prevOrders) => prevOrders.filter(order => order.id_order !== id));
+        setFilteredOrders((prevOrders) => prevOrders.filter(order => order.id_order !== id));
     };
 
-    // Handle updating an order
     const handleUpdateOrder = (updatedOrder) => {
         setOrders((prevOrders) => prevOrders.map(order =>
             order.id_order === updatedOrder.id_order ? updatedOrder : order
-        ));  // Update the order in the list
+        ));
         setFilteredOrders((prevOrders) => prevOrders.map(order =>
             order.id_order === updatedOrder.id_order ? updatedOrder : order
-        ));  // Update filtered orders
+        ));
     };
 
     return (
@@ -90,14 +107,17 @@ const OrderList = () => {
             />
 
             {error && <p style={{ color: 'red' }}>{error}</p>}
+
             {filteredOrders.length > 0 ? (
                 filteredOrders.map((order) => (
-                    <OrderItem
-                        key={order.id_order}
-                        order={order}
-                        onDelete={handleDeleteOrder}
-                        onUpdate={handleUpdateOrder}
-                    />
+                    <div key={order.id_order} className="mb-3">
+                        {/* Render OrderItem */}
+                        <OrderItem
+                            order={order}
+                            onDelete={handleDeleteOrder}
+                            onUpdate={handleUpdateOrder}
+                        />
+                    </div>
                 ))
             ) : (
                 <p>No orders available.</p>
