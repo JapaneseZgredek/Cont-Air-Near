@@ -34,10 +34,12 @@ const NavbarComponent = () => {
           { path: '/clients', label: 'Clients' },
       ],
       EMPLOYEE: [
-          { path: '/ships', label: 'Ships' },
+          // { path: '/ships', label: 'Ships' },
           { path: '/operations', label: 'Operations' },
           { path: '/ports', label: 'Ports' },
           { path: '/orders', label: 'Orders' },
+          { path: '/order_products', label: 'Order Products' },
+          { path: '/products', label: 'Products' },
       ],
       CLIENT: [
           { path: '/ports', label: 'Ports' },

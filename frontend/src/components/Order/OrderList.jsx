@@ -21,7 +21,7 @@ const OrderList = () => {
             setOrders(data);
             setFilteredOrders(data); // Initialize filteredOrders with fetched orders
         } catch (err) {
-            setError('Failed to load orders');
+            //setError('Failed to load orders');
         }
     };
 
