@@ -8,7 +8,6 @@ import ClientPage from './pages/ClientPage';
 import HomePage from './pages/HomePage';
 import OrderPage from './pages/OrderPage';
 import Order_productPage from './pages/Order_productPage';
-import OrderHistoryPage from './pages/OrderHistoryPage';
 
 import ProtectedRoute from './components/ProtectedRoute';
 // Login Register + Navbar if we need that to be injected just as partial (in future*)
@@ -33,7 +32,7 @@ const App = () => {
                 <Route
                     path="/ships"
                     element={
-                        <ProtectedRoute>
+                        <ProtectedRoute requiredRoles={['EMPLOYEE', 'ADMIN']}>
                             <ShipPage />
                         </ProtectedRoute>
                     }
@@ -42,17 +41,8 @@ const App = () => {
                 <Route
                     path="/order_products"
                     element={
-                        <ProtectedRoute>
+                        <ProtectedRoute requiredRoles={['EMPLOYEE','ADMIN']}>
                             <Order_productPage />
-                        </ProtectedRoute>
-                    }
-                />
-
-                <Route
-                    path="/order_histories"
-                    element={
-                        <ProtectedRoute>
-                            <OrderHistoryPage />
                         </ProtectedRoute>
                     }
                 />
@@ -60,7 +50,7 @@ const App = () => {
                 <Route
                     path="/operations"
                     element={
-                        <ProtectedRoute>
+                        <ProtectedRoute requiredRoles={['EMPLOYEE', 'ADMIN']}>
                             <OperationPage />
                         </ProtectedRoute>
                     }
@@ -68,7 +58,7 @@ const App = () => {
                 <Route
                     path="/ports"
                     element={
-                        <ProtectedRoute>
+                        <ProtectedRoute requiredRoles={['CLIENT','EMPLOYEE', 'ADMIN']}>
                             <PortPage />
                         </ProtectedRoute>
                     }
@@ -76,7 +66,7 @@ const App = () => {
                 <Route
                     path="/orders"
                     element={
-                        <ProtectedRoute>
+                        <ProtectedRoute requiredRoles={['EMPLOYEE','ADMIN']}>
                             <OrderPage />
                         </ProtectedRoute>
                     }
@@ -84,7 +74,7 @@ const App = () => {
                 <Route
                     path="/clients"
                     element={
-                        <ProtectedRoute>
+                        <ProtectedRoute requiredRoles={['ADMIN']}>
                             <ClientPage />
                         </ProtectedRoute>
                     }

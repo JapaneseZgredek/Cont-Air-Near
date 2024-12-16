@@ -7,6 +7,7 @@ const OrderAdd = ({ onAdd }) => {
     const [status, setStatus] = useState('pending'); // Domyślna wartość, która jest zgodna z backendem
     const [idPort, setIdPort] = useState('');
     const [idClient, setIdClient] = useState('');
+    const [description, setDescription] = useState('');
     const [ports, setPorts] = useState([]);
     const [clients, setClients] = useState([]);
     const [error, setError] = useState(null);
@@ -30,7 +31,7 @@ const OrderAdd = ({ onAdd }) => {
             return;
         }
 
-        const orderData = { status, id_port: parseInt(idPort), id_client: parseInt(idClient) };
+        const orderData = { status, description, id_port: parseInt(idPort), id_client: parseInt(idClient) };
         console.log("Sending data:", orderData); // Debugging
 
         try {
@@ -38,6 +39,7 @@ const OrderAdd = ({ onAdd }) => {
             onAdd(newOrder);
             setShow(false);
             setStatus('pending');
+            setDescription('');
             setIdPort('');
             setIdClient('');
         } catch (err) {
