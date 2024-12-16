@@ -10,10 +10,36 @@
 
 /* Styl dla komunikatu o błędzie */
 .err-field {
-    color: green;
+    color: red;
     font-size: 1rem;
     font-weight: bold;
     margin-top: 10px;
     margin-bottom: 10px;
     text-align: center;
+}
+
+/* Styl dla dropdown-menu */
+.dropdown-menu {
+    background-color: #6dbdff;
+    color: white;
+}
+
+/* Styl dla dropdown-item */
+.dropdown-item {
+    background-color: #6dbdff;
+    color: white;
+}
+
+/* Styl dla elementu dropdown-item przy hover */
+.dropdown-item:hover,
+.dropdown-item:focus {
+    background-color: #58a6d3;
+    color: white;
+}
+
+/* Styl dla przycisków toggle w dropdownach */
+.dropdown-toggle {
+    margin: 20px;
+    background-color: #6dbdff !important;
+    border: 2px solid #64b7fc !important;
 }

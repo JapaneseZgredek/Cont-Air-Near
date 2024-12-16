@@ -6,6 +6,24 @@
     width: 66%; 
 }
 
+/*ustawienia paginacji i itemperpage*/
+.pagination-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+/* Ustawienia dla paginacji */
+.pagination-container .pagination {
+    margin-top: 10px;
+    height: 40px;
+}
+
+/* Ustawienia dla paginacji */
+.pagination-container .pagination .pagination-item-middle {
+    align-items: center;
+}
+
 /* Tytuł itemu */
 .grid-item-card .card-title,
 .straight-item-card .card-title{
