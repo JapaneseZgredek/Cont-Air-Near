@@ -1,8 +1,22 @@
-import React, { useState } from 'react';
-import { registerClient, loginClient } from '../../services/api';
+import React, { useState, useContext } from 'react';
+import {registerClient, loginClient, fetchCurrentClient} from '../../services/api';
 import { useNavigate } from 'react-router-dom';
+import {RoleContext} from '../../contexts/RoleContext';
 
 const AuthenticationForm = () => {
+    const { setRole } = useContext(RoleContext);
+
+    const handleLoginSuccess = async () => {
+    try {
+      const response = await fetchCurrentClient();
+      setRole(response.role);
+      navigate('/');
+    } catch (error) {
+      console.error('Login failed:', error.message);
+    }
+  };
+
+
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     logonName: '',
@@ -64,7 +78,7 @@ const AuthenticationForm = () => {
         newErrors.name = 'Name must be at least 3 letters long.';
       }
 
-      // Address (rozbudować)
+      // Address
       if (!formData.address) {
         newErrors.address = 'Address is required.';
       } else if (!addressRegex.test(formData.address)) {
@@ -98,6 +112,7 @@ const AuthenticationForm = () => {
         };
         const response = await loginClient(credentials);
         localStorage.setItem('token', response.access_token);
+        handleLoginSuccess(); // Trigger role update
         setMessage('Login successful! Redirecting...');
         setTimeout(() => navigate('/'), 1000);
       } else {
@@ -112,6 +127,7 @@ const AuthenticationForm = () => {
         const response = await registerClient(newClient);
         setMessage(`Registration successful for user: ${response.logon_name}`);
         setIsLogin(true);
+        handleLoginSuccess();
       }
       setErrors({});
     } catch (err) {

@@ -5,7 +5,7 @@ import OperationList from '../components/Operation/OperationList';
 const OperationPage = () => {
   return (
     <div>
-      <NavbarComponent />
+      {/*<NavbarComponent />*/}
       <OperationList />
     </div>
   );

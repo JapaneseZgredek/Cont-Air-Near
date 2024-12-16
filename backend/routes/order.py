@@ -49,7 +49,7 @@ def read_orders_by_port(id_port: int, db: Session = Depends(get_db), current_cli
 
 @router.get("/orders/client/{id_client}", response_model=List[OrderRead])
 def read_orders_by_client(id_client: int, db: Session = Depends(get_db), current_client=Depends(get_current_client)):
-    orders = db.query(Order).filter(Order.id_client == Client.id_client).all()
+    orders = db.query(Order).filter(Order.id_client == id_client).all()
     if not orders:
         raise HTTPException(status_code=404, detail=f"No orders found for client with id: {id_client}")
     return orders

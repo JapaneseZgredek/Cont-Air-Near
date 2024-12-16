@@ -28,7 +28,7 @@ const Order_productAdd = ({ onAdd }) => {
             setIdProduct('');
             setQuantity('');
         } catch (err) {
-            setError('Failed to create order_product');
+            setError('Failed to create order_product entry, probably it is a duplicate of an product in order');
         }
     };
 

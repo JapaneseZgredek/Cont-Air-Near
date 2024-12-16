@@ -1,80 +1,78 @@
-import React, { useEffect, useState } from 'react';
-import { Navbar, Container, Nav } from 'react-bootstrap';
+import React, { useContext } from 'react';
+import { Navbar as BootstrapNavbar, Container, Nav } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
+import { RoleContext } from '../../contexts/RoleContext';
 
 const NavbarComponent = () => {
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { role, handleLogout } = useContext(RoleContext);
 
-    // Check for JWT token on initial render
-    useEffect(() => {
-        const token = localStorage.getItem('token');
-        setIsLoggedIn(!!token); // Set to true if token exists, false otherwise
-    }, []);
+  const getLinksForRole = () => {
+    if (!role) {
+      return (
+        <>
+          <LinkContainer to="/products">
+            <Nav.Link>Products</Nav.Link>
+          </LinkContainer>
+          <LinkContainer to="/login">
+            <Nav.Link>Login</Nav.Link>
+          </LinkContainer>
+          <LinkContainer to="/register">
+            <Nav.Link>Register</Nav.Link>
+          </LinkContainer>
+        </>
+      );
+    }
 
-    // Handle user logout
-    const handleLogout = () => {
-        localStorage.removeItem('token'); // Remove JWT token
-        setIsLoggedIn(false);
-        window.location.href = '/'; // Redirect to home page
+    const roleLinks = {
+      ADMIN: [
+          { path: '/products', label: 'Products' },
+          { path: '/ships', label: 'Ships' },
+          { path: '/operations', label: 'Operations' },
+          { path: '/ports', label: 'Ports' },
+          { path: '/orders', label: 'Orders' },
+          { path: '/order_products', label: 'Order Products' },
+          { path: '/clients', label: 'Clients' },
+      ],
+      EMPLOYEE: [
+          { path: '/ships', label: 'Ships' },
+          { path: '/operations', label: 'Operations' },
+          { path: '/ports', label: 'Ports' },
+          { path: '/orders', label: 'Orders' },
+      ],
+      CLIENT: [
+          { path: '/ports', label: 'Ports' },
+          { path: '/orders', label: 'Orders' },
+          { path: '/products', label: 'Products' },
+      ],
     };
 
-    return (
-        <Navbar bg="dark" variant="dark" expand="lg" className="mb-4">
-            <Container>
-                {/* Navbar Brand */}
-                <LinkContainer to="/">
-                    <Navbar.Brand>Cont-Air-Near</Navbar.Brand>
-                </LinkContainer>
-                <Navbar.Toggle aria-controls="basic-navbar-nav" />
-                <Navbar.Collapse id="basic-navbar-nav">
-                    <Nav className="ml-auto">
-                        {/* Public Links */}
-                        {/* New Unprotected Tables */}
-                        <LinkContainer to="/products">
-                            <Nav.Link>Products</Nav.Link>
-                        </LinkContainer>
-                        {/* Conditional Links Based on Authentication */}
-                        {isLoggedIn ? (
-                            <>
-                                {/* Protected Links */}
-                                <LinkContainer to="/ships">
-                                    <Nav.Link>Ships</Nav.Link>
-                                </LinkContainer>
-                                <LinkContainer to="/order_products">
-                                    <Nav.Link>Order_products</Nav.Link>
-                                </LinkContainer>
-                                <LinkContainer to="/operations">
-                                    <Nav.Link>Operations</Nav.Link>
-                                </LinkContainer>
-                                <LinkContainer to="/ports">
-                                    <Nav.Link>Ports</Nav.Link>
-                                </LinkContainer>
-                                <LinkContainer to="/orders">
-                                    <Nav.Link>Orders</Nav.Link>
-                                </LinkContainer>
-                                <LinkContainer to="/clients">
-                                    <Nav.Link>Clients</Nav.Link>
-                                </LinkContainer>
+    return roleLinks[role].map((link) => (
+      <LinkContainer key={link.path} to={link.path}>
+        <Nav.Link>{link.label}</Nav.Link>
+      </LinkContainer>
+    ));
+  };
 
-                                {/* Logout Link */}
-                                <Nav.Link onClick={handleLogout}>Logout</Nav.Link>
-                            </>
-                        ) : (
-                            <>
-                                {/* Login and Register Links */}
-                                <LinkContainer to="/login">
-                                    <Nav.Link>Login</Nav.Link>
-                                </LinkContainer>
-                                <LinkContainer to="/register">
-                                    <Nav.Link>Register</Nav.Link>
-                                </LinkContainer>
-                            </>
-                        )}
-                    </Nav>
-                </Navbar.Collapse>
-            </Container>
-        </Navbar>
-    );
+  return (
+    <BootstrapNavbar bg="dark" variant="dark" expand="lg" className="mb-4">
+      <Container>
+        <LinkContainer to="/">
+          <BootstrapNavbar.Brand>Cont-Air-Near</BootstrapNavbar.Brand>
+        </LinkContainer>
+        <BootstrapNavbar.Toggle aria-controls="basic-navbar-nav" />
+        <BootstrapNavbar.Collapse id="basic-navbar-nav">
+          <Nav className="ml-auto">
+            {getLinksForRole()}
+            {role && (
+              <Nav.Link onClick={handleLogout} style={{ cursor: 'pointer' }}>
+                Logout
+              </Nav.Link>
+            )}
+          </Nav>
+        </BootstrapNavbar.Collapse>
+      </Container>
+    </BootstrapNavbar>
+  );
 };
 
 export default NavbarComponent;
