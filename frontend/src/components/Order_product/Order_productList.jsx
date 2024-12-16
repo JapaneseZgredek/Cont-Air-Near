@@ -28,19 +28,23 @@ const Order_productList = () => {
     const handleUpdateOrder_product = (updatedOrder_product) => {
         setOrder_products((prevOrder_products) =>
             prevOrder_products.map((order_product) =>
-                (order_product.id_order === updatedOrder_product.id_order
-                    && order_product.id_product === updatedOrder_product.id_product
-                ) ? updatedOrder_product : order_product
+                order_product.id_order === updatedOrder_product.id_order &&
+                order_product.id_product === updatedOrder_product.id_product
+                    ? updatedOrder_product
+                    : order_product
             )
         );
     };
 
     const handleDeleteOrder_product = (id_order, id_product) => {
-        setOrder_products((prevOrder_products) => prevOrder_products
-        .filter((order_product) => order_product.id_order !== id_order)
-        .filter((order_product) => order_product.id_product !== id_product));
+        setOrder_products((prevOrder_products) =>
+            prevOrder_products.filter(
+                (order_product) =>
+                    !(order_product.id_order === id_order && order_product.id_product === id_product)
+            )
+        );
     };
-    
+
     return (
         <Container>
             <div className="d-flex justify-content-between mb-3">
@@ -51,7 +55,7 @@ const Order_productList = () => {
             {order_products.length > 0 ? (
                 order_products.map((order_product) => (
                     <Order_productItem
-                        key={order_product.id_order}
+                        key={`${order_product.id_order}-${order_product.id_product}`} // Ensure unique key
                         order_product={order_product}
                         onDelete={handleDeleteOrder_product}
                         onUpdate={handleUpdateOrder_product}

@@ -5,7 +5,7 @@ import OrderList from '../components/Order/OrderList';
 const OrderPage = () => {
     return (
         <div>
-            <NavbarComponent />
+            {/*<NavbarComponent />*/}
             <OrderList />
         </div>
     );

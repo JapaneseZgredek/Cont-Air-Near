@@ -15,7 +15,7 @@ const OrderList = () => {
         try {
             const data = await fetchOrders();
             setOrders(data);
-            setFilteredOrders(data);
+            setFilteredOrders(data); // Initialize filteredOrders with fetched orders
         } catch (err) {
             setError('Failed to load orders');
         }
@@ -24,6 +24,11 @@ const OrderList = () => {
     useEffect(() => {
         loadOrders();
     }, []);
+
+    // Synchronize filteredOrders with orders whenever orders change
+    useEffect(() => {
+        setFilteredOrders(orders);
+    }, [orders]);
 
     const handleSearch = (searchTerm) => {
         if (!searchTerm) {
@@ -47,11 +52,25 @@ const OrderList = () => {
         setSearchInColumn(column);
     };
 
+    const handleAddOrder = (newOrder) => {
+        setOrders((prevOrders) => [...prevOrders, newOrder]);
+    };
+
+    const handleDeleteOrder = (id) => {
+        setOrders((prevOrders) => prevOrders.filter((order) => order.id_order !== id));
+    };
+
+    const handleUpdateOrder = (updatedOrder) => {
+        setOrders((prevOrders) =>
+            prevOrders.map((order) => (order.id_order === updatedOrder.id_order ? updatedOrder : order))
+        );
+    };
+
     return (
         <Container>
             <div className="d-flex justify-content-between mb-3">
                 <h2>Order List</h2>
-                <OrderAdd onAdd={(newOrder) => setOrders(prev => [...prev, newOrder])} />
+                <OrderAdd onAdd={handleAddOrder} />
             </div>
 
             <SearchAndFilterBar
@@ -67,10 +86,8 @@ const OrderList = () => {
                     <OrderItem
                         key={order.id_order}
                         order={order}
-                        onDelete={(id) => setOrders(prev => prev.filter(o => o.id_order !== id))}
-                        onUpdate={(updatedOrder) =>
-                            setOrders(prev => prev.map(o => o.id_order === updatedOrder.id_order ? updatedOrder : o))
-                        }
+                        onDelete={handleDeleteOrder}
+                        onUpdate={handleUpdateOrder}
                     />
                 ))
             ) : (
