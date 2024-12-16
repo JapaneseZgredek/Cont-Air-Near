@@ -15,7 +15,7 @@ const NavbarComponent = () => {
     const handleLogout = () => {
         localStorage.removeItem('token'); // Remove JWT token
         setIsLoggedIn(false);
-        window.location.href = '/'; // Redirect to home page
+        window.location.href = '/login'; // Redirect to login
     };
 
     return (
