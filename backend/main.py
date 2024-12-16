@@ -33,11 +33,8 @@ app.include_router(product.router, prefix='/api')
 app.include_router(client.router, prefix='/api')
 app.include_router(order.router, prefix='/api')
 app.include_router(order_product.router, prefix='/api')
-app.include_router(order_history.router, prefix='/api')
 app.include_router(cart.router, prefix='/api')
 
-#Users routers
-app.include_router(user.router, prefix='/api')
 
 
 @app.on_event('startup')
