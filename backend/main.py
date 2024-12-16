@@ -74,7 +74,7 @@ def create_default_users():
         address="ul. Adminiska 5",
         telephone_number=1234567890,
         email="admin@admin.com",
-        password="admin",
+        password="password",
         role=UserRole.ADMIN
     )
 
@@ -86,7 +86,7 @@ def create_default_users():
         address="ul. Cliencka 1",
         telephone_number=200200200,
         email="client@client.com",
-        password="client",
+        password="password",
         role=UserRole.CLIENT
     )
 
@@ -98,7 +98,7 @@ def create_default_users():
         address="ul. Pracownika 12",
         telephone_number=111222333,
         email="employee@employee.com",
-        password="employee",
+        password="password",
         role=UserRole.EMPLOYEE
     )
 
