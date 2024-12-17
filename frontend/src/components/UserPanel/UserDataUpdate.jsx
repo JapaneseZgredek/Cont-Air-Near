@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Modal } from 'react-bootstrap';
 import {fetchCurrentClient, updateUserOwnData} from '../../services/api';
 import { useNavigate } from 'react-router-dom';
+import { RoleContext } from '../../contexts/RoleContext';
 
 const UserDataUpdate = ({client, show, onHide}) => {
     const [errors, setErrors] = useState({});
@@ -15,11 +16,22 @@ const UserDataUpdate = ({client, show, onHide}) => {
         telephone_number: client.telephone_number
     });
     const navigate = useNavigate();
+    const [showPassword, setShowPassword] = useState(false);
+    const [keepPassword, setKeepPassword] = useState(true);
+    const {role, handleLogout } = useContext(RoleContext);
 
     const handleLoginSuccess = async () => {
         try {
           const response = await fetchCurrentClient();
-          navigate('/');
+          if(formData.logonName !== 
+            client.logon_name || 
+            formData.email !== 
+            client.email || 
+            !keepPassword){
+            handleLogout();
+            navigate('/');
+          }
+          onHide();
         } catch (error) {
           console.error('Data update failed:', error.message);
         }
@@ -45,11 +57,11 @@ const UserDataUpdate = ({client, show, onHide}) => {
         }
     
         // Password
-        if (!formData.password) {
-          newErrors.password = 'Password is required.';
-        } else if (!passwordRegex.test(formData.password)) {
-          newErrors.password = 'Password must be at least 8 characters long.';
-        }
+        if (!keepPassword && !formData.password) {
+            newErrors.password = 'Password is required.';
+          } else if (!keepPassword && formData.password && !passwordRegex.test(formData.password)) {
+            newErrors.password = 'Password must be at least 8 characters long.';
+          }
         
         // Email
         if (!formData.email) {
@@ -89,16 +101,18 @@ const UserDataUpdate = ({client, show, onHide}) => {
               setErrors(newErrors);
               return;
             }
+                    
         
             try {
                 const updatedClient = {
                     ...client,
-                    logon_name: formData.logonName,
-                    password: formData.password,
-                    email: formData.email,
-                    name: formData.name,
-                    address: formData.address,
-                    telephone_number: parseInt(formData.telephone_number, 10),
+                    logon_name: formData.logonName != client.logonName ? formData.logonName : null,
+                    password: keepPassword ? "" : formData.password,
+                    email: formData.email != client.email ? formData.email : null,
+                    name: formData.name != client.name ? formData.name : null,
+                    address: formData.address != client.address ? formData.address : null,
+                    telephone_number: formData.telephone_number != client.telephone_number ?
+                     parseInt(formData.telephone_number, 10) : null,
                 };
                 const response = await updateUserOwnData(updatedClient);
                 setMessage(`Data update successful for user: ${response.logon_name}`);
@@ -136,19 +150,48 @@ const UserDataUpdate = ({client, show, onHide}) => {
                 {errors.logonName && <div className="invalid-feedback">{errors.logonName}</div>}
               </div>
     
-              <div className="mb-3">
+            <div className="mb-3">
                 <label htmlFor="password" className="form-label">Password:</label>
-                <input
-                  type="password"
-                  className={`form-control ${errors.password ? 'is-invalid' : ''}`}
-                  id="password"
-                  name="password"
-                  placeholder="Enter new password"
-                  value={formData.password}
-                  onChange={handleChange}
-                />
+                <div className="form-label"> {'(leave empty to keep the old one)'}</div>
+                {!keepPassword && (
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    className={`form-control ${errors.password ? 'is-invalid' : ''}`}
+                    id="password"
+                    name="password"
+                    placeholder="Enter new password"
+                    value={formData.password}
+                    onChange={handleChange}
+                  />
+                )}
                 {errors.password && <div className="invalid-feedback">{errors.password}</div>}
-              </div>
+
+                <div className="form-check mt-2">
+                  <input
+                    type="checkbox"
+                    className="form-check-input"
+                    id="showPassword"
+                    checked={showPassword}
+                    onChange={() => setShowPassword(!showPassword)}
+                  />
+                  <label className="form-check-label" htmlFor="showPassword">
+                    Show Password
+                  </label>
+                </div>
+
+                <div className="form-check mt-2">
+                  <input
+                    type="checkbox"
+                    className="form-check-input"
+                    id="keepPassword"
+                    checked={keepPassword}
+                    onChange={() => setKeepPassword(!keepPassword)}
+                  />
+                  <label className="form-check-label" htmlFor="keepPassword">
+                    Keep the old password
+                  </label>
+                </div>
+            </div>
     
               
                 <>
@@ -209,7 +252,16 @@ const UserDataUpdate = ({client, show, onHide}) => {
                   </div>
                 </>
               
-    
+                {(formData.logonName !== 
+                client.logon_name || 
+                formData.email !== 
+                client.email || 
+                !keepPassword) && (
+                  <label className="alert alert-warning mt-3" role="alert">
+                    Warning: Submitting the current changes will require you to log in again.
+                  </label>
+                )}
+
               <div className="d-flex justify-content-center">
                 <button type="submit" className="btn btn-primary px-4">
                   {'Submit changes'}
@@ -219,9 +271,6 @@ const UserDataUpdate = ({client, show, onHide}) => {
           </div>
         </Modal>
       );
-
-
-
 };
 
 export default UserDataUpdate;

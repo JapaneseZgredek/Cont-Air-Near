@@ -39,6 +39,7 @@ const UserPanel = () => {
             </div>
             <hr className="divider" /> {/*linia podzialu*/}
             {error && <p className="err-field">{"Err: "+error}</p>}
+            {/*
             <Card>
                 <a>Prefered display type</a>
                 <label className="switch">
@@ -47,6 +48,7 @@ const UserPanel = () => {
                 </label>
                 <p>{isToggled ? "List" : "Tiles"}</p>
             </Card>
+            */}
 
             <Card>
                 <a>User data</a>

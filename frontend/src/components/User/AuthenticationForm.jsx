@@ -46,7 +46,7 @@ const AuthenticationForm = () => {
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,3}$/;
     const nameRegex = /^[a-zA-Z ]{3,}$/;
     const telephoneNumberRegex = /^[0-9]{7,15}$/;
-    const addressRegex = /^[a-zA-Z ]{8,64}$/;
+    const addressRegex = /^[a-zA-Z0-9 .\-\/]{8,64}$/;
 
     // Login Name
     if (!formData.logonName) {
