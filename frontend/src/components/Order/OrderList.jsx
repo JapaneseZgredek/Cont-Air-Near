@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import OrderItem from './OrderItem';
 import OrderAdd from './OrderAdd';
-import { fetchOrders } from '../../services/api';
+import { fetchOrders, fetchCurrentClient, fetchOrdersForOwner } from '../../services/api';
 import { Container } from 'react-bootstrap';
 import SearchAndFilterBar from '../SearchAndFilterBar';
 
@@ -13,9 +13,16 @@ const OrderList = () => {
 
     const loadOrders = async () => {
         try {
-            const data = await fetchOrders();
+            const client = await fetchCurrentClient();
+            let data;
+            if (client.role == "CLIENT"){
+                data = await fetchOrdersForOwner(client.id_client);
+            }
+            else{
+                data = await fetchOrders();
+            }
             setOrders(data);
-            setFilteredOrders(data); // Initialize filteredOrders with fetched orders
+            setFilteredOrders(data);
         } catch (err) {
             setError('Failed to load orders');
         }
