@@ -5,7 +5,7 @@ import ProductList from '../components/Product/ProductList';
 const ProductPage = () => {
   return (
     <div className='listing-page'>
-      <NavbarComponent />
+      {/*<NavbarComponent />*/}
       <ProductList />
     </div>
   );

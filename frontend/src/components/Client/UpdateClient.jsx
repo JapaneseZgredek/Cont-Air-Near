@@ -51,7 +51,7 @@ const UpdateClient = ({ client, show, onHide, onUpdate }) => {
       email,
       logon_name,
       role,
-      password: password || undefined, // Optional password update
+      password: password
     };
 
     try {
@@ -147,12 +147,12 @@ const UpdateClient = ({ client, show, onHide, onUpdate }) => {
             <Form.Control.Feedback type="invalid">{validationErrors.role}</Form.Control.Feedback>
           </Form.Group>
           <Form.Group className="mb-3">
-            <Form.Label>Password (Optional)</Form.Label>
+            <Form.Label>Password</Form.Label>
             <Form.Control
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter new password (leave blank to keep current password)"
+              placeholder="Enter new password"
             />
           </Form.Group>
           {validationErrors.server && (

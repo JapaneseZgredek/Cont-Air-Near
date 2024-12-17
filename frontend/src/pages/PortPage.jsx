@@ -5,7 +5,7 @@ import PortList from '../components/Port/PortList';
 const PortPage = () => {
   return (
     <div className='listing-page'>
-      <NavbarComponent />
+      {/*<NavbarComponent />*/}
       <PortList />
     </div>
   );

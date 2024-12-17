@@ -6,6 +6,7 @@ const OperationPage = () => {
   return (
     <div className='listing-page'>
       <NavbarComponent />
+      {/*<NavbarComponent />*/}
       <OperationList />
     </div>
   );

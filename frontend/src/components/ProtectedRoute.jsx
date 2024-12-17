@@ -1,21 +1,33 @@
 import { Navigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { verifyRoles } from "../services/api";
 
 const ProtectedRoute = ({ requiredRoles, children }) => {
-  const isAuthenticated = !!localStorage.getItem("token");
+  const [isAuthorized, setIsAuthorized] = useState(null);
 
-  if (!isAuthenticated) {
-    console.warn("User is not authenticated. Redirecting to login.");
+  useEffect(() => {
+    const checkAuthorization = async () => {
+      try {
+        await verifyRoles(requiredRoles);
+        setIsAuthorized(true);
+      } catch (error) {
+        console.error("Access denied or authentication error:", error.message);
+        setIsAuthorized(false);
+      }
+    };
+
+    checkAuthorization();
+  }, [requiredRoles]);
+
+  if (isAuthorized === null) {
+    return <div>Loading...</div>; //dodac 403
+  }
+
+  if (!isAuthorized) {
     return <Navigate to="/login" />;
   }
 
-  try {
-    verifyRoles(requiredRoles);
-    return children;
-  } catch (error) {
-    console.error("Access denied. Redirecting to unauthorized page.");
-    return <Navigate to="/login" />;  //albo zrobic unauthorized ale to bez sensu
-  }
+  return children;
 };
 
 export default ProtectedRoute;

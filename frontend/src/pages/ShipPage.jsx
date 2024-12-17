@@ -5,7 +5,7 @@ import ShipList from '../components/Ship/ShipList';
 const ShipPage = () => {
   return (
     <div className='listing-page'>
-      <NavbarComponent />
+      {/*<NavbarComponent />*/}
       <ShipList />
     </div>
   );
