@@ -29,6 +29,8 @@ const AuthenticationForm = () => {
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  
 
   const switchForm = () => {
     setIsLogin(!isLogin);
@@ -163,7 +165,7 @@ const AuthenticationForm = () => {
           <div className="mb-3">
             <label htmlFor="password" className="form-label">Password:</label>
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               className={`form-control ${errors.password ? 'is-invalid' : ''}`}
               id="password"
               name="password"
@@ -172,6 +174,19 @@ const AuthenticationForm = () => {
               onChange={handleChange}
             />
             {errors.password && <div className="invalid-feedback">{errors.password}</div>}
+
+            <div className="form-check mt-2">
+                  <input
+                    type="checkbox"
+                    className="form-check-input"
+                    id="showPassword"
+                    checked={showPassword}
+                    onChange={() => setShowPassword(!showPassword)}
+                  />
+                  <label className="form-check-label" htmlFor="showPassword">
+                    Show Password
+                  </label>
+                </div>
           </div>
 
           {!isLogin && (
