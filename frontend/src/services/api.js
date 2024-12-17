@@ -543,6 +543,20 @@ export const fetchOrders_productsByProduct_zapas = async (product_id) => {
     }
 };
 
+export const fetchExcludedProducts = async () => {
+  try {
+    console.log("Making GET request to /api/products/exclude");
+    const response = await axios.get(`${API_URL}/api/products/exclude`, {
+      headers: authHeaders(),
+    });
+    console.log("Response from /api/products/exclude:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error in fetchExcludedProducts:", error.response?.data || error.message);
+    throw error.response?.data || new Error("Failed to fetch excluded products");
+  }
+};
+
 export const fetchClients = async () => {
     try {
         await verifyRoles(['ADMIN']);

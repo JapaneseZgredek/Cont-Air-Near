@@ -50,8 +50,6 @@ const Order_productItem = ({ order_product, onUpdate, onDelete }) => {
                             products.find((product) => product.id_product === order_product.id_product)?.name || 'Unknown Product'
                         }
                         </Card.Title>
-                        <Card.Text>Quantity {order_product.quantity}</Card.Text>
-
                     </div>
                     <div>
                         <Button variant="warning" className="me-2" onClick={openUpdateModal}>Update</Button>

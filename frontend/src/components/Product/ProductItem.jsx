@@ -5,13 +5,13 @@ import UpdateProduct from "./UpdateProduct";
 import Order_productButton from "../Order_product/Order_productButton";
 import GenericDetailModal from "../GenericDetailModal";
 
-const ProductItem = ({product, onUpdate, onDelete }) => {
+const ProductItem = ({ product, onUpdate, onDelete, onAddToCart }) => {
     const [showConfirm, setShowConfirm] = useState(false);
     const [showUpdateModal, setShowUpdateModal] = useState(false);
     const [showDetailModal, setShowDetailModal] = useState(false);
 
     const handleDelete = async () => {
-        try{
+        try {
             await deleteProduct(product.id_product);
             onDelete(product.id_product);
             setShowConfirm(false);
@@ -24,11 +24,34 @@ const ProductItem = ({product, onUpdate, onDelete }) => {
         setShowUpdateModal(true);
     };
 
-    const closeUpdateModal = () =>{
+    const closeUpdateModal = () => {
         setShowUpdateModal(false);
     };
 
-    return(
+    const handleAddToCart = () => {
+        const existingCart = JSON.parse(localStorage.getItem('cart')) || [];
+        const existingProduct = existingCart.find(item => item.id_product === product.id_product);
+
+        if (existingProduct) {
+            existingProduct.quantity += 1;
+        } else {
+            existingCart.push({
+                ...product,
+                quantity: 1
+            });
+        }
+
+        localStorage.setItem('cart', JSON.stringify(existingCart));
+
+        // Usunięcie produktu z listy dostępnych produktów
+        if (onAddToCart) {
+            onAddToCart(product.id_product);
+        }
+
+        alert('Produkt dodany do koszyka!');
+    };
+
+    return (
         <>
             <Card className="mb-3">
                 <Card.Body className="d-flex justify-content-between align-items-center">
@@ -45,9 +68,10 @@ const ProductItem = ({product, onUpdate, onDelete }) => {
                         <Card.Text>Port ID: {product.id_port}</Card.Text>
                     </div>
                     <div>
+                        <Button variant="outline-success" className="me-2" onClick={handleAddToCart}>Add to Cart</Button>
                         <Button variant="warning" className="me-2" onClick={openUpdateModal}>Update</Button>
-                        <Button variant="danger" onClick={() => setShowConfirm(true)}>Delete</Button>
-                        <Order_productButton productId={product.id_product} productName={product.name}/>
+                        <Button variant="danger" className="me-2" onClick={() => setShowConfirm(true)}>Delete</Button>
+                        <Order_productButton productId={product.id_product} productName={product.name} />
                     </div>
                 </Card.Body>
             </Card>
@@ -79,7 +103,7 @@ const ProductItem = ({product, onUpdate, onDelete }) => {
                 onUpdate={onUpdate}
             />
         </>
-    )
+    );
 };
 
 export default ProductItem;

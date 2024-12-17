@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import { Navbar as BootstrapNavbar, Container, Nav } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import { RoleContext } from '../../contexts/RoleContext';
+import { FaShoppingCart } from 'react-icons/fa'; // Import the cart icon from react-icons
 
 const NavbarComponent = () => {
   const { role, handleLogout } = useContext(RoleContext);
@@ -25,24 +26,27 @@ const NavbarComponent = () => {
 
     const roleLinks = {
       ADMIN: [
-          { path: '/products', label: 'Products' },
-          { path: '/ships', label: 'Ships' },
-          { path: '/operations', label: 'Operations' },
-          { path: '/ports', label: 'Ports' },
-          { path: '/orders', label: 'Orders' },
-          { path: '/order_products', label: 'Order Products' },
-          { path: '/clients', label: 'Clients' },
+        { path: '/products', label: 'Products' },
+        { path: '/ships', label: 'Ships' },
+        { path: '/operations', label: 'Operations' },
+        { path: '/ports', label: 'Ports' },
+        { path: '/orders', label: 'Orders' },
+        { path: '/order_products', label: 'Order Products' },
+        { path: '/clients', label: 'Clients' },
+        { path: '/cart', label: <FaShoppingCart /> }, // Replaced Cart text with cart icon
       ],
       EMPLOYEE: [
-          { path: '/ships', label: 'Ships' },
-          { path: '/operations', label: 'Operations' },
-          { path: '/ports', label: 'Ports' },
-          { path: '/orders', label: 'Orders' },
+        { path: '/ships', label: 'Ships' },
+        { path: '/operations', label: 'Operations' },
+        { path: '/ports', label: 'Ports' },
+        { path: '/orders', label: 'Orders' },
+        { path: '/cart', label: <FaShoppingCart /> }, // Replaced Cart text with cart icon
       ],
       CLIENT: [
-          { path: '/ports', label: 'Ports' },
-          { path: '/orders', label: 'Orders' },
-          { path: '/products', label: 'Products' },
+        { path: '/ports', label: 'Ports' },
+        { path: '/orders', label: 'Orders' },
+        { path: '/products', label: 'Products' },
+        { path: '/cart', label: <FaShoppingCart /> }, // Replaced Cart text with cart icon
       ],
     };
 

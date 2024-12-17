@@ -49,7 +49,6 @@ const Order_productList = () => {
         <Container>
             <div className="d-flex justify-content-between mb-3">
                 <h2>Order_product List</h2>
-                <Order_productAdd onAdd={handleAddOrder_product} />
             </div>
             {error && <p style={{ color: 'red' }}>{error}</p>}
             {order_products.length > 0 ? (

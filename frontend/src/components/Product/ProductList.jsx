@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import ProductItem from './ProductItem';
 import AddProduct from './AddProduct';
-import { fetchProducts } from '../../services/api';
+import { fetchExcludedProducts } from '../../services/api'; // Import the new method
 import { Container } from 'react-bootstrap';
 import SearchAndFilterBar from '../SearchAndFilterBar';
 
@@ -13,10 +13,17 @@ const ProductList = () => {
 
     const loadProducts = async () => {
         try {
-            const data = await fetchProducts();
-            setProducts(data);
-            setFilteredProducts(data);
+            const data = await fetchExcludedProducts(); // Call the new API method
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const cartProductIds = cart.map(item => item.id_product);
+
+            // Filter products that are not in the cart
+            const availableProducts = data.filter(product => !cartProductIds.includes(product.id_product));
+
+            setProducts(availableProducts);
+            setFilteredProducts(availableProducts);
         } catch (err) {
+            console.error('Failed to load products:', err);
             setError('Failed to load products');
         }
     };
@@ -25,11 +32,13 @@ const ProductList = () => {
         loadProducts();
     }, []);
 
+    // Add a new product
     const handleAddProduct = (newProduct) => {
         setProducts((prevProducts) => [...prevProducts, newProduct]);
         setFilteredProducts((prevProducts) => [...prevProducts, newProduct]);
     };
 
+    // Update a product in the list
     const handleUpdateProduct = (updatedProduct) => {
         setProducts((prevProducts) =>
             prevProducts.map((product) =>
@@ -43,9 +52,16 @@ const ProductList = () => {
         );
     };
 
+    // Delete a product from the list
     const handleDeleteProduct = (id) => {
         setProducts((prevProducts) => prevProducts.filter((product) => product.id_product !== id));
         setFilteredProducts((prevProducts) => prevProducts.filter((product) => product.id_product !== id));
+    };
+
+    // Remove a product from ProductList after adding it to the cart
+    const handleProductAddedToCart = (productId) => {
+        setProducts((prevProducts) => prevProducts.filter(product => product.id_product !== productId));
+        setFilteredProducts((prevProducts) => filteredProducts.filter(product => product.id_product !== productId));
     };
 
     const handleSearch = (searchTerm) => {
@@ -92,10 +108,11 @@ const ProductList = () => {
                         product={product}
                         onDelete={handleDeleteProduct}
                         onUpdate={handleUpdateProduct}
+                        onAddToCart={handleProductAddedToCart} // Pass the function to ProductItem
                     />
                 ))
             ) : (
-                <p>No products available.</p>
+                <p>No available products.</p>
             )}
         </Container>
     );
