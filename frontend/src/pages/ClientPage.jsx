@@ -4,8 +4,8 @@ import ClientList from '../components/Client/ClientList';
 
 const ClientPage = () => {
   return (
-    <div>
-      {/*<NavbarComponent />*/}
+    <div className='listing-page'>
+      {/* <NavbarComponent /> */}
       <ClientList />
     </div>
   );

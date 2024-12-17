@@ -46,7 +46,7 @@ function Order_productsButton({orderId, productId, productName}) {
                     <Modal.Title>Order_products for {orderId ? "Order " + orderId : "Product " + productName}</Modal.Title>
                 </Modal.Header>
                 <ModalBody>
-                {error && <p style={{ color: 'red' }}>{error}</p>}
+                {error && <p className="err-field">{"Err: "+error}</p>}
 
                     {loading ? (
                         <div className="text-center">

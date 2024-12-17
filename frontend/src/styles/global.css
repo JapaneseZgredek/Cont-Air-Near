@@ -1,0 +1,65 @@
+/* Styl tła dla strony listy*/
+.listing-page {
+    background-image: url('graphics/site_background.png'); /* Ścieżka do obrazka */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat; /* Zapobiega powtarzaniu tła */
+    background-attachment: fixed;
+    min-height: 100vh; /* Ustawia minimalną wysokość na 100% wysokości okna */
+}
+
+/* Styl tła dla strony głównej*/
+.home-page {
+    background-image: url('graphics/home_page_background.png'); /* Ścieżka do obrazka */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat; /* Zapobiega powtarzaniu tła */
+    background-attachment: fixed;
+    min-height: 100vh; /* Ustawia minimalną wysokość na 100% wysokości okna */
+}
+
+/* Styl tła dla strony z formularzem*/
+.form-page {
+    background-image: url('graphics/form_site_background2.png'); /* Ścieżka do obrazka */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat; /* Zapobiega powtarzaniu tła */
+    background-attachment: fixed;
+    min-height: 100vh; /* Ustawia minimalną wysokość na 100% wysokości okna */
+}
+
+/* Styl dla komunikatu o błędzie */
+.err-field {
+    color: red;
+    font-size: 1rem;
+    font-weight: bold;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+/* Styl dla dropdown-menu */
+.dropdown-menu {
+    background-color: #6dbdff;
+    color: white;
+}
+
+/* Styl dla dropdown-item */
+.dropdown-item {
+    background-color: #6dbdff;
+    color: white;
+}
+
+/* Styl dla elementu dropdown-item przy hover */
+.dropdown-item:hover,
+.dropdown-item:focus {
+    background-color: #58a6d3;
+    color: white;
+}
+
+/* Styl dla przycisków toggle w dropdownach */
+.dropdown-toggle {
+    margin: 20px;
+    background-color: #6dbdff !important;
+    border: 2px solid #64b7fc !important;
+}

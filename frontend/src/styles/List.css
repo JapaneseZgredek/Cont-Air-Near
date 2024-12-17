@@ -1,0 +1,173 @@
+/* Jasnoszara linia */
+.divider {
+    border: 0;
+    height: 5px;
+    background-image: linear-gradient(to right, #00569c, #ffffff);
+    width: 66%; 
+}
+
+/*ustawienia paginacji i itemperpage*/
+.pagination-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+/* Ustawienia dla paginacji */
+.pagination-container .pagination {
+    margin-top: 10px;
+    height: 40px;
+}
+
+/* Ustawienia dla paginacji */
+.pagination-container .pagination .pagination-item-middle {
+    align-items: center;
+}
+
+/* Tytuł itemu */
+.grid-item-card .card-title,
+.straight-item-card .card-title{
+    width: 250px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #2600ff;
+    transition: color 0.3s ease;
+}
+.grid-item-card .card-title:hover,
+.straight-item-card .card-title:hover{
+    color: #64b2ff;
+}
+
+/* Ustawienia obrazka*/
+.grid-item-card,
+.straight-item-card .image-container{
+    text-align: center;
+}
+.loading-message, .missing-image {
+    font-size: 16px;
+    color: #555;
+}
+
+/* Ustawienie przycisków itemu*/
+.grid-item-card .item-buttons,
+.straight-item-card .item-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+}
+
+/* Styl dla przycisków itemu */
+.grid-item-card .item-buttons button,
+.straight-item-card .item-buttons button,
+.item-buttons button.btn-warning,
+.item-buttons button.btn-danger{
+    padding: 0.25rem 0.5rem; /* Dodatkowe wypełnienie dla przycisków */
+    color: #333;
+    background-color: #fff;
+    font-size: 1rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    border: 1px solid #6dbdff;
+    transition: transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.grid-item-card .item-buttons button:hover,
+.straight-item-card .item-buttons button:hover {
+    background-color: #b5eeff;
+    transform: translateY(-2px);
+}
+
+/* Styl dla przycisku danger (delete) */
+.item-buttons button.btn-danger:hover {
+    background-color: rgb(255, 199, 199);
+}
+/* Styl dla przycisku warning (update) */
+.item-buttons button.btn-warning:hover {
+    background-color: rgb(255, 237, 199);
+}
+
+/* Ustawienie danych w poziomej linii */
+.item-texts {
+    font-family: 'Roboto', sans-serif;
+    display: flex;
+    gap: 10px;
+    justify-content:center;
+    flex-wrap: wrap;
+}
+.straight-item-card .item-texts{
+    width: 500px;
+    justify-content: space-between;
+}
+
+/*podział na grid i straight listy*/
+
+.grid-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+.straight-list {
+    display: inline;
+    gap: 20px;
+    padding: 20px;
+}
+
+
+/* Styl dla pojedynczego kafelka */
+.card.straight-item-card,
+.card.grid-item-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    align-items: center;
+}
+
+.card.grid-item-card {
+    background-color: rgb(255, 255, 255);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card.straight-item-card {
+    
+    background-color: rgb(255, 255, 255, 0.5);
+    display: flex;
+    flex-direction: row !important;
+    justify-content: space-between;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    /* Efekt po najechaniu myszką na kafelek */
+.grid-item-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+.straight-item-card:hover  {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    background-color: rgb(255, 255, 255);
+}
+    
+    /*ustawienia obrazka*/
+    .grid-item-card .item-image {
+        width: 200px;
+        height: 200px;
+        object-fit: cover;
+        border: 2px solid #c1e7ff;
+        border-radius: 1rem;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    .straight-item-card .item-image {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border: 2px solid #c1e7ff;
+        border-radius: 1rem;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
