@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from datetime import datetime
-from backend.models import Operation
+from backend.models import Operation, Product
 from backend.models.order import Order, OrderStatus
 from backend.models.order_product import Order_product
 from backend.models.client import Client
@@ -124,16 +124,43 @@ def update_order(id_order: int, order: OrderUpdate, db: Session = Depends(get_db
 @router.delete("/orders/{id_order}", response_model=dict)
 def delete_order(id_order: int, db: Session = Depends(get_db), current_client=Depends(get_current_client)):
     logger.info(f"Deleting order with id: {id_order}")
+
+    # Fetch the order from the database
     db_order = db.query(Order).filter(Order.id_order == id_order).first()
     if db_order is None:
         logger.error(f"Order with id: {id_order} not found")
         raise HTTPException(status_code=404, detail="Order not found")
 
+    # Check if the order status is 'delivered' or 'cancelled'
+    if db_order.status in [OrderStatus.DELIVERED, OrderStatus.CANCELLED]:
+        logger.info(f"Order with id: {id_order} has status '{db_order.status}', fetching linked products to delete")
+
+        # Step 1: Get list of product IDs from Order_product linked to this order
+        product_ids = db.query(Order_product.id_product).filter(Order_product.id_order == id_order).all()
+        product_ids = [product_id[0] for product_id in product_ids]  # Extract list of product IDs
+
+        if product_ids:
+            logger.info(f"Deleting {len(product_ids)} products linked to order id: {id_order}")
+
+            # Step 2: Delete products linked to this order from the Product table
+            db.query(Product).filter(Product.id_product.in_(product_ids)).delete(synchronize_session=False)
+
+    # Step 3: Delete all Order_product entries linked to the order
+    logger.info(f"Deleting Order_product records for order id: {id_order}")
     db.query(Order_product).filter(Order_product.id_order == id_order).delete()
+
+    # Step 4: Delete all operations linked to this order
+    logger.info(f"Deleting operations linked to order id: {id_order}")
     db.query(Operation).filter(Operation.id_order == id_order).delete()
+
+    # Step 5: Delete the order itself
+    logger.info(f"Deleting the order with id: {id_order}")
     db.delete(db_order)
+
+    # Commit all changes to the database
     db.commit()
 
+    logger.info(f"Order with id: {id_order} deleted successfully")
     return {
         "message": "Order deleted successfully",
     }

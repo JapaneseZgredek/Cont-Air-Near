@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import CartItem from './CartItem';
 import { Container, Button, Form } from 'react-bootstrap';
-import { createOrder, createOrder_product, fetchPorts } from '../../services/api'; // Import the fetchPorts API
+import {createOrder, createOrder_product, fetchCurrentClient, fetchPorts} from '../../services/api'; // Import the fetchPorts API
 
 const Cart = ({ onProductRestore }) => {
     const [cartItems, setCartItems] = useState([]);
@@ -9,6 +9,7 @@ const Cart = ({ onProductRestore }) => {
     const [selectedPortId, setSelectedPortId] = useState(''); // Selected port ID
     const [error, setError] = useState(null);
     const [validationErrors, setValidationErrors] = useState({});
+    const [clientId, setClientId] = useState(null);
 
     // Load cart items from localStorage on component mount
     useEffect(() => {
@@ -51,19 +52,19 @@ const Cart = ({ onProductRestore }) => {
         return errors;
     };
 
+
     const handleCheckout = async () => {
         const errors = validateInputs();
         if (Object.keys(errors).length > 0) {
             setValidationErrors(errors);
             return;
         }
-
+        const clientData = await fetchCurrentClient();
         try {
-            const clientId = 1; // Replace with actual client ID from context/session
             const orderPayload = {
                 status: 'pending',
                 id_port: parseInt(selectedPortId),
-                id_client: clientId
+                id_client: clientData.id_client,
             };
 
             // Step 1: Create Order

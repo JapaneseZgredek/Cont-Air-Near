@@ -3,22 +3,22 @@ import { Navbar as BootstrapNavbar, Container, Nav } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import { RoleContext } from '../../contexts/RoleContext';
 import { FaShoppingCart } from 'react-icons/fa'; // Import the cart icon from react-icons
+import { useNavigate } from 'react-router-dom';
 
 const NavbarComponent = () => {
   const { role, handleLogout } = useContext(RoleContext);
+  const navigate = useNavigate();
+  const handleLogoutClick = () => {
+    handleLogout(); // Wywołanie funkcji wylogowania
+    navigate('/login'); // Przeniesienie na stronę logowania
+  };
 
   const getLinksForRole = () => {
     if (!role) {
       return (
         <>
-          <LinkContainer to="/products">
-            <Nav.Link>Products</Nav.Link>
-          </LinkContainer>
           <LinkContainer to="/login">
             <Nav.Link>Login</Nav.Link>
-          </LinkContainer>
-          <LinkContainer to="/register">
-            <Nav.Link>Register</Nav.Link>
           </LinkContainer>
         </>
       );
@@ -68,7 +68,7 @@ const NavbarComponent = () => {
           <Nav className="ml-auto">
             {getLinksForRole()}
             {role && (
-              <Nav.Link onClick={handleLogout} style={{ cursor: 'pointer' }}>
+              <Nav.Link onClick={handleLogoutClick} style={{ cursor: 'pointer' }}>
                 Logout
               </Nav.Link>
             )}

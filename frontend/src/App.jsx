@@ -21,7 +21,6 @@ import Cart from "./components/Cart/Cart";
 
 const App = () => {
   const [role, setRole] = useState(null);
-
   const fetchRole = async () => {
     try {
       const client = await fetchCurrentClient();

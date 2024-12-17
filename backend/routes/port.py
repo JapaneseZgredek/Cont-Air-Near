@@ -43,7 +43,7 @@ def get_all_ports(
     db: Session = Depends(get_db),
     current_client = Depends(get_current_client)
 ):
-    check_user_role(current_client, [UserRole.EMPLOYEE, UserRole.ADMIN])
+    check_user_role(current_client, [UserRole.CLIENT, UserRole.EMPLOYEE, UserRole.ADMIN])
     logger.info("Getting all ports")
     ports = db.query(Port).all()
     return ports

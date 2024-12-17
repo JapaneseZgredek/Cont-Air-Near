@@ -272,7 +272,7 @@ export const updateProduct = async (product) => {
 //Orders table related
 
 export const fetchOrders = async () => {
-    await verifyRoles(['EMPLOYEE', 'ADMIN']);
+    await verifyRoles(['CLIENT', 'EMPLOYEE', 'ADMIN']);
     return await fetchProtectedData(`/api/orders`);
 };
 
@@ -289,7 +289,7 @@ export const fetchOrdersByClient = async (client_id) => {
 
 
 export const createOrder = async (order) => {
-    await verifyRoles(['EMPLOYEE','ADMIN']);
+    await verifyRoles(['CLIENT','EMPLOYEE','ADMIN']);
     try {
         console.log("Making POST request to /api/orders with payload:", order);
         const response = await axios.post(`${API_URL}/api/orders`, order, {
@@ -453,7 +453,7 @@ export const fetchOrders_productsByProduct = async (product_id) => {
 
 
 export const createOrder_product = async (order_product) => {
-    await verifyRoles(['EMPLOYEE', 'ADMIN']);
+    await verifyRoles(['CLIENT', 'EMPLOYEE', 'ADMIN']);
     try {
         console.log("Making POST request to /api/orders_products with payload:", order_product);
         const response = await axios.post(`${API_URL}/api/orders_products`, order_product, {
