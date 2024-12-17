@@ -1,52 +1,78 @@
-import React, {useEffect, useState} from 'react';
-import {Button, Modal, ModalBody, Spinner, Table} from 'react-bootstrap';
-import {fetchOrders_productsByOrder, fetchOrders_productsByProduct, fetchOrders_products, fetchProducts} from "../../services/api";
+import React, { useEffect, useState } from 'react';
+import { Button, Modal, ModalBody, Spinner, Table } from 'react-bootstrap';
+import {
+    fetchOrders_productsByOrder,
+    fetchOrders_productsByProduct,
+    fetchOrders_products,
+    fetchProducts,
+} from "../../services/api";
 
-function Order_productsButton({orderId, productId, productName}) {
+function Order_productsButton({ orderId, productId, productName }) {
     if (!orderId && !productId) {
-        throw new Error("OrdersButton requires either orderId or productId");
+        throw new Error("Order_productsButton requires either orderId or productId");
     }
+
     const [order_products, setOrder_products] = useState([]);
     const [products, setProducts] = useState([]);
     const [showModal, setShowModal] = useState(false);
-    const [loading, setLoading ] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
-    const openModal = async () => {
-        setLoading(true);
+    // Helper function to fetch data based on type
+    const fetchData = async () => {
         try {
-            let order_productsData;
+            setLoading(true);
+            setError("");
+
             if (orderId) {
-                order_productsData = await fetchOrders_productsByOrder(orderId);
-                const products_data = await fetchProducts();
-                setProducts(products_data);
+                const order_productsData = await fetchOrders_productsByOrder(orderId);
+                const productsData = await fetchProducts();
+                setOrder_products(order_productsData);
+                setProducts(productsData);
             } else if (productId) {
-                order_productsData = await fetchOrders_productsByProduct(productId);
+                const order_productsData = await fetchOrders_productsByProduct(productId);
+                setOrder_products(order_productsData);
             }
-            setOrder_products(order_productsData);
-        } catch (error) {
-            console.error('Failed to fetch order_products:', error);
+        } catch (err) {
+            console.error('Error fetching order_products:', err);
+            setError("Failed to fetch data. Please try again.");
         } finally {
             setLoading(false);
-            setShowModal(true);
         }
     };
+
+    const openModal = async () => {
+        await fetchData();
+        setShowModal(true);
+    };
+
     const closeModal = () => {
         setShowModal(false);
         setOrder_products([]);
-    }
+    };
+
+    // Resolve product name
+    const getProductName = (idProduct) => {
+        if (productName) return productName; // Passed directly as prop
+        const product = products.find((p) => p.id_product === idProduct);
+        return product ? product.name : 'Unknown Product';
+    };
 
     return (
         <>
             <Button variant="info" onClick={openModal} style={{ marginRight: "10px" }}>
                 Show Order_products
             </Button>
+
             <Modal show={showModal} onHide={closeModal} size="lg">
                 <Modal.Header closeButton>
-                    <Modal.Title>Order_products for {orderId ? "Order " + orderId : "Product " + productName}</Modal.Title>
+                    <Modal.Title>
+                        Order_products for {orderId ? `Order ${orderId}` : `Product ${productName}`}
+                    </Modal.Title>
                 </Modal.Header>
+
                 <ModalBody>
-                {error && <p style={{ color: 'red' }}>{error}</p>}
+                    {error && <p style={{ color: 'red' }}>{error}</p>}
 
                     {loading ? (
                         <div className="text-center">
@@ -63,20 +89,21 @@ function Order_productsButton({orderId, productId, productName}) {
                                 </tr>
                             </thead>
                             <tbody>
-                            {order_products.map((op, index) =>
-                                <tr key={`${op.id_order}-${op.id_product}`}>
-                                    <td>{index + 1}</td>
-                                    <td>{op.id_order}</td>
-                                    <td>{productName ? productName : products.find((product) => product.id_product === op.id_product)?.name || 'Unknown Product'}</td>
-                                    <td>{op.quantity}</td>
-                                </tr>
-                            )}
+                                {order_products.map((op, index) => (
+                                    <tr key={`${op.id_order}-${op.id_product}`}>
+                                        <td>{index + 1}</td>
+                                        <td>{op.id_order}</td>
+                                        <td>{getProductName(op.id_product)}</td>
+                                        <td>{op.quantity > 0 ? op.quantity : 'Invalid Quantity'}</td>
+                                    </tr>
+                                ))}
                             </tbody>
                         </Table>
                     ) : (
                         <p>No Order_products found.</p>
                     )}
                 </ModalBody>
+
                 <Modal.Footer>
                     <Button variant="secondary" onClick={closeModal}>
                         Close
@@ -85,5 +112,6 @@ function Order_productsButton({orderId, productId, productName}) {
             </Modal>
         </>
     );
-};
+}
+
 export default Order_productsButton;

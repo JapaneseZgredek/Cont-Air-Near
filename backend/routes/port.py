@@ -8,7 +8,7 @@ from backend.models.port import Port
 from backend.database import get_db
 from backend.logging_config import logger
 from backend.utils.role_validation import check_user_role
-from pydantic import BaseModel
+from pydantic import BaseModel, constr
 from typing import List, Optional
 from .client import get_current_client
 from ..models import UserRole
@@ -17,15 +17,15 @@ router = APIRouter()
 
 
 class PortCreate(BaseModel):
-    name: str
-    location: str
-    country: str
+    name: constr(max_length=32)
+    location: constr(max_length=32)
+    country: constr(max_length=32)
 
 
 class PortUpdate(BaseModel):
-    name: Optional[str] = None
-    location: Optional[str] = None
-    country: Optional[str] = None
+    name: Optional[constr(max_length=32)] = None
+    location: Optional[constr(max_length=32)] = None
+    country: Optional[constr(max_length=32)] = None
 
 
 class PortRead(BaseModel):
