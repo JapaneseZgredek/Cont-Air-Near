@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Button, Form, Modal } from 'react-bootstrap';
-import { createShip } from "../../services/api";
+import { createShip, uploadShipImage } from "../../services/api";
 
 const AddShip = ({ onAdd }) => {
     const [show, setShow] = useState(false);
     const [name, setName] = useState('');
     const [capacity, setCapacity] = useState('');
+    const [imageFile, setImageFile] = useState(null);
     const [error, setError] = useState(null);
     const [validationErrors, setValidationErrors] = useState({});
 
@@ -21,6 +22,10 @@ const AddShip = ({ onAdd }) => {
 
         return errors;
     }
+
+    const maxImageWidth = 512;
+    const maxImageHeight = 512;
+
     const handleSubimt = async (e) => {
         e.preventDefault();
         const errors = validateInputs();
@@ -29,7 +34,19 @@ const AddShip = ({ onAdd }) => {
             return;
         }
         try {
-            const newShip = await createShip({ name, capacity: parseInt(capacity) });
+            if (imageFile) {
+                await checkImageDimensions(imageFile);
+            }
+            const newShip = await createShip({ 
+                name, 
+                capacity: parseInt(capacity), 
+                image: ""
+            });
+            // if image was chosen - uploading it
+            if (imageFile) {
+                await uploadShipImage(newShip.id_ship, imageFile);
+                newShip.image = "image_added";
+            }
             onAdd(newShip);
             setShow(false);
             setName('');
@@ -40,6 +57,31 @@ const AddShip = ({ onAdd }) => {
         }
     };
 
+    // Funkcja przypisująca wybrany obrazek do zmiennej
+    const handleImageChange = (e) => {
+        setImageFile(e.target.files[0]);
+    };
+
+    //  Funkcja sprawdzająca czy wybrany obrazek jest właściwego formatu
+    const checkImageDimensions = (file) => {
+        return new Promise((resolve, reject) => {
+            const validTypes = ['image/jpeg', 'image/png'];
+            if (!validTypes.includes(file.type)) {
+                return reject("\nInvalid file type. Allowed types: "+validTypes);
+            }
+            const img = new Image();
+            img.onload = () => {
+                if (img.width > maxImageWidth || img.height > maxImageHeight) {
+                    reject("\nImage dimensions must not exceed "+maxImageWidth+"x"+maxImageHeight+" pixels.");
+                } else {
+                    resolve();
+                }
+            };
+            img.onerror = () => reject("\nFailed to load image.");
+            img.src = URL.createObjectURL(file);
+        });
+    };
+
     return (
         <>
             <Button variant="primary" onClick={() => setShow(true)}>Add Ship</Button>
@@ -48,7 +90,7 @@ const AddShip = ({ onAdd }) => {
                     <Modal.Title>Add New Ship</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    {error && <p style={{ color: 'red'}}>{error}</p>}
+                    {error && <p className="err-field">{"Err: "+error}</p>}
                     <Form onSubmit={handleSubimt}>
                         <Form.Group className="mb-3">
                             <Form.Label>Ship Name</Form.Label>
@@ -76,6 +118,17 @@ const AddShip = ({ onAdd }) => {
                                 {validationErrors.capacity}
                             </Form.Control.Feedback>
                         </Form.Group>
+
+                        {/* Pole wyboru obrazka */}
+                        <Form.Group className="mb-3">
+                            <Form.Label>Ship Image</Form.Label>
+                            <Form.Control
+                                type="file"
+                                accept="image/*"
+                                onChange={handleImageChange}
+                            />
+                        </Form.Group>
+
                         <Button varian="success" type="submit">Add Ship</Button>
                     </Form>
                 </Modal.Body>

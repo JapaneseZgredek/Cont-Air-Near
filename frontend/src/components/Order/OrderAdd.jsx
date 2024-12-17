@@ -1,10 +1,10 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Form, Modal } from 'react-bootstrap';
 import { createOrder, fetchClients, fetchPorts } from '../../services/api';
 
 const OrderAdd = ({ onAdd }) => {
     const [show, setShow] = useState(false);
-    const [status, setStatus] = useState('pending'); // Domyślna wartość, która jest zgodna z backendem
+    const [status, setStatus] = useState('pending');
     const [idPort, setIdPort] = useState('');
     const [idClient, setIdClient] = useState('');
     const [description, setDescription] = useState('');
@@ -13,14 +13,12 @@ const OrderAdd = ({ onAdd }) => {
     const [error, setError] = useState(null);
     const [validationErrors, setValidationErrors] = useState({});
 
-
     const validateInputs = () => {
         const errors = {};
         if (!idPort) errors.idPort = "Port must be selected.";
         if (!idClient) errors.idClient = "Client must be selected.";
-
         return errors;
-    }
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -32,12 +30,12 @@ const OrderAdd = ({ onAdd }) => {
         }
 
         const orderData = { status, description, id_port: parseInt(idPort), id_client: parseInt(idClient) };
-        console.log("Sending data:", orderData); // Debugging
 
         try {
             const newOrder = await createOrder(orderData);
-            onAdd(newOrder);
+            onAdd(newOrder);  // Pass the newly created order to parent component
             setShow(false);
+            // Clear form fields
             setStatus('pending');
             setDescription('');
             setIdPort('');
@@ -70,7 +68,6 @@ const OrderAdd = ({ onAdd }) => {
         loadClients();
     }, []);
 
-
     return (
         <>
             <Button variant="primary" onClick={() => setShow(true)}>Add Order</Button>
@@ -97,7 +94,6 @@ const OrderAdd = ({ onAdd }) => {
                                 required
                                 value={idPort}
                                 onChange={(e) => setIdPort(e.target.value)}
-                                placeholder="Select Port"
                                 isInvalid={!!validationErrors.idPort}
                             >
                                 <option value="">Select Port</option>
@@ -116,7 +112,6 @@ const OrderAdd = ({ onAdd }) => {
                                 required
                                 value={idClient}
                                 onChange={(e) => setIdClient(e.target.value)}
-                                placeholder="Select Client"
                                 isInvalid={!!validationErrors.idClient}
                             >
                                 <option value="">Select Client</option>

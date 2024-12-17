@@ -50,6 +50,13 @@ const NavbarComponent = () => {
       ],
     };
 
+    // Handle user logout
+    const handleLogout = () => {
+        localStorage.removeItem('token'); // Remove JWT token
+        setIsLoggedIn(false);
+        window.location.href = '/'; // Redirect to login
+    };
+
     return roleLinks[role].map((link) => (
       <LinkContainer key={link.path} to={link.path}>
         <Nav.Link>{link.label}</Nav.Link>

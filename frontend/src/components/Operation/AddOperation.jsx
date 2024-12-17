@@ -26,19 +26,19 @@ const AddOperation = ({ onAdd }) => {
         if (!dateOfOperation) errors.dateOfOperation = "Date of operation is required.";
 
         return errors;
-    }
+    };
 
-const handleSubmit = async (e) => {
-    e.preventDefault();
+    const handleSubmit = async (e) => {
+        e.preventDefault();
 
-    // Prevent double Submit
-    if (error) return;
+        // Prevent double Submit
+        if (error) return;
 
-    const errors = validateInputs();
-    if (Object.keys(errors).length > 0) {
-        setValidationErrors(errors);
-        return;
-    }
+        const errors = validateInputs();
+        if (Object.keys(errors).length > 0) {
+            setValidationErrors(errors);
+            return;
+        }
 
     try {
         setError(null); // Clear previous errors
@@ -62,8 +62,15 @@ const handleSubmit = async (e) => {
     }
 };
 
+    const resetForm = () => {
+        setNameOfOperation('');
+        setOperationType('AT_BAY');
+        setDateOfOperation('');
+        setIdShip('');
+        setIdPort('');
+    };
 
-    //for ships/ports dropdown list
+    // For ships/ports dropdown list
     const [ships, setShips] = useState([]);
     const [ports, setPorts] = useState([]);
     const [orders, setOrders] = useState([]);
@@ -107,7 +114,7 @@ const handleSubmit = async (e) => {
                     <Modal.Title>Add New Operation</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    {error && <p style={{ color: 'red' }}>{error}</p>}
+                    {error && <p className="err-field">{"Err: "+error}</p>}
                     <Form onSubmit={handleSubmit}>
                         <Form.Group className="mb-3">
                             <Form.Label>Operation Name</Form.Label>
@@ -125,18 +132,18 @@ const handleSubmit = async (e) => {
 
                         <Form.Group className="mb-3">
                             <Form.Label>Operation Type</Form.Label>
-                                <Form.Select
-                                  value={operationType}
-                                  onChange={(e) => setOperationType(e.target.value)}
-                                >
-                                  <option value="AT_BAY">At Bay</option>
-                                  <option value="TRANSPORT">Transport</option>
-                                  <option value="TRANSFER">Transfer</option>
-                                  <option value="DEPARTURE">Departure</option>
-                                  <option value="ARRIVAL">Arrival</option>
-                                  <option value="CARGO_LOADING">Cargo Loading</option>
-                                  <option value="CARGO_DISCHARGE">Cargo Discharge</option>
-                                </Form.Select>
+                            <Form.Select
+                                value={operationType}
+                                onChange={(e) => setOperationType(e.target.value)}
+                            >
+                                <option value="AT_BAY">At Bay</option>
+                                <option value="TRANSPORT">Transport</option>
+                                <option value="TRANSFER">Transfer</option>
+                                <option value="DEPARTURE">Departure</option>
+                                <option value="ARRIVAL">Arrival</option>
+                                <option value="CARGO_LOADING">Cargo Loading</option>
+                                <option value="CARGO_DISCHARGE">Cargo Discharge</option>
+                            </Form.Select>
                         </Form.Group>
 
                         <Form.Group className="mb-3">
@@ -169,7 +176,6 @@ const handleSubmit = async (e) => {
                             </Form.Control.Feedback>
                         </Form.Group>
 
-
                         <Form.Group className="mb-3">
                             <Form.Label>Port</Form.Label>
                             <Form.Select
@@ -185,7 +191,7 @@ const handleSubmit = async (e) => {
                             <Form.Control.Feedback type="invalid">
                                 {validationErrors.idPort}
                             </Form.Control.Feedback>
-                         </Form.Group>
+                        </Form.Group>
 
                         <Form.Group className="mb-3">
                             <Form.Label>Order</Form.Label>

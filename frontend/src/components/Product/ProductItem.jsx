@@ -1,14 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, Button, Modal } from 'react-bootstrap';
-import { deleteProduct } from '../../services/api';
+import { deleteProduct , fetchProductImage } from '../../services/api';
 import UpdateProduct from "./UpdateProduct";
 import Order_productButton from "../Order_product/Order_productButton";
 import GenericDetailModal from "../GenericDetailModal";
+import '../../styles/List.css';
 
 const ProductItem = ({ product, onUpdate, onDelete, onAddToCart }) => {
     const [showConfirm, setShowConfirm] = useState(false);
     const [showUpdateModal, setShowUpdateModal] = useState(false);
+    const [imageUrl, setImageUrl] = useState(null);
+    const [loadingImage, setLoadingImage] = useState(true);
     const [showDetailModal, setShowDetailModal] = useState(false);
+    const [displayType, setDisplayType] = useState("grid");
 
     const handleDelete = async () => {
         try {
@@ -26,6 +30,7 @@ const ProductItem = ({ product, onUpdate, onDelete, onAddToCart }) => {
 
     const closeUpdateModal = () => {
         setShowUpdateModal(false);
+        loadImage();
     };
 
     const handleAddToCart = () => {
@@ -51,29 +56,63 @@ const ProductItem = ({ product, onUpdate, onDelete, onAddToCart }) => {
         alert('Produkt dodany do koszyka!');
     };
 
-    return (
+    const loadImage = async () => {
+        try {
+              setLoadingImage(true);
+              const url = await fetchProductImage(product.id_product);
+              setImageUrl(url);
+          } catch (error) {
+              console.error("Failed to load product image", error);
+              setImageUrl(null);
+          } finally {
+              setLoadingImage(false);
+          }
+      };
+
+    useEffect(() => {
+        loadImage();
+    }, [product.id_product]);
+
+
+    return(
         <>
-            <Card className="mb-3">
-                <Card.Body className="d-flex justify-content-between align-items-center">
-                    <div>
-                        <Card.Title
+            <Card className={`${displayType}-item-card`}>
+                    <Card.Title
                             className="clickable"
                             onClick={() => setShowDetailModal(true)}
                             style={{ cursor: 'pointer', textDecoration: 'underline' }}
                         >
                             {product.name}
                         </Card.Title>
-                        <Card.Text>Price: {product.price}</Card.Text>
-                        <Card.Text>Weight: {product.weight}</Card.Text>
-                        <Card.Text>Port ID: {product.id_port}</Card.Text>
+                    {/* Kontener dla tekstów */}
+                    <div className="item-texts">
+                        <a>Price: {product.price}</a>
+                        <a>Weight: {product.weight}</a>
+                        <a>Port ID: {product.id_port}</a>
                     </div>
+
+                    {/* Obrazek */}
                     <div>
-                        <Button variant="outline-success" className="me-2" onClick={handleAddToCart}>Add to Cart</Button>
-                        <Button variant="warning" className="me-2" onClick={openUpdateModal}>Update</Button>
-                        <Button variant="danger" className="me-2" onClick={() => setShowConfirm(true)}>Delete</Button>
-                        <Order_productButton productId={product.id_product} productName={product.name} />
+                        {loadingImage ? (
+                            <div className="loading-message">Loading image...</div>
+                        ) : imageUrl ? (
+                            <img 
+                                className="item-image" 
+                                src={imageUrl} 
+                                alt={`Product_${product.id_product}`} 
+                            />
+                        ) : (
+                            <div className="missing-image">Missing image</div>
+                        )}
                     </div>
-                </Card.Body>
+
+                    {/* Kontener dla przycisków */}
+                    <div className="item-buttons">
+                        <Button variant="outline-success" className="me-2" onClick={handleAddToCart}>Add to Cart</Button>
+                        <Order_productButton productId={product.id_product} productName={product.name} />
+                        <Button variant="warning" onClick={openUpdateModal}>Update</Button>
+                        <Button variant="danger" onClick={() => setShowConfirm(true)}>Delete</Button>
+                    </div>
             </Card>
 
             <Modal show={showConfirm} onHide={() => setShowConfirm(false)}>

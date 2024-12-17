@@ -1,24 +1,25 @@
-import React, { useEffect, useState } from 'react';
-import { Button, Form, Modal } from 'react-bootstrap';
-import { createOrder_product } from '../../services/api';
-import { fetchOrders } from '../../services/api';
-import { fetchProducts } from '../../services/api';
+import React, { useEffect, useState } from "react";
+import { Button, Form, Modal } from "react-bootstrap";
+import { createOrder_product, fetchOrders, fetchProducts } from "../../services/api";
 
 const Order_productAdd = ({ onAdd }) => {
-    const [show, setShow] = useState(false);
-    const [idOrder, setIdOrder] = useState('');
-    const [idProduct, setIdProduct] = useState('');
-    const [quantity, setQuantity] = useState('');
-    const [error, setError] = useState(null);
+  const [show, setShow] = useState(false);
+  const [idOrder, setIdOrder] = useState("");
+  const [idProduct, setIdProduct] = useState("");
+  const [quantity, setQuantity] = useState("");
+  const [error, setError] = useState(null);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        const order_productData = { 
-            id_order: parseInt(idOrder),
-            id_product: parseInt(idProduct),
-            quantity: parseInt(quantity) 
-        };
-        console.log("Sending data:", order_productData); // Debugging
+  const [orders, setOrders] = useState([]);
+  const [products, setProducts] = useState([]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const order_productData = { 
+        id_order: parseInt(idOrder),
+        id_product: parseInt(idProduct),
+        quantity: parseInt(quantity) 
+    };
+    console.log("Sending data:", order_productData); // Debugging
 
         try {
             const newOrder_product = await createOrder_product(order_productData);
@@ -32,40 +33,69 @@ const Order_productAdd = ({ onAdd }) => {
         }
     };
 
-    const [orders, setOrders] = useState([]);
-    const [products, setProducts] = useState([]);
+  // Load Orders and Products
+  useEffect(() => {
     const loadOrders = async () => {
-        try {
-            const data = await fetchOrders();
-            setOrders(data);
-        } catch (err) {
-            setError('Failed to load orders');
-        }
+      try {
+        const data = await fetchOrders();
+        setOrders(data);
+      } catch (err) {
+        setError("Failed to load orders.");
+      }
     };
+
     const loadProducts = async () => {
-        try {
-            const data = await fetchProducts();
-            setProducts(data);
-        } catch (err) {
-            setError('Failed to load products');
-        }
+      try {
+        const data = await fetchProducts();
+        setProducts(data);
+      } catch (err) {
+        setError("Failed to load products.");
+      }
     };
-    useEffect(() => {
-        loadOrders();
-        loadProducts();
-    }, []);
 
+    loadOrders();
+    loadProducts();
+  }, []);
 
+  // Validate input fields
+  const validateInputs = () => {
+    if (!idOrder) return "Please select an order.";
+    if (!idProduct) return "Please select a product.";
+    if (!quantity || isNaN(quantity) || parseInt(quantity) <= 0)
+      return "Quantity must be a valid positive number.";
+    return null;
+  };
 
-    return (
-        <>
-            <Button variant="primary" onClick={() => setShow(true)}>Add Order_product</Button>
+  const loadOrders = async () => {
+    try {
+        const data = await fetchOrders();
+        setOrders(data);
+    } catch (err) {
+        setError('Failed to load orders');
+    }
+};
+const loadProducts = async () => {
+    try {
+        const data = await fetchProducts();
+        setProducts(data);
+    } catch (err) {
+        setError('Failed to load products');
+    }
+};
+useEffect(() => {
+    loadOrders();
+    loadProducts();
+}, []);
+
+  return (
+    <>
+    <Button variant="primary" onClick={() => setShow(true)}>Add Order_product</Button>
             <Modal show={show} onHide={() => setShow(false)}>
                 <Modal.Header closeButton>
                     <Modal.Title>Add New Order_product</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    {error && <p style={{ color: 'red' }}>{error}</p>}
+                    {error && <p className="err-field">{"Err: "+error}</p>}
                     <Form onSubmit={handleSubmit}>
 
                         <Form.Group className="mb-3">
@@ -117,8 +147,8 @@ const Order_productAdd = ({ onAdd }) => {
                     </Form>
                 </Modal.Body>
             </Modal>
-        </>
-    );
+      </>
+  );
 };
 
 export default Order_productAdd;
