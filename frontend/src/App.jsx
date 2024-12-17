@@ -14,6 +14,7 @@ import PortPage from './pages/PortPage';
 import ClientPage from './pages/ClientPage';
 import OrderPage from './pages/OrderPage';
 import Order_productPage from './pages/Order_productPage';
+import UserPanelPage from './pages/UserPanelPage';
 
 import { RoleProvider } from "./contexts/RoleContext";
 
@@ -93,7 +94,6 @@ const App = () => {
             element={
               // <ProtectedRoute requiredRoles={['CLIENT', 'EMPLOYEE', 'ADMIN']}>
                 <ProtectedRoute requiredRoles={['EMPLOYEE', 'ADMIN']}>
-                    {/*//bez clienta chyba co?*/}
                 <Order_productPage />
               </ProtectedRoute>
             }
@@ -104,6 +104,15 @@ const App = () => {
             element={
               <ProtectedRoute requiredRoles={['ADMIN']}>
                 <ClientPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/user_panel"
+            element={
+              <ProtectedRoute requiredRoles={['CLIENT', 'EMPLOYEE', 'ADMIN']}>
+                <UserPanelPage />
               </ProtectedRoute>
             }
           />

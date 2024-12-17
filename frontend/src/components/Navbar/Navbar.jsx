@@ -32,6 +32,7 @@ const NavbarComponent = () => {
           { path: '/orders', label: 'Orders' },
           { path: '/order_products', label: 'Order Products' },
           { path: '/clients', label: 'Clients' },
+          { path: '/user_panel', label: 'User Panel' },
       ],
       EMPLOYEE: [
           // { path: '/ships', label: 'Ships' },
@@ -40,11 +41,13 @@ const NavbarComponent = () => {
           { path: '/orders', label: 'Orders' },
           { path: '/order_products', label: 'Order Products' },
           { path: '/products', label: 'Products' },
+          { path: '/user_panel', label: 'User Panel' },
       ],
       CLIENT: [
           { path: '/ports', label: 'Ports' },
           { path: '/orders', label: 'Orders' },
           { path: '/products', label: 'Products' },
+          { path: '/user_panel', label: 'User Panel' },
       ],
     };
 

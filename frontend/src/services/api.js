@@ -522,6 +522,30 @@ export const updateClient = async (client) => {
     }
 };
 
+export const updateUserOwnData = async (user) => {
+    await verifyRoles(['ADMIN','EMPLOYEE','CLIENT']);
+    const userLoggedIn = await fetchCurrentClient();
+    if(user.id_client != userLoggedIn.id_client){
+        console.error("Error in updateUserOwnData: cannot modify data of a user other than the logged-in one");
+        throw new Error("Failed to update user data - cannot modify data of a user other than the logged-in one");
+    } else {
+        try {
+            console.log("Making PUT request to /api/clients with payload:", user);
+            const response = await axios.put(`${API_URL}/api/clients/${user.id_client}`, user, {
+                headers: {
+                    Authorization: `Bearer ${getAuthToken()}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+            console.log("Response from /api/clients:", response.data);
+            return response.data;
+        } catch (error) {
+            console.error("Error in updateUserOwnData:", error.response?.data || error.message);
+            throw error.response?.data || new Error("Failed to update user data");
+        }
+    }
+};
+
 // Login
 
 export const loginClient = async (credentials) => {
