@@ -82,7 +82,7 @@ const UpdateOperation = ({ operation, show, onHide, onUpdate }) => {
         <Modal.Title>Update Operation</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {error && <p className="err-field">{"Err: "+error}</p>}
         <Form onSubmit={handleSubmit}>
           <Form.Group className="mb-3">
             <Form.Label>Operation Name</Form.Label>

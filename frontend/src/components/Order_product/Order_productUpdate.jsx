@@ -59,7 +59,7 @@ const Order_productUpdate = ({ order_product, show, onHide, onUpdate }) => {
             <Card.Text>Order ID: {order_product.id_order} Product: {
                             products.find((product) => product.id_product === order_product.id_product)?.name || 'Unknown Product'
                         }</Card.Text>
-                {error && <p style={{ color: 'red' }}>{error}</p>}
+                    {error && <p className="err-field">{"Err: "+error}</p>}
                 <Form onSubmit={handleSubmit}>
                     
                 {/*<Form.Group className="mb-3">

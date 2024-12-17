@@ -17,5 +17,6 @@ class Ship(Base):
     status = Column(Enum(ShipStatus), default=ShipStatus.ACTIVE)
     created_at = Column(DateTime, default=datetime.now())
     updated_at = Column(DateTime, default=datetime.now(), onupdate=datetime.now())
+    image = Column(String, nullable=True)
 
     operations = relationship("Operation", back_populates="ship")

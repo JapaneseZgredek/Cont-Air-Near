@@ -11,7 +11,7 @@ const LoginPage = () => {
     }, [navigate]);
 
     return (
-        <div>
+        <div className='form-page'>
             <AuthenticationForm />
         </div>
     );

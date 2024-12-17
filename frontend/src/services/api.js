@@ -72,6 +72,31 @@ export const updateShip = async (ship) => {
     }
 };
 
+export const fetchShipImage = async (id_ship) => {
+    const response = await fetch(`${API_URL}/api/ships/image/${id_ship}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch ship image');
+    }
+    // response converted to Blob object
+    const imageBlob = await response.blob();
+    const imageUrl = URL.createObjectURL(imageBlob);
+    return imageUrl;
+  };
+  
+  export const uploadShipImage = async (id_ship, file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await fetch(`${API_URL}/api/ships/image/${id_ship}`, {
+      method: 'POST',
+      body: formData
+    });
+    if (!response.ok) {
+      throw new Error('Failed to upload ship '+id_ship+' image');
+    }
+    const data = await response.json();
+    return data;
+  };
+
 // Operation table related
 export async function fetchOperationsByPort(portId) {
     await verifyRoles(['EMPLOYEE', 'ADMIN']);
@@ -254,6 +279,31 @@ export const updateProduct = async (product) => {
         console.error("Error in updateProduct:", error.response?.data || error.message);
         throw error.response?.data || new Error("Failed to update ship");
     }
+};
+
+export const fetchProductImage = async (id_product) => {
+  const response = await fetch(`${API_URL}/api/products/image/${id_product}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch product image');
+  }
+  // response converted to Blob object
+  const imageBlob = await response.blob();
+  const imageUrl = URL.createObjectURL(imageBlob);
+  return imageUrl;
+};
+
+export const uploadProductImage = async (id_product, file) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  const response = await fetch(`${API_URL}/api/products/image/${id_product}`, {
+    method: 'POST',
+    body: formData
+  });
+  if (!response.ok) {
+    throw new Error('Failed to upload product '+id_product+' image');
+  }
+  const data = await response.json();
+  return data;
 };
 
 //Orders table related
