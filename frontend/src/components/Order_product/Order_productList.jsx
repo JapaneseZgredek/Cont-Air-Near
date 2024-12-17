@@ -67,7 +67,6 @@ const Order_productList = () => {
         <Container>
             <div className="d-flex justify-content-between mb-3">
                 <h2>Order_product List</h2>
-                <Order_productAdd onAdd={handleAddOrder_product} />
             </div>
             <hr className="divider" /> {/*linia podzialu*/}
 

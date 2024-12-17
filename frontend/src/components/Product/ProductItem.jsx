@@ -6,7 +6,7 @@ import Order_productButton from "../Order_product/Order_productButton";
 import GenericDetailModal from "../GenericDetailModal";
 import '../../styles/List.css';
 
-const ProductItem = ({product, onUpdate, onDelete }) => {
+const ProductItem = ({ product, onUpdate, onDelete, onAddToCart }) => {
     const [showConfirm, setShowConfirm] = useState(false);
     const [showUpdateModal, setShowUpdateModal] = useState(false);
     const [imageUrl, setImageUrl] = useState(null);
@@ -15,7 +15,7 @@ const ProductItem = ({product, onUpdate, onDelete }) => {
     const [displayType, setDisplayType] = useState("grid");
 
     const handleDelete = async () => {
-        try{
+        try {
             await deleteProduct(product.id_product);
             onDelete(product.id_product);
             setShowConfirm(false);
@@ -28,9 +28,32 @@ const ProductItem = ({product, onUpdate, onDelete }) => {
         setShowUpdateModal(true);
     };
 
-    const closeUpdateModal = () =>{
+    const closeUpdateModal = () => {
         setShowUpdateModal(false);
         loadImage();
+    };
+
+    const handleAddToCart = () => {
+        const existingCart = JSON.parse(localStorage.getItem('cart')) || [];
+        const existingProduct = existingCart.find(item => item.id_product === product.id_product);
+
+        if (existingProduct) {
+            existingProduct.quantity += 1;
+        } else {
+            existingCart.push({
+                ...product,
+                quantity: 1
+            });
+        }
+
+        localStorage.setItem('cart', JSON.stringify(existingCart));
+
+        // Usunięcie produktu z listy dostępnych produktów
+        if (onAddToCart) {
+            onAddToCart(product.id_product);
+        }
+
+        alert('Produkt dodany do koszyka!');
     };
 
     const loadImage = async () => {
@@ -85,6 +108,7 @@ const ProductItem = ({product, onUpdate, onDelete }) => {
 
                     {/* Kontener dla przycisków */}
                     <div className="item-buttons">
+                        <Button variant="outline-success" className="me-2" onClick={handleAddToCart}>Add to Cart</Button>
                         <Order_productButton productId={product.id_product} productName={product.name} />
                         <Button variant="warning" onClick={openUpdateModal}>Update</Button>
                         <Button variant="danger" onClick={() => setShowConfirm(true)}>Delete</Button>

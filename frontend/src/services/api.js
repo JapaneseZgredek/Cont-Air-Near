@@ -25,7 +25,7 @@ export const fetchShips = async () => {
 };
 
 export const createShip = async (ship) => {
-    await verifyRoles(['ADMIN']);
+    await verifyRoles(['EMPLOYEE', 'ADMIN']);
     try {
         console.log("Making POST request to /api/ships with payload:", ship);
         const response = await axios.post(`${API_URL}/api/ships`, ship, {
@@ -44,7 +44,7 @@ export const createShip = async (ship) => {
 
 export const deleteShip = async (ship_id) => {
     try {
-        await verifyRoles(['ADMIN']);
+        await verifyRoles(['EMPLOYEE', 'ADMIN']);
         return await fetchProtectedData(`/api/ships/${ship_id}`, {
             method: 'DELETE',
         });
@@ -55,7 +55,7 @@ export const deleteShip = async (ship_id) => {
 };
 
 export const updateShip = async (ship) => {
-    await verifyRoles(['ADMIN']);
+    await verifyRoles(['EMPLOYEE', 'ADMIN']);
     try {
         console.log("Making PUT request to /api/ships with payload:", ship);
         const response = await axios.put(`${API_URL}/api/ships/${ship.id_ship}`, ship, {
@@ -309,7 +309,7 @@ export const uploadProductImage = async (id_product, file) => {
 //Orders table related
 
 export const fetchOrders = async () => {
-    await verifyRoles(['EMPLOYEE', 'ADMIN']);
+    await verifyRoles(['CLIENT', 'EMPLOYEE', 'ADMIN']);
     return await fetchProtectedData(`/api/orders`);
 };
 
@@ -331,7 +331,7 @@ export const fetchOrdersByClient = async (client_id) => {
 
 
 export const createOrder = async (order) => {
-    await verifyRoles(['EMPLOYEE','ADMIN']);
+    await verifyRoles(['CLIENT','EMPLOYEE','ADMIN']);
     try {
         console.log("Making POST request to /api/orders with payload:", order);
         const response = await axios.post(`${API_URL}/api/orders`, order, {
@@ -423,7 +423,7 @@ export const fetchOrders_productsByProduct = async (product_id) => {
 
 
 export const createOrder_product = async (order_product) => {
-    await verifyRoles(['EMPLOYEE', 'ADMIN']);
+    await verifyRoles(['CLIENT', 'EMPLOYEE', 'ADMIN']);
     try {
         console.log("Making POST request to /api/orders_products with payload:", order_product);
         const response = await axios.post(`${API_URL}/api/orders_products`, order_product, {
@@ -511,6 +511,20 @@ export const fetchOrders_productsByProduct_zapas = async (product_id) => {
         console.error(`Error in fetchOrders_productsByProduct_zapas for product_id ${product_id}:`, error.response?.data || error.message);
         throw error.response?.data || new Error(`Failed to fetch orders_products for product ID ${product_id}`);
     }
+};
+
+export const fetchExcludedProducts = async () => {
+  try {
+    console.log("Making GET request to /api/products/exclude");
+    const response = await axios.get(`${API_URL}/api/products/exclude`, {
+      headers: authHeaders(),
+    });
+    console.log("Response from /api/products/exclude:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error in fetchExcludedProducts:", error.response?.data || error.message);
+    throw error.response?.data || new Error("Failed to fetch excluded products");
+  }
 };
 
 export const fetchClients = async () => {

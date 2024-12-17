@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Form, Modal } from 'react-bootstrap';
-import { createOperation } from "../../services/api";
-import { fetchShips, fetchPorts } from '../../services/api';
+import { createOperation } from "../../services/api"; //
+import { fetchShips } from '../../services/api';
+import { fetchPorts } from '../../services/api';
+import { fetchOrders } from "../../services/api";
 
 const AddOperation = ({ onAdd }) => {
     const [show, setShow] = useState(false);
@@ -10,6 +12,7 @@ const AddOperation = ({ onAdd }) => {
     const [dateOfOperation, setDateOfOperation] = useState('');
     const [idShip, setIdShip] = useState('');
     const [idPort, setIdPort] = useState('');
+    const [idOrder, setIdOrder] = useState('');
     const [error, setError] = useState(null);
     const [validationErrors, setValidationErrors] = useState({});
 
@@ -19,6 +22,7 @@ const AddOperation = ({ onAdd }) => {
         if (!nameOfOperation.trim()) errors.nameOfOperation = "Operation name is required";
         if (!idShip) errors.idShip = "You must select a ship.";
         if (!idPort) errors.idPort = "You must select a port.";
+        if (!idOrder) errors.idOrder = "You must select an order.";
         if (!dateOfOperation) errors.dateOfOperation = "Date of operation is required.";
 
         return errors;
@@ -36,28 +40,27 @@ const AddOperation = ({ onAdd }) => {
             return;
         }
 
-        try {
-            setError(null); // Clear previous errors
-            console.log("Sending payload to create operation");
-            const newOperation = await createOperation({
-                name_of_operation: nameOfOperation,
-                operation_type: operationType,
-                date_of_operation: dateOfOperation,
-                id_ship: parseInt(idShip),
-                id_port: parseInt(idPort),
-            });
-            console.log("Operation created:", newOperation);
-            onAdd(newOperation);
-
-            // Reset the form fields to initial values
-            resetForm();
-            setShow(false); // Close modal after successful submission
-            setValidationErrors({});
-        } catch (err) {
-            console.error("Error creating operation:", err.message);
-            setError("Failed to create operation. Please try again.");
-        }
-    };
+    try {
+        setError(null); // Clear previous errors
+        console.log("Sending payload to create operation");
+        const newOperation = await createOperation({
+            name_of_operation: nameOfOperation,
+            operation_type: operationType,
+            // date_of_operation: dateOfOperation || new Date().toISOString(),
+            date_of_operation: dateOfOperation,
+            id_ship: parseInt(idShip),
+            id_port: parseInt(idPort),
+            id_order: parseInt(idOrder),
+        });
+        console.log("Operation created:", newOperation);
+        onAdd(newOperation);
+        setShow(false);
+        setValidationErrors({});
+    } catch (err) {
+        console.error("Error creating operation:", err.message);
+        setError("Failed to create operation. Please try again.");
+    }
+};
 
     const resetForm = () => {
         setNameOfOperation('');
@@ -70,6 +73,8 @@ const AddOperation = ({ onAdd }) => {
     // For ships/ports dropdown list
     const [ships, setShips] = useState([]);
     const [ports, setPorts] = useState([]);
+    const [orders, setOrders] = useState([]);
+
     const loadShips = async () => {
         try {
             const data = await fetchShips();
@@ -86,9 +91,19 @@ const AddOperation = ({ onAdd }) => {
             setError('Failed to load ports');
         }
     };
+    const loadOrders = async() => {
+        try {
+            const data = await fetchOrders();
+            setOrders(data);
+        } catch (err) {
+            setError('Failed to load orders');
+        }
+    };
+
     useEffect(() => {
         loadShips();
         loadPorts();
+        loadOrders();
     }, []);
 
     return (
@@ -175,6 +190,23 @@ const AddOperation = ({ onAdd }) => {
                             </Form.Select>
                             <Form.Control.Feedback type="invalid">
                                 {validationErrors.idPort}
+                            </Form.Control.Feedback>
+                        </Form.Group>
+
+                        <Form.Group className="mb-3">
+                            <Form.Label>Order</Form.Label>
+                            <Form.Select
+                                value={idOrder}
+                                onChange={(e) => setIdOrder(e.target.value)}
+                                isInvalid={!!validationErrors.idOrder}
+                            >
+                                <option value="">Select Order</option>
+                                {orders.map((order) => (
+                                    <option key={order.id_order} value={order.id_order}>Order #{order.id_order}</option>
+                                ))}
+                            </Form.Select>
+                            <Form.Control.Feedback type="invalid">
+                                {validationErrors.idOrder}
                             </Form.Control.Feedback>
                         </Form.Group>
 

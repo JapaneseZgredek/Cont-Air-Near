@@ -38,26 +38,30 @@ const OperationItem = ({ operation, onUpdate, onDelete }) => {
         fetchNames();
     }, [operation.id_ship, operation.id_port]);
 
+    // Handle delete operation
     const handleDelete = async () => {
         try {
-            await deleteOperation(operation.id_operation);
-            onDelete(operation.id_operation);
-            setShowConfirm(false);
+            await deleteOperation(operation.id_operation); // Call API to delete operation
+            onDelete(operation.id_operation); // Trigger onDelete callback
+            setShowConfirm(false); // Close confirmation modal
         } catch (error) {
             console.error('Failed to delete operation: ', error);
         }
     };
 
+    // Open update modal
     const openUpdateModal = () => {
         setShowUpdateModal(true);
     };
 
+    // Close update modal
     const closeUpdateModal = () => {
         setShowUpdateModal(false);
     };
 
     return (
         <>
+
             <Card className={`${displayType}-item-card`}>
                     <Card.Title
                         className="clickable"
@@ -73,6 +77,7 @@ const OperationItem = ({ operation, onUpdate, onDelete }) => {
                         <a>Date: {new Date(operation.date_of_operation).toLocaleString()}</a>
                         <a>Ship ID: {shipName || 'Loading...'}</a>
                         <a>Port ID: {portName || 'Loading...'}</a>
+                        <a>Order ID: {operation.id_order || 'Loading...'}</a>
                     </div>
                     
                     {/* Kontener dla przycisków */}
@@ -82,6 +87,7 @@ const OperationItem = ({ operation, onUpdate, onDelete }) => {
                     </div>
             </Card>
 
+            {/* Confirmation Modal */}
             <Modal show={showConfirm} onHide={() => setShowConfirm(false)}>
                 <Modal.Header closeButton>
                     <Modal.Title>Confirm Deletion</Modal.Title>
@@ -95,13 +101,22 @@ const OperationItem = ({ operation, onUpdate, onDelete }) => {
                 </Modal.Footer>
             </Modal>
 
+            {/* Detail Modal for Operation Information */}
             <GenericDetailModal
                 show={showDetailModal}
                 onHide={() => setShowDetailModal(false)}
                 title={`Operation: ${operation.name_of_operation}`}
-                details={operation}
+                details={{
+                    Name: operation.name_of_operation,
+                    Type: operation.operation_type,
+                    Date: new Date(operation.date_of_operation).toLocaleString(),
+                    'Ship ID': operation.id_ship,
+                    'Port ID': operation.id_port,
+                    'Order ID': operation.id_order, // New: Include Order ID in the details
+                }}
             />
 
+            {/* Update Operation Modal */}
             <UpdateOperation
                 operation={operation}
                 show={showUpdateModal}

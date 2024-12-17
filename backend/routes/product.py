@@ -1,5 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends, File, UploadFile
 from sqlalchemy.orm import Session
+
+from backend.models import Order_product
 from backend.models.product import Product
 from backend.database import get_db
 from backend.logging_config import logger
@@ -65,6 +67,22 @@ def create_product(product: ProductCreate, db: Session = Depends(get_db)):
 def get_all_products(db: Session = Depends(get_db)):
     logger.info("Getting all products")
     products = db.query(Product).all()
+    return products
+
+@router.get("/products/exclude", response_model=List[ProductRead])
+def get_all_products(db: Session = Depends(get_db)):
+    """
+    Get all products that are NOT linked to any Order Product.
+    """
+    logger.info("Getting all products that are NOT linked to any OrderProduct")
+    products = (
+        db.query(Product)
+        .outerjoin(Order_product, Product.id_product == Order_product.id_product)
+        .filter(Order_product.id_product == None)  # Only products NOT linked to OrderProduct
+        .all()
+    )
+    if not products:
+        logger.warning("No products found that are not linked to any OrderProduct")
     return products
 
 @router.get("/products/{id_product}", response_model=ProductRead)

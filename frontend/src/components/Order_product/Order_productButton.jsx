@@ -61,14 +61,12 @@ function Order_productsButton({ orderId, productId, productName }) {
     return (
         <>
             <Button variant="info" onClick={openModal} style={{ marginRight: "10px" }}>
-                Show Order_products
+                Show Products
             </Button>
 
             <Modal show={showModal} onHide={closeModal} size="lg">
                 <Modal.Header closeButton>
-                    <Modal.Title>
-                        Order_products for {orderId ? `Order ${orderId}` : `Product ${productName}`}
-                    </Modal.Title>
+                    <Modal.Title>Products for {orderId ? "Order " + orderId : "Product " + productName}</Modal.Title>
                 </Modal.Header>
 
                 <ModalBody>
@@ -83,20 +81,16 @@ function Order_productsButton({ orderId, productId, productName }) {
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>Order ID</th>
                                     <th>Product</th>
-                                    <th>Quantity</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {order_products.map((op, index) => (
-                                    <tr key={`${op.id_order}-${op.id_product}`}>
-                                        <td>{index + 1}</td>
-                                        <td>{op.id_order}</td>
-                                        <td>{getProductName(op.id_product)}</td>
-                                        <td>{op.quantity > 0 ? op.quantity : 'Invalid Quantity'}</td>
-                                    </tr>
-                                ))}
+                            {order_products.map((op, index) =>
+                                <tr key={`${op.id_order}-${op.id_product}`}>
+                                    <td>{index + 1}</td>
+                                    <td>{productName ? productName : products.find((product) => product.id_product === op.id_product)?.name || 'Unknown Product'}</td>
+                                </tr>
+                            )}
                             </tbody>
                         </Table>
                     ) : (

@@ -61,9 +61,9 @@ const Order_productItem = ({ order_product, onUpdate, onDelete }) => {
                     </Card.Title>
 
                     {/* Kontener dla tekstów */}
-                    <div className="item-texts">
+                    {/* <div className="item-texts">
                         <a>Quantity {order_product.quantity}</a>
-                    </div>
+                    </div> */}
 
                     {/* Kontener dla przycisków */}
                     <div className="item-buttons">
