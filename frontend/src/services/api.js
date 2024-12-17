@@ -73,7 +73,7 @@ export const updateShip = async (ship) => {
 };
 
 export const fetchShipImage = async (id_ship) => {
-    const response = await fetch(`http://localhost:8000/api/ships/image/${id_ship}`);
+    const response = await fetch(`${API_URL}/api/ships/image/${id_ship}`);
     if (!response.ok) {
       throw new Error('Failed to fetch ship image');
     }
@@ -86,7 +86,7 @@ export const fetchShipImage = async (id_ship) => {
   export const uploadShipImage = async (id_ship, file) => {
     const formData = new FormData();
     formData.append('file', file);
-    const response = await fetch(`http://localhost:8000/api/ships/image/${id_ship}`, {
+    const response = await fetch(`${API_URL}/api/ships/image/${id_ship}`, {
       method: 'POST',
       body: formData
     });
@@ -295,7 +295,7 @@ export const updateProduct = async (product) => {
 };
 
 export const fetchProductImage = async (id_product) => {
-  const response = await fetch(`http://localhost:8000/api/products/image/${id_product}`);
+  const response = await fetch(`${API_URL}/api/products/image/${id_product}`);
   if (!response.ok) {
     throw new Error('Failed to fetch product image');
   }
@@ -308,7 +308,7 @@ export const fetchProductImage = async (id_product) => {
 export const uploadProductImage = async (id_product, file) => {
   const formData = new FormData();
   formData.append('file', file);
-  const response = await fetch(`http://localhost:8000/api/products/image/${id_product}`, {
+  const response = await fetch(`${API_URL}/api/products/image/${id_product}`, {
     method: 'POST',
     body: formData
   });
