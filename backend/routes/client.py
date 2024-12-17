@@ -43,7 +43,7 @@ class ClientUpdate(BaseModel):
     telephone_number: Optional[int] = None
     email: Optional[str] = None
     logon_name: str
-    password: str
+    password: Optional[str] = None
     role: UserRole
 
 class ClientRead(BaseModel):

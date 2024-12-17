@@ -1,20 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import OrderItem from './OrderItem';
 import OrderAdd from './OrderAdd';
-import { fetchOrders } from '../../services/api';
-import { Container, Pagination, Dropdown } from 'react-bootstrap';
+import { fetchOrders, fetchPorts, fetchClients } from '../../services/api';
+import { Container, Pagination, Dropdown} from 'react-bootstrap';
+import OrdersButton from './OrdersButton';
 import SearchAndFilterBar from '../SearchAndFilterBar';
 import '../../styles/List.css';
 
 const OrderList = () => {
     const [orders, setOrders] = useState([]);
     const [filteredOrders, setFilteredOrders] = useState([]);
+    const [ports, setPorts] = useState([]);
+    const [clients, setClients] = useState([]);
     const [searchInColumn, setSearchInColumn] = useState('');
     const [error, setError] = useState(null);
     const [displayType, setDisplayType] = useState("straight");
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
 
+    // Fetch orders, ports, and clients
     const loadOrders = async () => {
         try {
             const data = await fetchOrders();

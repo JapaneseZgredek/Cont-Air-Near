@@ -8,15 +8,16 @@ import '../../styles/List.css';
 
 const ClientList = () => {
     const [clients, setClients] = useState([]);
-    const [error, setError] = useState(null);
     const [filteredClients, setFilteredClients] = useState([]);
-    const filterOptions = ['name', 'address', 'telephone number', 'email'];
+    const [error, setError] = useState(null);
     const [searchInColumn, setSearchInColumn] = useState('');
     const [showAddClientModal, setShowAddClientModal] = useState(false);
     const [displayType, setDisplayType] = useState("straight");
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
+    const filterOptions = ['name', 'address', 'telephone_number', 'email'];
 
+    // Load clients from the API
     const loadClients = async () => {
         try {
             const data = await fetchClients();
@@ -31,27 +32,38 @@ const ClientList = () => {
         loadClients();
     }, []);
 
+    // Handle add client
     const handleAddClient = (newClient) => {
         setClients((prevClients) => [...prevClients, newClient]);
+        setFilteredClients((prevClients) => [...prevClients, newClient]);
         setShowAddClientModal(false);
     };
 
+    // Handle update client
     const handleUpdateClient = (updatedClient) => {
         setClients((prevClients) =>
             prevClients.map((client) =>
                 client.id_client === updatedClient.id_client ? updatedClient : client
             )
         );
+        setFilteredClients((prevClients) =>
+            prevClients.map((client) =>
+                client.id_client === updatedClient.id_client ? updatedClient : client
+            )
+        );
     };
 
+    // Handle delete client
     const handleDeleteClient = (id) => {
         setClients((prevClients) => prevClients.filter((client) => client.id_client !== id));
+        setFilteredClients((prevClients) => prevClients.filter((client) => client.id_client !== id));
     };
 
+    // Handle search
     const handleSearch = (searchTerm) => {
         if (!searchTerm) {
-            setFilteredClients(clients); // 🆕 Jeśli brak frazy, przywracamy oryginalną listę
-        } else if (searchInColumn) { // 🆕 Szukaj w konkretnej kolumnie
+            setFilteredClients(clients);
+        } else if (searchInColumn) {
             const filtered = clients.filter(client =>
                 client[searchInColumn] && client[searchInColumn].toString().toLowerCase().includes(searchTerm.toLowerCase())
             );
@@ -66,10 +78,12 @@ const ClientList = () => {
         }
     };
 
+    // Handle search in column change
     const handleSearchInChange = (column) => {
-        setSearchInColumn(column); // 🆕 Aktualizacja kolumny wyszukiwania
+        setSearchInColumn(column);
     };
 
+    // Handle sorting
     const handleSortChange = (sortField) => {
         const sorted = [...filteredClients].sort((a, b) => {
             if (a[sortField] < b[sortField]) return -1;
@@ -192,6 +206,7 @@ const ClientList = () => {
             ) : (
                 <p>No clients available.</p>
             )}
+
             <AddClient
                 show={showAddClientModal}
                 onHide={() => setShowAddClientModal(false)}
