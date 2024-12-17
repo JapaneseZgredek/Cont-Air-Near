@@ -86,7 +86,7 @@ const OperationItem = ({ operation, onUpdate, onDelete }) => {
 
             {/* Update Operation Modal */}
             <UpdateOperation
-                operation={operation} 
+                operation={operation}
                 show={showUpdateModal}
                 onHide={closeUpdateModal}
                 onUpdate={onUpdate}

@@ -46,9 +46,9 @@ const OrderItem = ({ order, onUpdate, onDelete }) => {
                         <Card.Text>Client ID: {order.id_client}</Card.Text>
                     </div>
                     <div>
+                        <Order_productButton className="me-2" orderId={order.id_order}/>
                         <Button variant="warning" className="me-2" onClick={openUpdateModal}>Update</Button>
                         <Button variant="danger" onClick={() => setShowConfirm(true)}>Delete</Button>
-                        <Order_productButton orderId={order.id_order}/>
                     </div>
                 </Card.Body>
             </Card>
