@@ -44,6 +44,14 @@ const Order_productItem = ({ order_product, onUpdate, onDelete }) => {
         return product ? product.name : 'Unknown Product';
     };
 
+    const openUpdateModal = () => {
+        setShowUpdateModal(true);
+    };
+
+    const closeUpdateModal = () => {
+        setShowUpdateModal(false);
+    };
+
     return (
         <>
             <Card className={`${displayType}-item-card`}>

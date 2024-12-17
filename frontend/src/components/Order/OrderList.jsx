@@ -3,7 +3,6 @@ import OrderItem from './OrderItem';
 import OrderAdd from './OrderAdd';
 import { fetchOrders, fetchPorts, fetchClients } from '../../services/api';
 import { Container, Pagination, Dropdown} from 'react-bootstrap';
-import OrdersButton from './OrdersButton';
 import SearchAndFilterBar from '../SearchAndFilterBar';
 import '../../styles/List.css';
 
@@ -120,7 +119,7 @@ const OrderList = () => {
                         className="pagination-item"
                         onClick={() => handlePageChange(1)}
                         disabled={currentPage === 1}
-                    />      
+                    />
                     <Pagination.Prev
                       className="pagination-item"
                       onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
@@ -153,7 +152,7 @@ const OrderList = () => {
                       className="pagination-item"
                       onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
                       disabled={currentPage === totalPages}
-                    />      
+                    />
                     <Pagination.Last
                         className="pagination-item"
                         onClick={() => handlePageChange(totalPages)}
