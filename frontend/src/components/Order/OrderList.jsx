@@ -66,10 +66,6 @@ const OrderList = () => {
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentItems = filteredOrders.slice(indexOfFirstItem, indexOfLastItem);
 
-    const handleItemsPerPageChange = (newItemsPerPage) => {
-        setItemsPerPage(newItemsPerPage);
-        setCurrentPage(1);
-
     const handleAddOrder = (newOrder) => {
         setOrders((prevOrders) => [...prevOrders, newOrder]);
     };
@@ -83,6 +79,9 @@ const OrderList = () => {
             prevOrders.map((order) => (order.id_order === updatedOrder.id_order ? updatedOrder : order))
         )};
 
+    const handleItemsPerPageChange = (newItemsPerPage) => {
+        setItemsPerPage(newItemsPerPage);
+        setCurrentPage(1);
     };
 
     return (

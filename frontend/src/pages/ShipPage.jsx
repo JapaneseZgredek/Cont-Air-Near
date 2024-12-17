@@ -4,11 +4,7 @@ import ShipList from '../components/Ship/ShipList';
 
 const ShipPage = () => {
   return (
-<<<<<<< HEAD
-    <div>
-=======
     <div className='listing-page'>
->>>>>>> pagination
       {/*<NavbarComponent />*/}
       <ShipList />
     </div>
