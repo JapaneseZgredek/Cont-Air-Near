@@ -35,11 +35,13 @@ class Operation(Base):
     name_of_operation = Column(String(255),nullable=False)
     operation_type = Column(Enum(OperationType), default=OperationType.AT_BAY)
     date_of_operation = Column(DateTime, default=datetime.now(), nullable=False)
-    id_ship = Column(Integer, ForeignKey('ship.id_ship'), nullable=False) #add
-    id_port = Column(Integer, ForeignKey('port.id_port'), nullable=False) #add
+    id_ship = Column(Integer, ForeignKey('ship.id_ship'), nullable=False)
+    id_port = Column(Integer, ForeignKey('port.id_port'), nullable=False)
+    id_order = Column(Integer, ForeignKey('order.id_order'), nullable=False)
 
     ship = relationship("Ship", back_populates="operations")
     port = relationship("Port", back_populates="operations")
+    order = relationship("Order", back_populates="operations")
 
 
 

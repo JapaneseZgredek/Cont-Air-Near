@@ -16,6 +16,7 @@ import OrderPage from './pages/OrderPage';
 import Order_productPage from './pages/Order_productPage';
 
 import { RoleProvider } from "./contexts/RoleContext";
+import Cart from "./components/Cart/Cart";
 
 
 const App = () => {
@@ -105,6 +106,7 @@ const App = () => {
               </ProtectedRoute>
             }
           />
+            <Route path="/cart" element={<Cart />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </Router>
