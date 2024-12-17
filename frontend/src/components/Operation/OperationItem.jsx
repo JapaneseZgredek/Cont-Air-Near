@@ -1,15 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Card, Button, Modal } from 'react-bootstrap';
 import { deleteOperation } from '../../services/api';
 import UpdateOperation from "./UpdateOperation";
 import GenericDetailModal from "../GenericDetailModal";
 import '../../styles/List.css';
+import { RoleContext } from '../../contexts/RoleContext';
 
 const OperationItem = ({ operation, onUpdate, onDelete }) => {
     const [showConfirm, setShowConfirm] = useState(false);
     const [showUpdateModal, setShowUpdateModal] = useState(false);
     const [showDetailModal, setShowDetailModal] = useState(false);
     const [displayType, setDisplayType] = useState("straight");
+    const { role } = useContext(RoleContext);    
 
     const handleDelete = async () => {
         try {
@@ -49,10 +51,12 @@ const OperationItem = ({ operation, onUpdate, onDelete }) => {
                     </div>
                     
                     {/* Kontener dla przycisków */}
+                    {(['EMPLOYEE', 'ADMIN'].includes(role)) && (
                     <div className="item-buttons">
                         <Button variant="warning" className="me-2" onClick={openUpdateModal}>Update</Button>
                         <Button variant="danger" onClick={() => setShowConfirm(true)}>Delete</Button>
                     </div>
+                    )}
             </Card>
 
             <Modal show={showConfirm} onHide={() => setShowConfirm(false)}>

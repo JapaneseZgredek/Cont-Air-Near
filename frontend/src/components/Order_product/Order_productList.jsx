@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import Order_productItem from './Order_productItem';
 import Order_productAdd from './Order_productAdd';
 import { fetchOrders_products } from '../../services/api';
 import { Container, Pagination, Dropdown } from 'react-bootstrap';
 import '../../styles/List.css';
+import { RoleContext } from '../../contexts/RoleContext';
 
 const Order_productList = () => {
     const [order_products, setOrder_products] = useState([]);
@@ -11,6 +12,7 @@ const Order_productList = () => {
     const [displayType, setDisplayType] = useState("straight");
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
+    const { role } = useContext(RoleContext);    
 
     const loadOrder_products = async () => {
         try {
@@ -67,7 +69,9 @@ const Order_productList = () => {
         <Container>
             <div className="d-flex justify-content-between mb-3">
                 <h2>Order_product List</h2>
+                {(['ADMIN'].includes(role)) && (
                 <Order_productAdd onAdd={handleAddOrder_product} />
+                )}
             </div>
             <hr className="divider" /> {/*linia podzialu*/}
 

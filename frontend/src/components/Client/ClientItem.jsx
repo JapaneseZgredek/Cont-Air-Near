@@ -1,16 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Card, Button, Modal } from 'react-bootstrap';
 import { deleteClient } from '../../services/api';
 import UpdateClient from "./UpdateClient";
 import OrdersButton from "../Order/OrdersButton";
 import GenericDetailModal from "../GenericDetailModal";
 import '../../styles/List.css';
+import { RoleContext } from '../../contexts/RoleContext';
 
 const ClientItem = ({ client, onUpdate, onDelete }) => {
     const [showConfirm, setShowConfirm] = useState(false);
     const [showUpdatedModal, setShowUpdateModal] = useState(false);
     const [showDetailModal, setShowDetailModal] = useState(false);
     const [displayType, setDisplayType] = useState("straight");
+    const { role } = useContext(RoleContext);
 
     const handleDelete = async () => {
         try {
@@ -50,9 +52,13 @@ const ClientItem = ({ client, onUpdate, onDelete }) => {
 
                 {/* Kontener dla przycisków */}
                 <div className="item-buttons">
+                {(['ADMIN'].includes(role)) && (
+                    <>
                     <OrdersButton clientId={client.id_client} clientName={client.name} />
                     <Button variant="warning" className="me-2" onClick={openUpdateModal}>Update</Button>
                     <Button variant="danger" onClick={() => setShowConfirm(true)}>Delete</Button>
+                    </>
+                )}
                 </div>
         </Card>
 

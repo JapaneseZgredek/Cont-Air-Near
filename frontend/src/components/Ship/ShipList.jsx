@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import ShipItem from './ShipItem';
 import AddShip from './AddShip';
 import { fetchShips } from '../../services/api';
 import { Container, Pagination, Dropdown } from 'react-bootstrap';
 import SearchAndFilterBar from '../SearchAndFilterBar'; // 🆕 Import komponentu do wyszukiwania i filtrowania
 import '../../styles/List.css';
+import { RoleContext } from '../../contexts/RoleContext';
 
 const ShipList = () => {
     const [ships, setShips] = useState([]);
@@ -14,6 +15,7 @@ const ShipList = () => {
     const [displayType, setDisplayType] = useState("grid");
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
+    const { role } = useContext(RoleContext);
 
     const loadShips = async () => {
         try {
@@ -92,7 +94,9 @@ const ShipList = () => {
         <Container>
             <div className="d-flex justify-content-between mb-3">
                 <h2>Ships</h2>
+                {(['ADMIN'].includes(role)) && (
                 <AddShip onAdd={handleAddShip} />
+                )}
             </div>
             <hr className="divider" /> {/*linia podzialu*/}
 

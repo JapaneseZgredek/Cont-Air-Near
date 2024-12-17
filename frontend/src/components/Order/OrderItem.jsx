@@ -1,16 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Card, Button, Modal } from 'react-bootstrap';
 import { deleteOrder } from '../../services/api';
 import OrderUpdate from './OrderUpdate';
 import Order_productButton from "../Order_product/Order_productButton";
 import GenericDetailModal from "../GenericDetailModal";
 import '../../styles/List.css';
+import { RoleContext } from '../../contexts/RoleContext';
 
 const OrderItem = ({ order, onUpdate, onDelete }) => {
     const [showConfirm, setShowConfirm] = useState(false);
     const [showUpdateModal, setShowUpdateModal] = useState(false);
     const [showDetailModal, setShowDetailModal] = useState(false);
     const [displayType, setDisplayType] = useState("straight");
+    const { role } = useContext(RoleContext);    
 
     const handleDelete = async () => {
         try {
@@ -52,8 +54,12 @@ const OrderItem = ({ order, onUpdate, onDelete }) => {
                     {/* Kontener dla przycisków */}
                     <div className="item-buttons">
                         <Order_productButton orderId={order.id_order}/>
-                        <Button variant="warning" className="me-2" onClick={openUpdateModal}>Update</Button>
-                        <Button variant="danger" onClick={() => setShowConfirm(true)}>Delete</Button>
+                        {(['EMPLOYEE', 'ADMIN'].includes(role)) && (
+                            <>
+                            <Button variant="warning" className="me-2" onClick={openUpdateModal}>Update</Button>
+                            <Button variant="danger" onClick={() => setShowConfirm(true)}>Delete</Button>
+                            </>
+                        )}
                     </div>
             </Card>
 

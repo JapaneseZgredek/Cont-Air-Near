@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Card, Button, Modal } from 'react-bootstrap';
 import { deletePort } from '../../services/api';
 import UpdatePort from "./UpdatePort";
@@ -6,11 +6,13 @@ import OperationsButton from "../Operation/OperationsButton";
 import OrdersButton from "../Order/OrdersButton";
 import ProductButton from "../Product/ProductButton";
 import GenericDetailModal from "../GenericDetailModal";
+import { RoleContext } from '../../contexts/RoleContext';
 
 const PortItem = ({ port, onUpdate, onDelete }) => {
     const [showConfirm, setShowConfirm] = useState(false);
     const [showUpdateModal, setShowUpdateModal] = useState(false);
     const [showDetailModal, setShowDetailModal] = useState(false);
+    const { role } = useContext(RoleContext);
 
     const handleDelete = async () => {
         try {
@@ -45,11 +47,14 @@ const PortItem = ({ port, onUpdate, onDelete }) => {
                         <Card.Text>Country: {port.country}</Card.Text>
                     </div>
                     <div className="item-buttons">
+                        {(['EMPLOYEE','ADMIN'].includes(role)) && (
+                        <>
                         <ProductButton portId={port.id_port} portName={port.name}/>
                         <OperationsButton  portId={port.id_port} portName={port.name}/>
                         <OrdersButton portId={port.id_port} portName={port.name} />
                         <Button variant="warning" onClick={openUpdateModal}>Update</Button>
                         <Button variant="danger" onClick={() => setShowConfirm(true)}>Delete</Button>
+                        </>)}
                     </div>
             </Card>
 
