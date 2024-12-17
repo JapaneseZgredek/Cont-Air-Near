@@ -91,8 +91,8 @@ const OrderList = () => {
                 <h2>Orders</h2>
                 <OrderAdd onAdd={(newOrder) => setOrders(prev => [...prev, newOrder])} />
 
-                <h2>Order List</h2>
-                <OrderAdd onAdd={handleAddOrder} />
+                {/*<h2>Order List</h2>*/}
+                {/*<OrderAdd onAdd={handleAddOrder} />*/}
 
             </div>
             <hr className="divider" /> {/*linia podzialu*/}
