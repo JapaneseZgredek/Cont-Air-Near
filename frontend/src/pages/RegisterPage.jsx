@@ -3,7 +3,7 @@ import AuthenticationForm from '../components/User/AuthenticationForm';
 
 const RegisterPage = () => {
     return (
-        <div>
+        <div className='form-page'>
             <AuthenticationForm />
         </div>
     );

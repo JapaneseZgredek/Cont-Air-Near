@@ -1,6 +1,26 @@
-/* Styl tła dla całej strony */
+/* Styl tła dla strony listy*/
 .listing-page {
     background-image: url('graphics/site_background.png'); /* Ścieżka do obrazka */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat; /* Zapobiega powtarzaniu tła */
+    background-attachment: fixed;
+    min-height: 100vh; /* Ustawia minimalną wysokość na 100% wysokości okna */
+}
+
+/* Styl tła dla strony głównej*/
+.home-page {
+    background-image: url('graphics/home_page_background.png'); /* Ścieżka do obrazka */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat; /* Zapobiega powtarzaniu tła */
+    background-attachment: fixed;
+    min-height: 100vh; /* Ustawia minimalną wysokość na 100% wysokości okna */
+}
+
+/* Styl tła dla strony z formularzem*/
+.form-page {
+    background-image: url('graphics/form_site_background2.png'); /* Ścieżka do obrazka */
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat; /* Zapobiega powtarzaniu tła */
