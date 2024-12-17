@@ -25,7 +25,7 @@ export const fetchShips = async () => {
 };
 
 export const createShip = async (ship) => {
-    await verifyRoles(['ADMIN']);
+    await verifyRoles(['EMPLOYEE', 'ADMIN']);
     try {
         console.log("Making POST request to /api/ships with payload:", ship);
         const response = await axios.post(`${API_URL}/api/ships`, ship, {
@@ -44,7 +44,7 @@ export const createShip = async (ship) => {
 
 export const deleteShip = async (ship_id) => {
     try {
-        await verifyRoles(['ADMIN']);
+        await verifyRoles(['EMPLOYEE', 'ADMIN']);
         return await fetchProtectedData(`/api/ships/${ship_id}`, {
             method: 'DELETE',
         });
@@ -55,7 +55,7 @@ export const deleteShip = async (ship_id) => {
 };
 
 export const updateShip = async (ship) => {
-    await verifyRoles(['ADMIN']);
+    await verifyRoles(['EMPLOYEE', 'ADMIN']);
     try {
         console.log("Making PUT request to /api/ships with payload:", ship);
         const response = await axios.put(`${API_URL}/api/ships/${ship.id_ship}`, ship, {

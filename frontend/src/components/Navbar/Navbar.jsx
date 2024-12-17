@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, {useContext, useState} from 'react';
 import { Navbar as BootstrapNavbar, Container, Nav } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import { RoleContext } from '../../contexts/RoleContext';
@@ -12,6 +12,8 @@ const NavbarComponent = () => {
     handleLogout(); // Wywołanie funkcji wylogowania
     navigate('/login'); // Przeniesienie na stronę logowania
   };
+
+  const [loggedIn, setLoggedIn] = useState(false);
 
   const getLinksForRole = () => {
     if (!role) {
@@ -51,11 +53,11 @@ const NavbarComponent = () => {
     };
 
     // Handle user logout
-    const handleLogout = () => {
-        localStorage.removeItem('token'); // Remove JWT token
-        setIsLoggedIn(false);
-        window.location.href = '/'; // Redirect to login
-    };
+    // const handleLogout = () => {
+    //     localStorage.removeItem('token'); // Remove JWT token
+    //     setIsLoggedIn(false);
+    //     window.location.href = '/'; // Redirect to login
+    // };
 
     return roleLinks[role].map((link) => (
       <LinkContainer key={link.path} to={link.path}>
