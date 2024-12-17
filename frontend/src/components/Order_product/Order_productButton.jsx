@@ -57,7 +57,6 @@ function Order_productsButton({orderId, productId, productName}) {
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>Order ID</th>
                                     <th>Product</th>
                                 </tr>
                             </thead>
@@ -65,7 +64,6 @@ function Order_productsButton({orderId, productId, productName}) {
                             {order_products.map((op, index) =>
                                 <tr key={`${op.id_order}-${op.id_product}`}>
                                     <td>{index + 1}</td>
-                                    <td>{op.id_order}</td>
                                     <td>{productName ? productName : products.find((product) => product.id_product === op.id_product)?.name || 'Unknown Product'}</td>
                                 </tr>
                             )}

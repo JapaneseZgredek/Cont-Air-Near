@@ -1,24 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import CartItem from './CartItem';
-import { Container, Button, Form } from 'react-bootstrap';
-import {createOrder, createOrder_product, fetchCurrentClient, fetchPorts} from '../../services/api'; // Import the fetchPorts API
+import { Container, Button, Form, Card } from 'react-bootstrap';
+import { createOrder, createOrder_product, fetchCurrentClient, fetchPorts } from '../../services/api';
 
 const Cart = ({ onProductRestore }) => {
     const [cartItems, setCartItems] = useState([]);
-    const [ports, setPorts] = useState([]); // List of ports for the dropdown
-    const [selectedPortId, setSelectedPortId] = useState(''); // Selected port ID
+    const [ports, setPorts] = useState([]);
+    const [selectedPortId, setSelectedPortId] = useState('');
     const [error, setError] = useState(null);
     const [validationErrors, setValidationErrors] = useState({});
-    const [clientId, setClientId] = useState(null);
+    const [totalPrice, setTotalPrice] = useState(0);
+    const [totalWeight, setTotalWeight] = useState(0);
 
-    // Load cart items from localStorage on component mount
     useEffect(() => {
         const cart = JSON.parse(localStorage.getItem('cart')) || [];
         setCartItems(cart);
-        if (cart.length > 0) loadPorts(); // Load the list of ports only if cart has items
+        calculateTotals(cart);
+
+        if (cart.length > 0) loadPorts();
     }, []);
 
-    // Load available ports for the dropdown
     const loadPorts = async () => {
         try {
             const data = await fetchPorts();
@@ -29,20 +30,22 @@ const Cart = ({ onProductRestore }) => {
         }
     };
 
+    const calculateTotals = (cart) => {
+        const priceSum = cart.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0);
+        const weightSum = cart.reduce((sum, item) => sum + item.weight * (item.quantity || 1), 0);
+        setTotalPrice(priceSum);
+        setTotalWeight(weightSum);
+    };
+
     const handleRemoveItem = (product) => {
-        setCartItems((prevCartItems) => prevCartItems.filter(item => item.id_product !== product.id_product));
-
-        // Restore product back to the product list
-        if (onProductRestore) {
-            onProductRestore(product);
-        }
-
         const updatedCart = cartItems.filter(item => item.id_product !== product.id_product);
+        setCartItems(updatedCart);
+        calculateTotals(updatedCart);
         localStorage.setItem('cart', JSON.stringify(updatedCart));
 
         if (updatedCart.length === 0) {
-            setPorts([]); // Clear ports if cart is empty
-            setSelectedPortId(''); // Reset port selection
+            setPorts([]);
+            setSelectedPortId('');
         }
     };
 
@@ -52,13 +55,13 @@ const Cart = ({ onProductRestore }) => {
         return errors;
     };
 
-
     const handleCheckout = async () => {
         const errors = validateInputs();
         if (Object.keys(errors).length > 0) {
             setValidationErrors(errors);
             return;
         }
+
         const clientData = await fetchCurrentClient();
         try {
             const orderPayload = {
@@ -67,31 +70,22 @@ const Cart = ({ onProductRestore }) => {
                 id_client: clientData.id_client,
             };
 
-            // Step 1: Create Order
-            console.log("Creating Order with payload: ", orderPayload);
             const orderResponse = await createOrder(orderPayload);
             const orderId = orderResponse.id_order;
 
-            // Step 2: Create OrderProduct entries for each product in the cart
-            const orderProductPromises = cartItems.map(item => {
-                const orderProductPayload = {
+            await Promise.all(cartItems.map(item =>
+                createOrder_product({
                     id_order: orderId,
                     id_product: item.id_product,
                     quantity: item.quantity || 1,
-                };
-                console.log("Creating OrderProduct with payload: ", orderProductPayload);
-                return createOrder_product(orderProductPayload);
-            });
+                })
+            ));
 
-            await Promise.all(orderProductPromises);
-
-            // Clear the cart after successful checkout
             localStorage.removeItem('cart');
             setCartItems([]);
-            setPorts([]); // Clear ports
-            setSelectedPortId(''); // Reset the selected port
+            setPorts([]);
+            setSelectedPortId('');
             alert('Order placed successfully!');
-
         } catch (error) {
             console.error('Error placing order:', error);
             alert('Failed to place the order. Please try again.');
@@ -100,48 +94,68 @@ const Cart = ({ onProductRestore }) => {
 
     return (
         <Container>
-            <div className="d-flex justify-content-between mb-3">
-                <h2>Cart</h2>
-            </div>
+            <Card className="mb-4 shadow-sm border-0">
+                <Card.Body>
+                    <div className="d-flex justify-content-between align-items-center mb-3">
+                        <h2 className="text-primary">Your Cart</h2>
+                        <h5 className="text-secondary">Items: {cartItems.length}</h5>
+                    </div>
 
-            {/* Port Dropdown: Display only if there is at least one product in the cart */}
-            {cartItems.length > 0 && (
-                <Form.Group className="mb-3">
-                    <Form.Label>Select the port to which you want to deliver your order</Form.Label>
-                    <Form.Control
-                        as="select"
-                        value={selectedPortId}
-                        onChange={(e) => setSelectedPortId(e.target.value)}
-                        isInvalid={!!validationErrors.selectedPortId}
-                    >
-                        <option value="">Select Port</option>
-                        {ports.map((port) => (
-                            <option key={port.id_port} value={port.id_port}>{port.name}</option>
-                        ))}
-                    </Form.Control>
-                    <Form.Control.Feedback type="invalid">
-                        {validationErrors.selectedPortId}
-                    </Form.Control.Feedback>
-                </Form.Group>
-            )}
+                    {cartItems.length > 0 && (
+                        <Form.Group className="mb-3">
+                            <Form.Label>Select Port for Delivery</Form.Label>
+                            <Form.Control
+                                as="select"
+                                value={selectedPortId}
+                                onChange={(e) => setSelectedPortId(e.target.value)}
+                                isInvalid={!!validationErrors.selectedPortId}
+                            >
+                                <option value="">Select Port</option>
+                                {ports.map((port) => (
+                                    <option key={port.id_port} value={port.id_port}>{port.name}</option>
+                                ))}
+                            </Form.Control>
+                            <Form.Control.Feedback type="invalid">
+                                {validationErrors.selectedPortId}
+                            </Form.Control.Feedback>
+                        </Form.Group>
+                    )}
 
-            {cartItems.length > 0 ? (
-                cartItems.map((item) => (
-                    <CartItem
-                        key={item.id_product}
-                        item={item}
-                        onRemove={handleRemoveItem}
-                    />
-                ))
-            ) : (
-                <p>Your cart is empty.</p>
-            )}
+                    {cartItems.length > 0 ? (
+                        <>
+                            <div style={{ maxHeight: '300px', overflowY: 'auto', marginBottom: '20px' }}>
+                                {cartItems.map((item) => (
+                                    <CartItem
+                                        key={item.id_product}
+                                        item={item}
+                                        onRemove={handleRemoveItem}
+                                    />
+                                ))}
+                            </div>
 
-            {cartItems.length > 0 && (
-                <div className="d-flex justify-content-end">
-                    <Button variant="success" onClick={handleCheckout}>Place Order</Button>
-                </div>
-            )}
+                            <hr />
+                            <div className="d-flex justify-content-between mb-3">
+                                <h5>Total Price:</h5>
+                                <h5 className="text-success">{totalPrice.toFixed(2)} PLN</h5>
+                            </div>
+                            <div className="d-flex justify-content-between mb-3">
+                                <h5>Total Weight:</h5>
+                                <h5 className="text-info">{totalWeight.toFixed(2)} kg</h5>
+                            </div>
+                        </>
+                    ) : (
+                        <p className="text-muted">Your cart is empty.</p>
+                    )}
+
+                    {cartItems.length > 0 && (
+                        <div className="d-flex justify-content-end">
+                            <Button variant="success" size="lg" onClick={handleCheckout}>
+                                Place Order
+                            </Button>
+                        </div>
+                    )}
+                </Card.Body>
+            </Card>
         </Container>
     );
 };
