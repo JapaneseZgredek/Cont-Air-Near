@@ -85,7 +85,7 @@ const ShipItem = ({ ship, onUpdate, onDelete }) => {
 
                 {/* Kontener dla przycisków */}
                 <div className="item-buttons">
-                    {(['ADMIN'].includes(role)) && (
+                    {(['EMPLOYEE','ADMIN'].includes(role)) && (
                     <>
                     <OperationsButton shipId={ship.id_ship} shipName={ship.name} />
                     <Button variant="warning" onClick={openUpdateModal}>Update</Button>

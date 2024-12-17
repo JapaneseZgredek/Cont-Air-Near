@@ -94,7 +94,7 @@ const ShipList = () => {
         <Container>
             <div className="d-flex justify-content-between mb-3">
                 <h2>Ships</h2>
-                {(['ADMIN'].includes(role)) && (
+                {(['EMPLOYEE','ADMIN'].includes(role)) && (
                 <AddShip onAdd={handleAddShip} />
                 )}
             </div>
