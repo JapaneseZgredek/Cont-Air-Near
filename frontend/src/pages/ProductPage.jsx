@@ -4,7 +4,7 @@ import ProductList from '../components/Product/ProductList';
 
 const ProductPage = () => {
   return (
-    <div>
+    <div className='listing-page'>
       {/*<NavbarComponent />*/}
       <ProductList />
     </div>

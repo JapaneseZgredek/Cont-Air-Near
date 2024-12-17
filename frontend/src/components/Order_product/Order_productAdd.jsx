@@ -65,7 +65,7 @@ const Order_productAdd = ({ onAdd }) => {
                     <Modal.Title>Add New Order_product</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    {error && <p style={{ color: 'red' }}>{error}</p>}
+                    {error && <p className="err-field">{"Err: "+error}</p>}
                     <Form onSubmit={handleSubmit}>
 
                         <Form.Group className="mb-3">

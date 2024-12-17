@@ -52,7 +52,7 @@ const AddPort = ({ onAdd }) => {
                     <Modal.Title>Add New Port</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    {error && <p style={{ color: 'red' }}>{error}</p>}
+                    {error && <p className="err-field">{"Err: "+error}</p>}
                     <Form onSubmit={handleSubmit}>
                         <Form.Group className="mb-3">
                             <Form.Label>Port Name</Form.Label>
