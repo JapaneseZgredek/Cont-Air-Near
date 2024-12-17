@@ -9,9 +9,11 @@ const GenericDetailModal = ({ show, onHide, title, details }) => {
             </Modal.Header>
             <Modal.Body>
                 {Object.entries(details).map(([key, value]) => (
+                    key !== 'image' && (
                     <p key={key}>
                         <strong>{key}:</strong> {value !== null && value !== undefined ? value.toString() : 'N/A'}
                     </p>
+                    )
                 ))}
             </Modal.Body>
             <Modal.Footer>
