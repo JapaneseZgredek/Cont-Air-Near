@@ -50,10 +50,12 @@ const UserPanel = () => {
             </Card>
             */}
 
-            <Card>
-                <a>User data</a>
+            <div className='section-buttons'>
+                <p className='section-name'>User data</p>
                 <Button variant="warning" className="me-2" onClick={openUpdateModal}>Update</Button>
-            </Card>
+            </div>
+            <hr className="section-divider" /> {/*linia podzialu*/}
+
 
             {currentclient && (
                 <UserDataUpdate

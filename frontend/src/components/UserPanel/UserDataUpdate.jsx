@@ -1,8 +1,9 @@
 import React, { useState, useContext } from 'react';
 import { Modal } from 'react-bootstrap';
-import {fetchCurrentClient, updateUserOwnData} from '../../services/api';
+import { updateUserOwnData } from '../../services/api';
 import { useNavigate } from 'react-router-dom';
 import { RoleContext } from '../../contexts/RoleContext';
+import '../../styles/panel.css';
 
 const UserDataUpdate = ({client, show, onHide}) => {
     const [errors, setErrors] = useState({});
@@ -18,11 +19,10 @@ const UserDataUpdate = ({client, show, onHide}) => {
     const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
     const [keepPassword, setKeepPassword] = useState(true);
-    const {role, handleLogout } = useContext(RoleContext);
+    const { handleLogout } = useContext(RoleContext);
 
     const handleLoginSuccess = async () => {
         try {
-          const response = await fetchCurrentClient();
           if(formData.logonName !== 
             client.logon_name || 
             formData.email !== 
@@ -106,12 +106,12 @@ const UserDataUpdate = ({client, show, onHide}) => {
             try {
                 const updatedClient = {
                     ...client,
-                    logon_name: formData.logonName != client.logonName ? formData.logonName : null,
+                    logon_name: formData.logonName !== client.logonName ? formData.logonName : null,
                     password: keepPassword ? "" : formData.password,
-                    email: formData.email != client.email ? formData.email : null,
-                    name: formData.name != client.name ? formData.name : null,
-                    address: formData.address != client.address ? formData.address : null,
-                    telephone_number: formData.telephone_number != client.telephone_number ?
+                    email: formData.email !== client.email ? formData.email : null,
+                    name: formData.name !== client.name ? formData.name : null,
+                    address: formData.address !== client.address ? formData.address : null,
+                    telephone_number: formData.telephone_number !== client.telephone_number ?
                      parseInt(formData.telephone_number, 10) : null,
                 };
                 const response = await updateUserOwnData(updatedClient);
@@ -131,8 +131,8 @@ const UserDataUpdate = ({client, show, onHide}) => {
     
 
       return (
-        <Modal show={show} onHide={onHide} className="container d-flex justify-content-center align-items-center vh-100">
-          <div className="card shadow-sm p-4" style={{ maxWidth: '400px', width: '100%' }}>
+        <Modal show={show} onHide={onHide} centered>
+          <div className="card shadow-sm p-4">
             <h2 className="text-center mb-4">{'Update user data'}</h2>
             {message && <div className="alert alert-info text-center">{message}</div>}
             <form onSubmit={handleSubmit} noValidate>
@@ -152,7 +152,6 @@ const UserDataUpdate = ({client, show, onHide}) => {
     
             <div className="mb-3">
                 <label htmlFor="password" className="form-label">Password:</label>
-                <div className="form-label"> {'(leave empty to keep the old one)'}</div>
                 {!keepPassword && (
                   <input
                     type={showPassword ? "text" : "password"}
