@@ -55,17 +55,18 @@ const Order_productItem = ({ order_product, onUpdate, onDelete }) => {
     return (
         <>
             <Card className={`${displayType}-item-card`}>
-                    <Card.Title>Order ID: {order_product.id_order} Product: {
-                        products.find((product) => product.id_product === order_product.id_product)?.name || 'Unknown Product'
-                    }
+                    <Card.Title>
+                        Order ID: {order_product.id_order} 
+                        <br />
+                        Product: {getProductName(order_product.id_product)}
                     </Card.Title>
 
-                    {/* Kontener dla tekstów */}
-                    {/* <div className="item-texts">
-                        <a>Quantity {order_product.quantity}</a>
-                    </div> */}
+                    {/* Display Quantity */}
+                    <div className="item-texts">
+                        <p>Quantity: {order_product.quantity}</p> {/* Displaying the quantity */}
+                    </div>
 
-                    {/* Kontener dla przycisków */}
+                    {/* Action Buttons */}
                     <div className="item-buttons">
                         <Button variant="warning" className="me-2" onClick={openUpdateModal}>Update</Button>
                         <Button variant="danger" onClick={() => setShowConfirm(true)}>Delete</Button>
