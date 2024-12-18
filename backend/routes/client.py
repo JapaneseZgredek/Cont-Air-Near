@@ -93,7 +93,7 @@ def get_current_client(token: str = Depends(oauth2_scheme), db: Session = Depend
 #CRUD TABELE OG z wcześniej:
 @router.get("/clients", response_model=List[ClientRead])
 def get_all_clients(db: Session = Depends(get_db), current_client=Depends(get_current_client)):
-    check_user_role(current_client, [UserRole.ADMIN])
+    check_user_role(current_client, [UserRole.ADMIN, UserRole.CLIENT, UserRole.EMPLOYEE])
     logger.info("Getting all clients")
     clients = db.query(Client).all()
     return clients

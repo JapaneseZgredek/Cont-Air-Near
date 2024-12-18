@@ -48,7 +48,7 @@ def get_operations_by_port(
     db: Session = Depends(get_db),
     current_client=Depends(get_current_client)
 ):
-    check_user_role(current_client, [UserRole.EMPLOYEE, UserRole.ADMIN])  # Validate roles
+    check_user_role(current_client, [UserRole.EMPLOYEE, UserRole.ADMIN, UserRole.CLIENT])  # Validate roles
     operations = db.query(Operation).filter(Operation.id_port == id_port).all()
     if not operations:
         raise HTTPException(status_code=404, detail=f"No operations found for port with id: {id_port}")
