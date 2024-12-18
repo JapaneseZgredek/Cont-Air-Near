@@ -309,9 +309,21 @@ export const uploadProductImage = async (id_product, file) => {
 //Orders table related
 
 export const fetchOrders = async () => {
-    await verifyRoles(['CLIENT', 'EMPLOYEE', 'ADMIN']);
-    return await fetchProtectedData(`/api/orders`);
+    try {
+        const currentClient = await fetchCurrentClient();
+
+        if (currentClient.role === 'CLIENT') {
+            return await fetchOrdersByClient(currentClient.id_client);
+        }
+
+        await verifyRoles(['EMPLOYEE', 'ADMIN']);
+        return await fetchProtectedData(`/api/orders`);
+    } catch (error) {
+        console.error("Error fetching orders:", error.message);
+        throw error;
+    }
 };
+
 
 //DODAĆ, ŻE CLIENT MOŻE SAM ZFETCHOWAĆ SWÓJ ORDER w podobny sposób jak
 //fetchOrderById
@@ -325,7 +337,7 @@ export const fetchOrdersByPort = async (port_id) => {
 
 
 export const fetchOrdersByClient = async (client_id) => {
-    await verifyRoles(['EMPLOYEE', 'ADMIN']);
+    await verifyRoles(['CLIENT', 'EMPLOYEE', 'ADMIN']);
     return await fetchProtectedData(`/api/orders/client/${client_id}`);
 }
 
@@ -529,7 +541,7 @@ export const fetchExcludedProducts = async () => {
 
 export const fetchClients = async () => {
     try {
-        await verifyRoles(['ADMIN']);
+        await verifyRoles(['CLIENT', 'EMPLOYEE' ,'ADMIN']);
         return await fetchProtectedData(`/api/clients`);
     } catch (error) {
         console.error("Role verification failed:", error.message);
