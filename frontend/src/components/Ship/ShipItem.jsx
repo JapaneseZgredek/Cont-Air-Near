@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Card, Button, Modal } from 'react-bootstrap';
 import { deleteShip, fetchShipImage } from '../../services/api';
 import UpdateShip from "./UpdateShip";
 import OperationsButton from "../Operation/OperationsButton";
 import GenericDetailModal from "../GenericDetailModal";
 import '../../styles/List.css';
+import { RoleContext } from '../../contexts/RoleContext';
 
 const ShipItem = ({ ship, onUpdate, onDelete }) => {
     const [showConfirm, setShowConfirm] = useState(false);
@@ -13,6 +14,7 @@ const ShipItem = ({ ship, onUpdate, onDelete }) => {
     const [loadingImage, setLoadingImage] = useState(true);
     const [showDetailModal, setShowDetailModal] = useState(false);
     const [displayType, setDisplayType] = useState("grid");
+    const { role } = useContext(RoleContext);
 
     const handleDelete = async () => {
         try {
@@ -63,7 +65,7 @@ const ShipItem = ({ ship, onUpdate, onDelete }) => {
 
                 {/* Kontener dla tekstów */}
                 <div className="item-texts">    
-                    <a>Capacity: {ship.capacity}</a>
+                    <a></a>
                 </div>
 
                 {/* Obrazek */}
@@ -83,9 +85,12 @@ const ShipItem = ({ ship, onUpdate, onDelete }) => {
 
                 {/* Kontener dla przycisków */}
                 <div className="item-buttons">
+                    {(['EMPLOYEE','ADMIN'].includes(role)) && (
+                    <>
                     <OperationsButton shipId={ship.id_ship} shipName={ship.name} />
                     <Button variant="warning" onClick={openUpdateModal}>Update</Button>
                     <Button variant="danger" onClick={() => setShowConfirm(true)}>Delete</Button>
+                    </>)}
                 </div>
         </Card>
 

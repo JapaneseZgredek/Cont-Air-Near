@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import OperationItem from './OperationItem';
 import AddOperation from './AddOperation';
 import { fetchOperations } from '../../services/api';
 import { Container, Pagination, Dropdown } from 'react-bootstrap';
 import SearchAndFilterBar from '../SearchAndFilterBar';
 import '../../styles/List.css';
+import { RoleContext } from '../../contexts/RoleContext';
 
 const OperationList = () => {
     const [operations, setOperations] = useState([]);
@@ -14,6 +15,7 @@ const OperationList = () => {
     const [displayType, setDisplayType] = useState("straight");
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
+    const { role } = useContext(RoleContext);    
 
     const loadOperations = async () => {
         try {
@@ -92,7 +94,9 @@ const OperationList = () => {
         <Container>
             <div className="d-flex justify-content-between mb-3">
                 <h2>Operations</h2>
+                {(['EMPLOYEE', 'ADMIN'].includes(role)) && (
                 <AddOperation onAdd={handleAddOperation} />
+                )}
             </div>
             <hr className="divider" /> {/*linia podzialu*/}
             

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Card, Button, Modal } from 'react-bootstrap';
 import { deleteOrder, fetchPorts, fetchClients } from '../../services/api';
 import OrderUpdate from "./OrderUpdate";
@@ -7,12 +7,14 @@ import GenericDetailModal from "../GenericDetailModal";
 import Order_productButton from '../Order_product/Order_productButton';
 
 import '../../styles/List.css';
+import { RoleContext } from '../../contexts/RoleContext';
 
 const OrderItem = ({ order, onUpdate, onDelete }) => {
     const [showConfirm, setShowConfirm] = useState(false);
     const [showUpdateModal, setShowUpdateModal] = useState(false);
     const [showDetailModal, setShowDetailModal] = useState(false);
     const [displayType, setDisplayType] = useState("straight");
+    const { role } = useContext(RoleContext);    
     const [portName, setPortName] = useState('');
     const [clientName, setClientName] = useState('');
     const [error, setError] = useState('');
@@ -77,8 +79,12 @@ const OrderItem = ({ order, onUpdate, onDelete }) => {
                     {/* Kontener dla przycisków */}
                     <div className="item-buttons">
                         <Order_productButton orderId={order.id_order}/>
-                        <Button variant="warning" className="me-2" onClick={openUpdateModal}>Update</Button>
-                        <Button variant="danger" onClick={() => setShowConfirm(true)}>Delete</Button>
+                        {(['EMPLOYEE', 'ADMIN'].includes(role)) && (
+                            <>
+                            <Button variant="warning" className="me-2" onClick={openUpdateModal}>Update</Button>
+                            <Button variant="danger" onClick={() => setShowConfirm(true)}>Delete</Button>
+                            </>
+                        )}
 
                         <OrdersButton portId={order.id_port} portName={portName} clientId={order.id_client} clientName={clientName} />
                     </div>

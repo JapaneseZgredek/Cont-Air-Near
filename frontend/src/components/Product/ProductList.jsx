@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import ProductItem from './ProductItem';
 import AddProduct from './AddProduct';
 import { fetchExcludedProducts } from '../../services/api'; // Import the new method
 import { Container, Pagination, Dropdown } from 'react-bootstrap';
 import SearchAndFilterBar from '../SearchAndFilterBar';
 import '../../styles/List.css';
+import { RoleContext } from '../../contexts/RoleContext';
 
 const ProductList = () => {
     const [products, setProducts] = useState([]);
@@ -14,6 +15,7 @@ const ProductList = () => {
     const [displayType, setDisplayType] = useState("grid");
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
+    const { role } = useContext(RoleContext);
 
     const loadProducts = async () => {
         try {
@@ -108,7 +110,9 @@ const ProductList = () => {
         <Container>
             <div className="d-flex justify-content-between mb-3">
                 <h2>Products</h2>
+                {(['EMPLOYEE','ADMIN'].includes(role)) && (
                 <AddProduct onAdd={handleAddProduct} />
+                )}
             </div>
             <hr className="divider" /> {/*linia podzialu*/}
 

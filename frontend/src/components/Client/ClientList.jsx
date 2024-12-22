@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import ClientItem from './ClientItem';
 import AddClient from './AddClient';
 import SearchAndFilterBar from "../SearchAndFilterBar";
 import { fetchClients } from '../../services/api';
 import { Container, Button, Pagination, Dropdown } from 'react-bootstrap';
 import '../../styles/List.css';
+import { RoleContext } from '../../contexts/RoleContext';
 
 const ClientList = () => {
     const [clients, setClients] = useState([]);
@@ -15,6 +16,7 @@ const ClientList = () => {
     const [displayType, setDisplayType] = useState("straight");
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
+    const { role } = useContext(RoleContext);
     const filterOptions = ['name', 'address', 'telephone_number', 'email'];
 
     // Load clients from the API
@@ -111,9 +113,11 @@ const ClientList = () => {
         <Container>
             <div className="d-flex justify-content-between mb-3">
                 <h2>Clients</h2>
+                {(['ADMIN'].includes(role)) && (
                 <Button variant="primary" onClick={() => setShowAddClientModal(true)}>
                     Add Client
                 </Button>
+                )}
             </div>
             <hr className="divider" /> {/*linia podzialu*/}
 

@@ -99,7 +99,7 @@ export const fetchShipImage = async (id_ship) => {
 
 // Operation table related
 export async function fetchOperationsByPort(portId) {
-    await verifyRoles(['EMPLOYEE', 'ADMIN']);
+    await verifyRoles(['EMPLOYEE', 'ADMIN', 'CLIENT']);
     return await fetchProtectedData(`/api/operations/port/${portId}`);
 }
 
@@ -219,7 +219,7 @@ export const updatePort = async (port) => {
 // Products table related
 
 export async function fetchProductsByPort(portId) {
-  await verifyRoles(['EMPLOYEE', 'ADMIN']); //CLIENT?
+  await verifyRoles(['EMPLOYEE', 'ADMIN', 'CLIENT']);
   return await fetchProtectedData(`/api/products/port/${portId}`);
 }
 
@@ -309,9 +309,21 @@ export const uploadProductImage = async (id_product, file) => {
 //Orders table related
 
 export const fetchOrders = async () => {
-    await verifyRoles(['CLIENT', 'EMPLOYEE', 'ADMIN']);
-    return await fetchProtectedData(`/api/orders`);
+    try {
+        const currentClient = await fetchCurrentClient();
+
+        if (currentClient.role === 'CLIENT') {
+            return await fetchOrdersByClient(currentClient.id_client);
+        }
+
+        await verifyRoles(['EMPLOYEE', 'ADMIN']);
+        return await fetchProtectedData(`/api/orders`);
+    } catch (error) {
+        console.error("Error fetching orders:", error.message);
+        throw error;
+    }
 };
+
 
 //DODAĆ, ŻE CLIENT MOŻE SAM ZFETCHOWAĆ SWÓJ ORDER w podobny sposób jak
 //fetchOrderById
@@ -319,13 +331,18 @@ export const fetchOrders = async () => {
 //napisac metode podobna do fetch current client tylko taką co fetchuje po id jego produkty i dorobić backend + front
 
 export const fetchOrdersByPort = async (port_id) => {
-    await verifyRoles(['EMPLOYEE', 'ADMIN']);
+    await verifyRoles(['EMPLOYEE', 'ADMIN', 'CLIENT']);
     return await fetchProtectedData(`/api/orders/port/${port_id}`);
 }
 
 
 export const fetchOrdersByClient = async (client_id) => {
-    await verifyRoles(['EMPLOYEE', 'ADMIN']);
+    await verifyRoles(['CLIENT', 'EMPLOYEE', 'ADMIN']);
+    return await fetchProtectedData(`/api/orders/client/${client_id}`);
+}
+
+export const fetchOrdersForOwner = async (client_id) => {
+    await verifyRoles(['CLIENT']);
     return await fetchProtectedData(`/api/orders/client/${client_id}`);
 }
 
@@ -386,7 +403,7 @@ export const fetchOrders_products = async () => {
 };
 
 export const fetchOrders_productsByOrder = async (order_id) => {
-    await verifyRoles(['EMPLOYEE', 'ADMIN']);
+    await verifyRoles(['CLIENT', 'EMPLOYEE', 'ADMIN']);
     try {
         console.log(`Making GET request to /api/orders_products/order/${order_id}`);
         const response = await axios.get(`${API_URL}/api/orders_products/order/${order_id}`, {
@@ -530,7 +547,7 @@ export const fetchExcludedProducts = async () => {
 
 export const fetchClients = async () => {
     try {
-        await verifyRoles(['ADMIN']);
+        await verifyRoles(['CLIENT', 'EMPLOYEE' ,'ADMIN']);
         return await fetchProtectedData(`/api/clients`);
     } catch (error) {
         console.error("Role verification failed:", error.message);
@@ -584,6 +601,30 @@ export const updateClient = async (client) => {
     } catch (error) {
         console.error("Error in updateClient:", error.response?.data || error.message);
         throw error.response?.data || new Error("Failed to update client");
+    }
+};
+
+export const updateUserOwnData = async (user) => {
+    await verifyRoles(['ADMIN','EMPLOYEE','CLIENT']);
+    const userLoggedIn = await fetchCurrentClient();
+    if(user.id_client != userLoggedIn.id_client){
+        console.error("Error in updateUserOwnData: cannot modify data of a user other than the logged-in one");
+        throw new Error("Failed to update user data - cannot modify data of a user other than the logged-in one");
+    } else {
+        try {
+            console.log("Making PUT request to /api/clients with payload:", user);
+            const response = await axios.put(`${API_URL}/api/clients/${user.id_client}`, user, {
+                headers: {
+                    Authorization: `Bearer ${getAuthToken()}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+            console.log("Response from /api/clients:", response.data);
+            return response.data;
+        } catch (error) {
+            console.error("Error in updateUserOwnData:", error.response?.data || error.message);
+            throw error.response?.data || new Error("Failed to update user data");
+        }
     }
 };
 

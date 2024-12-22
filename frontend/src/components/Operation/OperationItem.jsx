@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Card, Button, Modal } from 'react-bootstrap';
 import { deleteOperation } from '../../services/api';
 import UpdateOperation from "./UpdateOperation";
 import GenericDetailModal from "../GenericDetailModal";
 import '../../styles/List.css';
+import { RoleContext } from '../../contexts/RoleContext';
 import { fetchShips } from '../../services/api'; // Assuming this is the correct import path
 import { fetchPorts } from '../../services/api'; // Assuming this is the correct import path
 
@@ -13,6 +14,7 @@ const OperationItem = ({ operation, onUpdate, onDelete }) => {
     const [showUpdateModal, setShowUpdateModal] = useState(false);
     const [showDetailModal, setShowDetailModal] = useState(false);
     const [displayType, setDisplayType] = useState("straight");
+    const { role } = useContext(RoleContext);    
     const [shipName, setShipName] = useState('');
     const [portName, setPortName] = useState('');
 
@@ -81,10 +83,12 @@ const OperationItem = ({ operation, onUpdate, onDelete }) => {
                     </div>
                     
                     {/* Kontener dla przycisków */}
+                    {(['EMPLOYEE', 'ADMIN'].includes(role)) && (
                     <div className="item-buttons">
                         <Button variant="warning" className="me-2" onClick={openUpdateModal}>Update</Button>
                         <Button variant="danger" onClick={() => setShowConfirm(true)}>Delete</Button>
                     </div>
+                    )}
             </Card>
 
             {/* Confirmation Modal */}

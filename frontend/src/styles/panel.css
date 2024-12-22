@@ -1,0 +1,38 @@
+/*Ustawienia dla nazwy sekcji*/
+.section-name{
+    font-family: 'Roboto', sans-serif;
+    font-size: 1.5rem;
+    font-weight: bold;
+    justify-content:left;
+}
+
+.section-buttons{
+    justify-content:space-between;
+}
+
+/* Jasnoszara linia */
+.section-divider {
+    height: 3px;
+    background-color: rgb(0, 79, 170);
+    width: 50%;
+    justify-content: right;
+}
+
+/* Styl dla przycisków itemu */
+button.btn-warning{
+    padding: 0.25rem 0.5rem; /* Dodatkowe wypełnienie dla przycisków */
+    color: #333;
+    background-color: #fff;
+    font-size: 1rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    border: 1px solid #6dbdff;
+    transition: transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+/* Styl dla przycisku warning (update) */
+button.btn-warning:hover {
+    transform: translateY(-2px);
+    background-color: rgb(255, 237, 199);
+}

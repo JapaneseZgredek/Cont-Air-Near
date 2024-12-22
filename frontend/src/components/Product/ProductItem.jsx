@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Card, Button, Modal } from 'react-bootstrap';
-import { deleteProduct , fetchProductImage } from '../../services/api';
+import { deleteProduct, fetchPorts, fetchProductImage } from '../../services/api';
 import UpdateProduct from "./UpdateProduct";
-import Order_productButton from "../Order_product/Order_productButton";
 import GenericDetailModal from "../GenericDetailModal";
 import '../../styles/List.css';
+import { RoleContext } from '../../contexts/RoleContext';
 
 const ProductItem = ({ product, onUpdate, onDelete, onAddToCart }) => {
     const [showConfirm, setShowConfirm] = useState(false);
@@ -13,6 +13,25 @@ const ProductItem = ({ product, onUpdate, onDelete, onAddToCart }) => {
     const [loadingImage, setLoadingImage] = useState(true);
     const [showDetailModal, setShowDetailModal] = useState(false);
     const [displayType, setDisplayType] = useState("grid");
+    const { role } = useContext(RoleContext);
+    const [portName, setPortName] = useState('');
+    const [error, setError] = useState('');
+
+    // Fetch port names based on the product's id_port
+    useEffect(() => {
+        const fetchPortName = async () => {
+            try {
+                const portsResponse = await fetchPorts();
+                const foundPort = portsResponse.find(port => port.id_port === product.id_port);
+                setPortName(foundPort ? foundPort.name : 'Unknown Port');
+            } catch (error) {
+                setError('Error fetching port name');
+                console.error('Error fetching port name:', error);
+            }
+        };
+
+        fetchPortName();
+    }, [product.id_port]);
 
     const handleDelete = async () => {
         try {
@@ -48,7 +67,6 @@ const ProductItem = ({ product, onUpdate, onDelete, onAddToCart }) => {
 
         localStorage.setItem('cart', JSON.stringify(existingCart));
 
-        // Usunięcie produktu z listy dostępnych produktów
         if (onAddToCart) {
             onAddToCart(product.id_product);
         }
@@ -58,23 +76,22 @@ const ProductItem = ({ product, onUpdate, onDelete, onAddToCart }) => {
 
     const loadImage = async () => {
         try {
-              setLoadingImage(true);
-              const url = await fetchProductImage(product.id_product);
-              setImageUrl(url);
-          } catch (error) {
-              console.error("Failed to load product image", error);
-              setImageUrl(null);
-          } finally {
-              setLoadingImage(false);
-          }
-      };
+            setLoadingImage(true);
+            const url = await fetchProductImage(product.id_product);
+            setImageUrl(url);
+        } catch (error) {
+            console.error("Failed to load product image", error);
+            setImageUrl(null);
+        } finally {
+            setLoadingImage(false);
+        }
+    };
 
     useEffect(() => {
         loadImage();
     }, [product.id_product]);
 
-
-    return(
+    return (
         <>
             <Card className={`${displayType}-item-card`}>
                     <Card.Title
@@ -108,11 +125,13 @@ const ProductItem = ({ product, onUpdate, onDelete, onAddToCart }) => {
 
                     {/* Kontener dla przycisków */}
                     <div className="item-buttons">
-                        <Button variant="outline-success" className="me-2" onClick={handleAddToCart}>Add to Cart</Button>
+                        {(['EMPLOYEE','ADMIN'].includes(role)) && (<>
                         <Order_productButton productId={product.id_product} productName={product.name} />
                         <Button variant="warning" onClick={openUpdateModal}>Update</Button>
                         <Button variant="danger" onClick={() => setShowConfirm(true)}>Delete</Button>
+                        </>)}
                     </div>
+
             </Card>
 
             <Modal show={showConfirm} onHide={() => setShowConfirm(false)}>

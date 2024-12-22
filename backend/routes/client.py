@@ -93,7 +93,7 @@ def get_current_client(token: str = Depends(oauth2_scheme), db: Session = Depend
 #CRUD TABELE OG z wcześniej:
 @router.get("/clients", response_model=List[ClientRead])
 def get_all_clients(db: Session = Depends(get_db), current_client=Depends(get_current_client)):
-    check_user_role(current_client, [UserRole.ADMIN])
+    check_user_role(current_client, [UserRole.ADMIN, UserRole.CLIENT, UserRole.EMPLOYEE])
     logger.info("Getting all clients")
     clients = db.query(Client).all()
     return clients
@@ -159,40 +159,43 @@ def update_client(
     db: Session = Depends(get_db),
     current_client=Depends(get_current_client)
 ):
-    check_user_role(current_client, [UserRole.ADMIN])
+    check_user_role(current_client, [UserRole.ADMIN, UserRole.EMPLOYEE, UserRole.CLIENT])
     logger.info(f"Updating client with ID: {id_client}")
+    if (current_client.role == UserRole.ADMIN or (current_client.id_client == id_client)):
+        db_client = db.query(Client).filter(Client.id_client == id_client).first()
+        if db_client is None:
+            logger.warning(f"Client with ID: {id_client} not found")
+            raise HTTPException(status_code=404, detail="Client not found")
 
-    db_client = db.query(Client).filter(Client.id_client == id_client).first()
-    if db_client is None:
-        logger.warning(f"Client with ID: {id_client} not found")
-        raise HTTPException(status_code=404, detail="Client not found")
+        # Prevent duplicate logon_name or email
+        if db.query(Client).filter(
+            (Client.logon_name == client.logon_name) | (Client.email == client.email)
+        ).filter(Client.id_client != id_client).first():
+            raise HTTPException(status_code=400, detail="Username or email already exists")
 
-    # Prevent duplicate logon_name or email
-    if db.query(Client).filter(
-        (Client.logon_name == client.logon_name) | (Client.email == client.email)
-    ).filter(Client.id_client != id_client).first():
-        raise HTTPException(status_code=400, detail="Username or email already exists")
+        # Update fields if provided
+        if client.name:
+            db_client.name = client.name
+        if client.address:
+            db_client.address = client.address
+        if client.telephone_number:
+            db_client.telephone_number = client.telephone_number
+        if client.email:
+            db_client.email = client.email
+        if client.logon_name:
+            db_client.logon_name = client.logon_name
+        if client.password:
+            db_client.password = bcrypt.hashpw(client.password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        if client.role:
+            db_client.role = client.role
 
-    # Update fields if provided
-    if client.name:
-        db_client.name = client.name
-    if client.address:
-        db_client.address = client.address
-    if client.telephone_number:
-        db_client.telephone_number = client.telephone_number
-    if client.email:
-        db_client.email = client.email
-    if client.logon_name:
-        db_client.logon_name = client.logon_name
-    if client.password:
-        db_client.password = bcrypt.hashpw(client.password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-    if client.role:
-        db_client.role = client.role
-
-    logger.info(f"Updated client fields: {client.dict(exclude_unset=True)}")
-    db.commit()
-    db.refresh(db_client)
-    return db_client
+        logger.info(f"Updated client fields: {client.dict(exclude_unset=True)}")
+        db.commit()
+        db.refresh(db_client)
+        return db_client
+    else:
+        logger.warning(f"Client with no admin role can't access other client data")
+        raise HTTPException(status_code=403, detail="Cant modify other users data")
 
 
 @router.delete("/clients/{id_client}", response_model=dict)
