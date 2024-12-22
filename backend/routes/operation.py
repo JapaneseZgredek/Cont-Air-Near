@@ -9,6 +9,7 @@ from pydantic import BaseModel
 from typing import List, Optional
 from ..models import Ship, Port, UserRole
 from .client import get_current_client
+from ..models.order import Order
 
 router = APIRouter()
 
@@ -18,6 +19,7 @@ class OperationCreate(BaseModel):
     date_of_operation: Optional[datetime]
     id_ship: int
     id_port: int
+    id_order: int
 
 class OperationUpdate(BaseModel):
     name_of_operation: Optional[str] = None
@@ -25,6 +27,7 @@ class OperationUpdate(BaseModel):
     date_of_operation: Optional[datetime] = None
     id_ship: Optional[int] = None
     id_port: Optional[int] = None
+    id_order: Optional[int] = None
 
 class OperationRead(BaseModel):
     id_operation: int
@@ -33,6 +36,7 @@ class OperationRead(BaseModel):
     date_of_operation: datetime
     id_ship: int
     id_port: int
+    id_order: int
 
     class Config:
         orm_mode = True
@@ -44,7 +48,7 @@ def get_operations_by_port(
     db: Session = Depends(get_db),
     current_client=Depends(get_current_client)
 ):
-    check_user_role(current_client, [UserRole.EMPLOYEE, UserRole.ADMIN])  # Validate roles
+    check_user_role(current_client, [UserRole.EMPLOYEE, UserRole.ADMIN, UserRole.CLIENT])  # Validate roles
     operations = db.query(Operation).filter(Operation.id_port == id_port).all()
     if not operations:
         raise HTTPException(status_code=404, detail=f"No operations found for port with id: {id_port}")
@@ -62,6 +66,18 @@ def get_operations_by_ship(
         raise HTTPException(status_code=404, detail=f"No operations found for ship with id: {id_ship}")
     return operations
 
+@router.get("/operations/order/{id_order}", response_model=List[OperationRead])
+def get_operations_by_order(
+        id_order: int,
+        db: Session = Depends(get_db),
+        current_client=Depends(get_current_client)
+):
+    check_user_role(current_client, [UserRole.EMPLOYEE, UserRole.ADMIN])
+    operations = db.query(Operation).filter(Operation.id_order == id_order).all()
+    if not operations:
+        raise HTTPException(status_code=404, detail=f"No operations found for order with id: {id_order}")
+    return operations
+
 @router.get("/operations/{id_operation}", response_model=OperationRead)
 def get_operation(
     id_operation: int,
@@ -75,17 +91,6 @@ def get_operation(
         raise HTTPException(status_code=404, detail="Operation not found")
     return operation
 
-# @router.get("/operations", response_model=List[OperationRead])
-# def get_all_operations(
-#     db: Session = Depends(get_db),
-#     current_client=Depends(get_current_client)
-# ):
-#     check_user_role(current_client, [UserRole.EMPLOYEE, UserRole.ADMIN])  # Validate roles
-#     logger.info("Fetching all operations")
-#     operations = db.query(Operation).all()
-#     if not operations:
-#         raise HTTPException(status_code=404, detail="No operations found")
-#     return operations
 
 @router.get("/operations", response_model=List[OperationRead])
 def get_all_operations(db: Session = Depends(get_db), current_client=Depends(get_current_client)):
@@ -110,6 +115,7 @@ def create_operation(
         Operation.name_of_operation == operation.name_of_operation,
         Operation.id_ship == operation.id_ship,
         Operation.id_port == operation.id_port,
+        Operation.id_order == operation.id_order
     ).first()
 
     if existing_operation:
@@ -130,6 +136,11 @@ def create_operation(
         logger.error(f"Port with ID {operation.id_port} not found")
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Port not found")
 
+    order = db.query(Order).filter(Order.id_order == operation.id_order).first()
+    if not order:
+        logger.error(f"Order with ID {operation.id_order} not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Order not found")
+
     # Create operation
     try:
         db_operation = Operation(
@@ -138,6 +149,7 @@ def create_operation(
             date_of_operation=operation.date_of_operation or datetime.now(),
             id_ship=operation.id_ship,
             id_port=operation.id_port,
+            id_order=operation.id_order
         )
         db.add(db_operation)
         db.commit()

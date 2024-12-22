@@ -32,27 +32,25 @@ const PortItem = ({ port, onUpdate, onDelete }) => {
 
     return (
         <>
-            <Card className="mb-3">
-                <Card.Body className="d-flex justify-content-between align-items-center">
-                    <div>
-                        <Card.Title
+            <Card className="straight-item-card">
+                <Card.Title
                             className="clickable"
                             onClick={() => setShowDetailModal(true)}
                             style={{ cursor: 'pointer', textDecoration: 'underline' }}
                         >
                             {port.name}
                         </Card.Title>
+                    <div className="item-texts">
                         <Card.Text>Location: {port.location}</Card.Text>
                         <Card.Text>Country: {port.country}</Card.Text>
                     </div>
-                    <div>
-                        <ProductButton className="me-2" portId={port.id_port} portName={port.name}/>
-                        <OperationsButton className="me-2" portId={port.id_port} portName={port.name}/>
+                    <div className="item-buttons">
+                        <ProductButton portId={port.id_port} portName={port.name}/>
+                        <OperationsButton  portId={port.id_port} portName={port.name}/>
                         <OrdersButton portId={port.id_port} portName={port.name} />
-                        <Button variant="warning" className="me-2" onClick={openUpdateModal}>Update</Button>
+                        <Button variant="warning" onClick={openUpdateModal}>Update</Button>
                         <Button variant="danger" onClick={() => setShowConfirm(true)}>Delete</Button>
                     </div>
-                </Card.Body>
             </Card>
 
             <Modal show={showConfirm} onHide={() => setShowConfirm(false)}>

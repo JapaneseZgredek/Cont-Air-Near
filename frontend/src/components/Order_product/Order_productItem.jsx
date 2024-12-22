@@ -3,21 +3,45 @@ import { Card, Button, Modal } from 'react-bootstrap';
 import { deleteOrder_product } from '../../services/api';
 import { fetchProducts } from '../../services/api';
 import Order_productUpdate from './Order_productUpdate';
-
+import '../../styles/List.css';
 
 const Order_productItem = ({ order_product, onUpdate, onDelete }) => {
     const [showConfirm, setShowConfirm] = useState(false);
     const [showUpdateModal, setShowUpdateModal] = useState(false);
+    const [products, setProducts] = useState([]);
     const [error, setError] = useState(null);
+    const [displayType, setDisplayType] = useState("straight");
 
+    // Fetch products to resolve product names
+    useEffect(() => {
+        const loadProducts = async () => {
+            try {
+                const data = await fetchProducts();
+                setProducts(data);
+            } catch (err) {
+                console.error('Failed to load products:', err);
+                setError('Failed to load products.');
+            }
+        };
+        loadProducts();
+    }, []);
+
+    // Delete handler
     const handleDelete = async () => {
         try {
             await deleteOrder_product(order_product.id_order, order_product.id_product);
             onDelete(order_product.id_order, order_product.id_product);
             setShowConfirm(false);
-        } catch (error) {
-            console.error('Failed to delete order_product:', error);
+        } catch (err) {
+            console.error('Failed to delete order_product:', err);
+            setError('Failed to delete order_product.');
         }
+    };
+
+    // Resolve product name
+    const getProductName = (idProduct) => {
+        const product = products.find((p) => p.id_product === idProduct);
+        return product ? product.name : 'Unknown Product';
     };
 
     const openUpdateModal = () => {
@@ -28,38 +52,28 @@ const Order_productItem = ({ order_product, onUpdate, onDelete }) => {
         setShowUpdateModal(false);
     };
 
-    const [products, setProducts] = useState([]);
-    const loadProducts = async () => {
-        try {
-            const data = await fetchProducts();
-            setProducts(data);
-        } catch (err) {
-            setError('Failed to load products');
-        }
-    };
-    useEffect(() => {
-        loadProducts();
-    }, []);
-
     return (
         <>
-            <Card className="mb-3">
-                <Card.Body className="d-flex justify-content-between align-items-center">
-                    <div>
-                        <Card.Title>Order ID: {order_product.id_order} Product: {
-                            products.find((product) => product.id_product === order_product.id_product)?.name || 'Unknown Product'
-                        }
-                        </Card.Title>
-                        <Card.Text>Quantity {order_product.quantity}</Card.Text>
+            <Card className={`${displayType}-item-card`}>
+                    <Card.Title>
+                        Order ID: {order_product.id_order} 
+                        <br />
+                        Product: {getProductName(order_product.id_product)}
+                    </Card.Title>
 
+                    {/* Display Quantity */}
+                    <div className="item-texts">
+                        <p>Quantity: {order_product.quantity}</p> {/* Displaying the quantity */}
                     </div>
-                    <div>
+
+                    {/* Action Buttons */}
+                    <div className="item-buttons">
                         <Button variant="warning" className="me-2" onClick={openUpdateModal}>Update</Button>
                         <Button variant="danger" onClick={() => setShowConfirm(true)}>Delete</Button>
                     </div>
-                </Card.Body>
             </Card>
 
+            {/* Confirmation Modal for Deletion */}
             <Modal show={showConfirm} onHide={() => setShowConfirm(false)}>
                 <Modal.Header closeButton>
                     <Modal.Title>Confirm Deletion</Modal.Title>
@@ -67,14 +81,15 @@ const Order_productItem = ({ order_product, onUpdate, onDelete }) => {
                 <Modal.Body>Are you sure you want to delete this order_product?</Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setShowConfirm(false)}>Cancel</Button>
-                    <Button variant="danger" onClick={handleDelete}>Yes, delete</Button>
+                    <Button variant="danger" onClick={handleDelete}>Yes, Delete</Button>
                 </Modal.Footer>
             </Modal>
 
+            {/* Update Modal */}
             <Order_productUpdate
                 order_product={order_product}
                 show={showUpdateModal}
-                onHide={closeUpdateModal}
+                onHide={() => setShowUpdateModal(false)}
                 onUpdate={onUpdate}
             />
         </>

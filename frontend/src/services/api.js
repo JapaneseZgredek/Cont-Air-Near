@@ -25,7 +25,7 @@ export const fetchShips = async () => {
 };
 
 export const createShip = async (ship) => {
-    await verifyRoles(['EMPLOYEE','ADMIN']);
+    await verifyRoles(['EMPLOYEE', 'ADMIN']);
     try {
         console.log("Making POST request to /api/ships with payload:", ship);
         const response = await axios.post(`${API_URL}/api/ships`, ship, {
@@ -44,7 +44,7 @@ export const createShip = async (ship) => {
 
 export const deleteShip = async (ship_id) => {
     try {
-        await verifyRoles(['EMPLOYEE','ADMIN']);
+        await verifyRoles(['EMPLOYEE', 'ADMIN']);
         return await fetchProtectedData(`/api/ships/${ship_id}`, {
             method: 'DELETE',
         });
@@ -55,7 +55,7 @@ export const deleteShip = async (ship_id) => {
 };
 
 export const updateShip = async (ship) => {
-    await verifyRoles(['EMPLOYEE','ADMIN']);
+    await verifyRoles(['EMPLOYEE', 'ADMIN']);
     try {
         console.log("Making PUT request to /api/ships with payload:", ship);
         const response = await axios.put(`${API_URL}/api/ships/${ship.id_ship}`, ship, {
@@ -72,34 +72,46 @@ export const updateShip = async (ship) => {
     }
 };
 
+export const fetchShipImage = async (id_ship) => {
+    const response = await fetch(`${API_URL}/api/ships/image/${id_ship}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch ship image');
+    }
+    // response converted to Blob object
+    const imageBlob = await response.blob();
+    const imageUrl = URL.createObjectURL(imageBlob);
+    return imageUrl;
+  };
+  
+  export const uploadShipImage = async (id_ship, file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await fetch(`${API_URL}/api/ships/image/${id_ship}`, {
+      method: 'POST',
+      body: formData
+    });
+    if (!response.ok) {
+      throw new Error('Failed to upload ship '+id_ship+' image');
+    }
+    const data = await response.json();
+    return data;
+  };
+
 // Operation table related
 export async function fetchOperationsByPort(portId) {
-    await verifyRoles(['EMPLOYEE', 'ADMIN']);
+    await verifyRoles(['EMPLOYEE', 'ADMIN', 'CLIENT']);
     return await fetchProtectedData(`/api/operations/port/${portId}`);
 }
 
 export async function fetchOperationsByShip(shipId) {
-  await verifyRoles(['EMPLOYEE', 'ADMIN']);
-  return await fetchProtectedData(`/api/operations/ship/${shipId}`);
+    await verifyRoles(['EMPLOYEE', 'ADMIN']);
+    return await fetchProtectedData(`/api/operations/ship/${shipId}`);
 }
-
-// export const fetchOperations = async () => {
-//   await verifyRoles(['EMPLOYEE', 'ADMIN']);
-//   return await fetchProtectedData(`/api/operations/`);
-// };
 
 export const fetchOperations = async () => {
   await verifyRoles(['EMPLOYEE', 'ADMIN']);
   return await fetchProtectedData(`/api/operations/`);
 };
-
-// export const createOperation = async (operation) => {
-//   await verifyRoles(['EMPLOYEE', 'ADMIN']);
-//   return await fetchProtectedData(`/api/operations`, {
-//     method: 'POST',
-//     // body: JSON.stringify(operation),
-//   });
-// };
 
 export const createOperation = async (operation) => {
     await verifyRoles(['EMPLOYEE', 'ADMIN']);
@@ -151,12 +163,12 @@ export const updateOperation = async (operation) => {
 // Ports table related
 
 export const fetchPorts = async () => {
-  await verifyRoles(['CLIENT','EMPLOYEE', 'ADMIN']);
+  await verifyRoles(['CLIENT','EMPLOYEE','ADMIN']);
   return await fetchProtectedData(`/api/ports`);
 };
 
 export const createPort = async (port) => {
-    await verifyRoles(['ADMIN']);
+    await verifyRoles(['EMPLOYEE','ADMIN']);
     try {
         console.log("Making POST request to /api/ports with payload:", port);
         const response = await axios.post(`${API_URL}/api/ports`, port, {
@@ -175,8 +187,8 @@ export const createPort = async (port) => {
 
 
 export const deletePort = async (id_port) => {
+    await verifyRoles(['EMPLOYEE','ADMIN']);
     try {
-        await verifyRoles(['ADMIN']);
         return await fetchProtectedData(`/api/ports/${id_port}`, {
             method: 'DELETE',
         });
@@ -187,7 +199,7 @@ export const deletePort = async (id_port) => {
 };
 
 export const updatePort = async (port) => {
-    await verifyRoles(['ADMIN']);
+    await verifyRoles(['EMPLOYEE','ADMIN']);
     try {
         console.log("Making PUT request to /api/ports with payload:", port);
         const response = await axios.put(`${API_URL}/api/ports/${port.id_port}`, port, {
@@ -207,8 +219,8 @@ export const updatePort = async (port) => {
 // Products table related
 
 export async function fetchProductsByPort(portId) {
-  await verifyRoles(['EMPLOYEE', 'ADMIN']); //CLIENT?
-  return await fetchProtectedData(`api/products/port/${portId}`);
+  await verifyRoles(['EMPLOYEE', 'ADMIN', 'CLIENT']);
+  return await fetchProtectedData(`/api/products/port/${portId}`);
 }
 
 // Guest Table product do not add auth
@@ -269,21 +281,63 @@ export const updateProduct = async (product) => {
     }
 };
 
+export const fetchProductImage = async (id_product) => {
+  const response = await fetch(`${API_URL}/api/products/image/${id_product}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch product image');
+  }
+  // response converted to Blob object
+  const imageBlob = await response.blob();
+  const imageUrl = URL.createObjectURL(imageBlob);
+  return imageUrl;
+};
+
+export const uploadProductImage = async (id_product, file) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  const response = await fetch(`${API_URL}/api/products/image/${id_product}`, {
+    method: 'POST',
+    body: formData
+  });
+  if (!response.ok) {
+    throw new Error('Failed to upload product '+id_product+' image');
+  }
+  const data = await response.json();
+  return data;
+};
+
 //Orders table related
 
 export const fetchOrders = async () => {
-    await verifyRoles(['EMPLOYEE', 'ADMIN']);
-    return await fetchProtectedData(`/api/orders`);
+    try {
+        const currentClient = await fetchCurrentClient();
+
+        if (currentClient.role === 'CLIENT') {
+            return await fetchOrdersByClient(currentClient.id_client);
+        }
+
+        await verifyRoles(['EMPLOYEE', 'ADMIN']);
+        return await fetchProtectedData(`/api/orders`);
+    } catch (error) {
+        console.error("Error fetching orders:", error.message);
+        throw error;
+    }
 };
 
+
+//DODAĆ, ŻE CLIENT MOŻE SAM ZFETCHOWAĆ SWÓJ ORDER w podobny sposób jak
+//fetchOrderById
+//verify roles
+//napisac metode podobna do fetch current client tylko taką co fetchuje po id jego produkty i dorobić backend + front
+
 export const fetchOrdersByPort = async (port_id) => {
-    await verifyRoles(['EMPLOYEE', 'ADMIN']);
+    await verifyRoles(['EMPLOYEE', 'ADMIN', 'CLIENT']);
     return await fetchProtectedData(`/api/orders/port/${port_id}`);
 }
 
 
 export const fetchOrdersByClient = async (client_id) => {
-    await verifyRoles(['EMPLOYEE', 'ADMIN']);
+    await verifyRoles(['CLIENT', 'EMPLOYEE', 'ADMIN']);
     return await fetchProtectedData(`/api/orders/client/${client_id}`);
 }
 
@@ -294,7 +348,7 @@ export const fetchOrdersForOwner = async (client_id) => {
 
 
 export const createOrder = async (order) => {
-    await verifyRoles(['EMPLOYEE','ADMIN']);
+    await verifyRoles(['CLIENT','EMPLOYEE','ADMIN']);
     try {
         console.log("Making POST request to /api/orders with payload:", order);
         const response = await axios.post(`${API_URL}/api/orders`, order, {
@@ -341,78 +395,6 @@ export const updateOrder = async (order) => {
     }
 };
 
-export const fetchOrderById = async (id_order) => {
-    await verifyRoles(['EMPLOYEE', 'ADMIN']);
-    return await fetchProtectedData(`/api/orders/${id_order}`);
-};
-
-export const fetchOrderHistoriesByOrder = async (orderId) => {
-    await verifyRoles(['EMPLOYEE', 'ADMIN']);
-    return await fetchProtectedData(`/api/order_histories/order/${orderId}`);
-};
-
-export const fetchOrderHistories = async () => {
-    await verifyRoles(['EMPLOYEE', 'ADMIN']);
-    return await fetchProtectedData(`/api/order_histories`);
-};
-
-export const createOrderHistory = async (orderHistory) => {
-    await verifyRoles(['EMPLOYEE', 'ADMIN']);
-    try {
-        console.log("Making POST request to /api/order_histories with payload:", orderHistory);
-        const response = await axios.post(`${API_URL}/api/order_histories`, orderHistory, {
-            headers: {
-                Authorization: `Bearer ${getAuthToken()}`,
-                'Content-Type': 'application/json',
-            },
-        });
-        console.log("Response from /api/order_histories:", response.data);
-        return response.data;
-    } catch (error) {
-        console.error("Error in createOrderHistory:", error.response?.data || error.message);
-        throw error.response?.data || new Error("Failed to create order history");
-    }
-};
-
-
-export const deleteOrderHistory = async (id_history) => {
-    try {
-        await verifyRoles(['EMPLOYEE', 'ADMIN']);
-        console.log(`Attempting to delete order history with ID: ${id_history}`);
-        return await fetchProtectedData(`/api/order_histories/${id_history}`, {
-            method: 'DELETE',
-        });
-    } catch (error) {
-        console.error("Error in deleteOrderHistory:", error.response?.data || error.message);
-        throw error.response?.data || new Error(`Failed to delete order history with ID: ${id_history}`);
-    }
-};
-
-
-export const updateOrderHistory = async (orderHistory) => {
-    await verifyRoles(['EMPLOYEE', 'ADMIN']);
-    try {
-        console.log("Making PUT request to /api/order_histories with payload:", orderHistory);
-        const response = await axios.put(`${API_URL}/api/order_histories/${orderHistory.id_history}`, orderHistory, {
-            headers: {
-                Authorization: `Bearer ${getAuthToken()}`,
-                'Content-Type': 'application/json',
-            },
-        });
-        console.log("Response from /api/order_histories:", response.data);
-        return response.data;
-    } catch (error) {
-        console.error("Error in updateOrderHistory:", error.response?.data || error.message);
-        throw error.response?.data || new Error("Failed to update order history");
-    }
-};
-
-
-export const fetchOrderHistoryById = async (id_history) => {
-        await verifyRoles(['EMPLOYEE', 'ADMIN']);
-        return await fetchProtectedData(`/api/order_histories/${id_history}`);
-};
-
 // Orders_products table related
 
 export const fetchOrders_products = async () => {
@@ -421,7 +403,7 @@ export const fetchOrders_products = async () => {
 };
 
 export const fetchOrders_productsByOrder = async (order_id) => {
-    await verifyRoles(['EMPLOYEE', 'ADMIN']);
+    await verifyRoles(['CLIENT', 'EMPLOYEE', 'ADMIN']);
     try {
         console.log(`Making GET request to /api/orders_products/order/${order_id}`);
         const response = await axios.get(`${API_URL}/api/orders_products/order/${order_id}`, {
@@ -458,7 +440,7 @@ export const fetchOrders_productsByProduct = async (product_id) => {
 
 
 export const createOrder_product = async (order_product) => {
-    await verifyRoles(['EMPLOYEE', 'ADMIN']);
+    await verifyRoles(['CLIENT', 'EMPLOYEE', 'ADMIN']);
     try {
         console.log("Making POST request to /api/orders_products with payload:", order_product);
         const response = await axios.post(`${API_URL}/api/orders_products`, order_product, {
@@ -548,9 +530,23 @@ export const fetchOrders_productsByProduct_zapas = async (product_id) => {
     }
 };
 
+export const fetchExcludedProducts = async () => {
+  try {
+    console.log("Making GET request to /api/products/exclude");
+    const response = await axios.get(`${API_URL}/api/products/exclude`, {
+      headers: authHeaders(),
+    });
+    console.log("Response from /api/products/exclude:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error in fetchExcludedProducts:", error.response?.data || error.message);
+    throw error.response?.data || new Error("Failed to fetch excluded products");
+  }
+};
+
 export const fetchClients = async () => {
     try {
-        await verifyRoles(['ADMIN']);
+        await verifyRoles(['CLIENT', 'EMPLOYEE' ,'ADMIN']);
         return await fetchProtectedData(`/api/clients`);
     } catch (error) {
         console.error("Role verification failed:", error.message);
@@ -622,63 +618,6 @@ export const registerClient = async (clientData) => {
   return response.data;
 };
 
-// Role Verification
-
-// export const verifyRole = async (requiredRole) => {
-//   const token = getAuthToken();
-//   if (!token) {
-//     throw new Error('Authentication token not found');
-//   }
-//
-//   try {
-//     const response = await axios.get(`${API_URL}/api/users/me`, {
-//       headers: {
-//         Authorization: `Bearer ${token}`,
-//       },
-//     });
-//
-//     const { role } = response.data; // Assuming role is returned by the API
-//     if (role !== requiredRole) {
-//         throw new Error(`Insufficient permissions. Required role: ${requiredRole}`);
-//     }
-//
-//     return true;
-//   } catch (error) {
-//     console.error('Role verification failed:', error);
-//     throw error;
-//   }
-// };
-
-// export const fetchCurrentClient = async () => {
-//   const token = localStorage.getItem('token');
-//   if (!token) {
-//     console.error("Authentication token not found in localStorage.");
-//     throw new Error("Authentication required. Please log in.");
-//   }
-//
-//   try {
-//     const response = await axios.get(`${API_URL}/api/clients/me`, {
-//       headers: {
-//         Authorization: `Bearer ${token}`,
-//         'Content-Type': 'application/json',
-//       },
-//     });
-//     console.log("Client details fetched:", response.data);
-//     return response.data;
-//   } catch (error) {
-//     if (error.response?.status === 404) {
-//       console.warn("/api/clients/me endpoint not found. Falling back to localStorage.");
-//       const role = localStorage.getItem('role');
-//       if (!role) {
-//         throw new Error("Role information is missing. Please log in.");
-//       }
-//       return { role };
-//     }
-//     console.error("Error fetching current client details:", error.message);
-//     throw error;
-//   }
-// };
-
 export const fetchCurrentClient = async () => {
   const token = localStorage.getItem('token');
   if (!token) {
@@ -721,23 +660,6 @@ export const verifyRoles = async (requiredRoles) => {
     throw error;
   }
 };
-
-
-
-
-// const fetchProtectedData = async (endpoint, options = {}) => {
-//   const token = getAuthToken();
-//   const response = await axios(`${API_URL}${endpoint}`, {
-//     ...options,
-//     headers: {
-//       Authorization: `Bearer ${token}`,
-//       'Content-Type': 'application/json',
-//       ...options.headers,
-//     },
-//   });
-//
-//   return response.data;
-// };
 
 const fetchProtectedData = async (endpoint, options = {}) => {
   const token = localStorage.getItem('token'); // Token retrieval logic

@@ -4,11 +4,13 @@ import { deleteClient } from '../../services/api';
 import UpdateClient from "./UpdateClient";
 import OrdersButton from "../Order/OrdersButton";
 import GenericDetailModal from "../GenericDetailModal";
+import '../../styles/List.css';
 
 const ClientItem = ({ client, onUpdate, onDelete }) => {
     const [showConfirm, setShowConfirm] = useState(false);
     const [showUpdatedModal, setShowUpdateModal] = useState(false);
     const [showDetailModal, setShowDetailModal] = useState(false);
+    const [displayType, setDisplayType] = useState("straight");
 
     const handleDelete = async () => {
         try {
@@ -30,26 +32,28 @@ const ClientItem = ({ client, onUpdate, onDelete }) => {
 
     return (
         <>
-        <Card className="mb-3">
-            <Card.Body className="d-flex justify-content-between align-items-center">
-                <div>
-                    <Card.Title
-                        className="clickable"
-                        onClick={() => setShowDetailModal(true)}
-                        style={{ cursor: 'pointer', textDecoration: 'underline' }}
-                    >
-                        {client.name}
-                    </Card.Title>
-                    <Card.Text>Address: {client.address}</Card.Text>
-                    <Card.Text>Telephone number: {client.telephone_number}</Card.Text>
-                    <Card.Text>Email: {client.email}</Card.Text>
+        <Card className={`${displayType}-item-card`}>
+                <Card.Title
+                    className="clickable"
+                    onClick={() => setShowDetailModal(true)}
+                    style={{ cursor: 'pointer', textDecoration: 'underline' }}
+                >
+                    {client.name}
+                </Card.Title>
+
+                {/* Kontener dla tekstów */}
+                <div className="item-texts">
+                    <a>Address: {client.address}</a>
+                    <a>Telephone number: {client.telephone_number}</a>
+                    <a>Email: {client.email}</a>
                 </div>
-                <div>
+
+                {/* Kontener dla przycisków */}
+                <div className="item-buttons">
                     <OrdersButton clientId={client.id_client} clientName={client.name} />
                     <Button variant="warning" className="me-2" onClick={openUpdateModal}>Update</Button>
                     <Button variant="danger" onClick={() => setShowConfirm(true)}>Delete</Button>
                 </div>
-            </Card.Body>
         </Card>
 
         <Modal show={showConfirm} onHide={() => setShowConfirm(false)}>

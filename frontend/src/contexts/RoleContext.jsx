@@ -9,7 +9,6 @@ export const RoleContext = createContext({
 
 export const RoleProvider = ({ children }) => {
   const [role, setRole] = useState(null);
-
   // Fetch role initially or when needed
   const fetchRole = async () => {
     try {

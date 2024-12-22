@@ -10,23 +10,41 @@ const AddPort = ({ onAdd }) => {
     const [error, setError] = useState(null);
     const [validationErrors, setValidationErrors] = useState({});
 
+    // Validation logic to ensure no field exceeds 32 characters
     const validateInputs = () => {
         const errors = {};
 
-        if (!name.trim()) errors.name = "Port Name is required.";
-        if (!location.trim()) errors.location = "Location is required";
-        if (!country.trim()) errors.country = "Country is required";
+        if (!name.trim()) {
+            errors.name = "Port Name is required.";
+        } else if (name.length > 32) {
+            errors.name = "Port Name cannot exceed 32 characters.";
+        }
+
+        if (!location.trim()) {
+            errors.location = "Location is required.";
+        } else if (location.length > 32) {
+            errors.location = "Location cannot exceed 32 characters.";
+        }
+
+        if (!country.trim()) {
+            errors.country = "Country is required.";
+        } else if (country.length > 32) {
+            errors.country = "Country cannot exceed 32 characters.";
+        }
 
         return errors;
-    }
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // Run validation checks
         const errors = validateInputs();
         if (Object.keys(errors).length > 0) {
             setValidationErrors(errors);
             return;
         }
+
         try {
             const newPort = await createPort({
                 name,
@@ -52,7 +70,7 @@ const AddPort = ({ onAdd }) => {
                     <Modal.Title>Add New Port</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    {error && <p style={{ color: 'red' }}>{error}</p>}
+                    {error && <p className="err-field">{"Err: "+error}</p>}
                     <Form onSubmit={handleSubmit}>
                         <Form.Group className="mb-3">
                             <Form.Label>Port Name</Form.Label>
@@ -67,6 +85,7 @@ const AddPort = ({ onAdd }) => {
                                 {validationErrors.name}
                             </Form.Control.Feedback>
                         </Form.Group>
+
                         <Form.Group className="mb-3">
                             <Form.Label>Location</Form.Label>
                             <Form.Control
@@ -80,6 +99,7 @@ const AddPort = ({ onAdd }) => {
                                 {validationErrors.location}
                             </Form.Control.Feedback>
                         </Form.Group>
+
                         <Form.Group className="mb-3">
                             <Form.Label>Country</Form.Label>
                             <Form.Control
@@ -93,6 +113,7 @@ const AddPort = ({ onAdd }) => {
                                 {validationErrors.country}
                             </Form.Control.Feedback>
                         </Form.Group>
+
                         <Button variant="success" type="submit">Add Port</Button>
                     </Form>
                 </Modal.Body>

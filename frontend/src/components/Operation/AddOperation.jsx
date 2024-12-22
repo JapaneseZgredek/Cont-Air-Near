@@ -3,6 +3,7 @@ import { Button, Form, Modal } from 'react-bootstrap';
 import { createOperation } from "../../services/api"; //
 import { fetchShips } from '../../services/api';
 import { fetchPorts } from '../../services/api';
+import { fetchOrders } from "../../services/api";
 
 const AddOperation = ({ onAdd }) => {
     const [show, setShow] = useState(false);
@@ -11,6 +12,7 @@ const AddOperation = ({ onAdd }) => {
     const [dateOfOperation, setDateOfOperation] = useState('');
     const [idShip, setIdShip] = useState('');
     const [idPort, setIdPort] = useState('');
+    const [idOrder, setIdOrder] = useState('');
     const [error, setError] = useState(null);
     const [validationErrors, setValidationErrors] = useState({});
 
@@ -20,22 +22,23 @@ const AddOperation = ({ onAdd }) => {
         if (!nameOfOperation.trim()) errors.nameOfOperation = "Operation name is required";
         if (!idShip) errors.idShip = "You must select a ship.";
         if (!idPort) errors.idPort = "You must select a port.";
+        if (!idOrder) errors.idOrder = "You must select an order.";
         if (!dateOfOperation) errors.dateOfOperation = "Date of operation is required.";
 
         return errors;
-    }
+    };
 
-const handleSubmit = async (e) => {
-    e.preventDefault();
+    const handleSubmit = async (e) => {
+        e.preventDefault();
 
-    // Prevent double Submit
-    if (error) return;
+        // Prevent double Submit
+        if (error) return;
 
-    const errors = validateInputs();
-    if (Object.keys(errors).length > 0) {
-        setValidationErrors(errors);
-        return;
-    }
+        const errors = validateInputs();
+        if (Object.keys(errors).length > 0) {
+            setValidationErrors(errors);
+            return;
+        }
 
     try {
         setError(null); // Clear previous errors
@@ -47,6 +50,7 @@ const handleSubmit = async (e) => {
             date_of_operation: dateOfOperation,
             id_ship: parseInt(idShip),
             id_port: parseInt(idPort),
+            id_order: parseInt(idOrder),
         });
         console.log("Operation created:", newOperation);
         onAdd(newOperation);
@@ -58,10 +62,19 @@ const handleSubmit = async (e) => {
     }
 };
 
+    const resetForm = () => {
+        setNameOfOperation('');
+        setOperationType('AT_BAY');
+        setDateOfOperation('');
+        setIdShip('');
+        setIdPort('');
+    };
 
-    //for ships/ports dropdown list
+    // For ships/ports dropdown list
     const [ships, setShips] = useState([]);
     const [ports, setPorts] = useState([]);
+    const [orders, setOrders] = useState([]);
+
     const loadShips = async () => {
         try {
             const data = await fetchShips();
@@ -78,9 +91,19 @@ const handleSubmit = async (e) => {
             setError('Failed to load ports');
         }
     };
+    const loadOrders = async() => {
+        try {
+            const data = await fetchOrders();
+            setOrders(data);
+        } catch (err) {
+            setError('Failed to load orders');
+        }
+    };
+
     useEffect(() => {
         loadShips();
         loadPorts();
+        loadOrders();
     }, []);
 
     return (
@@ -91,7 +114,7 @@ const handleSubmit = async (e) => {
                     <Modal.Title>Add New Operation</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    {error && <p style={{ color: 'red' }}>{error}</p>}
+                    {error && <p className="err-field">{"Err: "+error}</p>}
                     <Form onSubmit={handleSubmit}>
                         <Form.Group className="mb-3">
                             <Form.Label>Operation Name</Form.Label>
@@ -109,25 +132,25 @@ const handleSubmit = async (e) => {
 
                         <Form.Group className="mb-3">
                             <Form.Label>Operation Type</Form.Label>
-                                <Form.Select
-                                  value={operationType}
-                                  onChange={(e) => setOperationType(e.target.value)}
-                                >
-                                  <option value="AT_BAY">At Bay</option>
-                                  <option value="TRANSPORT">Transport</option>
-                                  <option value="TRANSFER">Transfer</option>
-                                  <option value="DEPARTURE">Departure</option>
-                                  <option value="ARRIVAL">Arrival</option>
-                                  <option value="CARGO_LOADING">Cargo Loading</option>
-                                  <option value="CARGO_DISCHARGE">Cargo Discharge</option>
-                                </Form.Select>
+                            <Form.Select
+                                value={operationType}
+                                onChange={(e) => setOperationType(e.target.value)}
+                            >
+                                <option value="AT_BAY">At Bay</option>
+                                <option value="TRANSPORT">Transport</option>
+                                <option value="TRANSFER">Transfer</option>
+                                <option value="DEPARTURE">Departure</option>
+                                <option value="ARRIVAL">Arrival</option>
+                                <option value="CARGO_LOADING">Cargo Loading</option>
+                                <option value="CARGO_DISCHARGE">Cargo Discharge</option>
+                            </Form.Select>
                         </Form.Group>
 
                         <Form.Group className="mb-3">
                             <Form.Label>Date of Operation</Form.Label>
                             <Form.Control
                                 type="datetime-local"
-                                value={dateOfOperation || new Date().toISOString().slice(0, 16)}
+                                value={dateOfOperation}
                                 onChange={(e) => setDateOfOperation(e.target.value)}
                                 isInvalid={!!validationErrors.dateOfOperation}
                             />
@@ -153,7 +176,6 @@ const handleSubmit = async (e) => {
                             </Form.Control.Feedback>
                         </Form.Group>
 
-
                         <Form.Group className="mb-3">
                             <Form.Label>Port</Form.Label>
                             <Form.Select
@@ -169,7 +191,24 @@ const handleSubmit = async (e) => {
                             <Form.Control.Feedback type="invalid">
                                 {validationErrors.idPort}
                             </Form.Control.Feedback>
-                         </Form.Group>
+                        </Form.Group>
+
+                        <Form.Group className="mb-3">
+                            <Form.Label>Order</Form.Label>
+                            <Form.Select
+                                value={idOrder}
+                                onChange={(e) => setIdOrder(e.target.value)}
+                                isInvalid={!!validationErrors.idOrder}
+                            >
+                                <option value="">Select Order</option>
+                                {orders.map((order) => (
+                                    <option key={order.id_order} value={order.id_order}>Order #{order.id_order}</option>
+                                ))}
+                            </Form.Select>
+                            <Form.Control.Feedback type="invalid">
+                                {validationErrors.idOrder}
+                            </Form.Control.Feedback>
+                        </Form.Group>
 
                         <Button variant="success" type="submit">Add Operation</Button>
                     </Form>
