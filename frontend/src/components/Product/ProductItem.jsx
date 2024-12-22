@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Card, Button, Modal } from 'react-bootstrap';
 import { deleteProduct, fetchPorts, fetchProductImage } from '../../services/api';
 import UpdateProduct from "./UpdateProduct";
 import GenericDetailModal from "../GenericDetailModal";
 import '../../styles/List.css';
+import { RoleContext } from '../../contexts/RoleContext';
 
 const ProductItem = ({ product, onUpdate, onDelete, onAddToCart }) => {
     const [showConfirm, setShowConfirm] = useState(false);
@@ -11,6 +12,8 @@ const ProductItem = ({ product, onUpdate, onDelete, onAddToCart }) => {
     const [imageUrl, setImageUrl] = useState(null);
     const [loadingImage, setLoadingImage] = useState(true);
     const [showDetailModal, setShowDetailModal] = useState(false);
+    const [displayType, setDisplayType] = useState("grid");
+    const { role } = useContext(RoleContext);
     const [portName, setPortName] = useState('');
     const [error, setError] = useState('');
 
@@ -90,45 +93,45 @@ const ProductItem = ({ product, onUpdate, onDelete, onAddToCart }) => {
 
     return (
         <>
-            <Card className="grid-item-card">
-                <Card.Title
-                    className="clickable"
-                    onClick={() => setShowDetailModal(true)}
-                    style={{ cursor: 'pointer', textDecoration: 'underline' }}
-                >
-                    {product.name}
-                </Card.Title>
+            <Card className={`${displayType}-item-card`}>
+                    <Card.Title
+                            className="clickable"
+                            onClick={() => setShowDetailModal(true)}
+                            style={{ cursor: 'pointer', textDecoration: 'underline' }}
+                        >
+                            {product.name}
+                        </Card.Title>
+                    {/* Kontener dla tekstów */}
+                    <div className="item-texts">
+                        <a>Price: {product.price}</a>
+                        <a>Weight: {product.weight}</a>
+                        <a>Port ID: {product.id_port}</a>
+                    </div>
 
-                {/* Container for texts */}
-                <div className="item-texts">
-                    <a>Price: {product.price}</a>
-                    <a>Weight: {product.weight}</a>
-                    <a>Port: {portName || 'Loading...'}</a>
-                </div>
+                    {/* Obrazek */}
+                    <div>
+                        {loadingImage ? (
+                            <div className="loading-message">Loading image...</div>
+                        ) : imageUrl ? (
+                            <img 
+                                className="item-image" 
+                                src={imageUrl} 
+                                alt={`Product_${product.id_product}`} 
+                            />
+                        ) : (
+                            <div className="missing-image">Missing image</div>
+                        )}
+                    </div>
 
-                {/* Image */}
-                <div>
-                    {loadingImage ? (
-                        <div className="loading-message">Loading image...</div>
-                    ) : imageUrl ? (
-                        <img 
-                            className="item-image" 
-                            src={imageUrl} 
-                            alt={`Product_${product.id_product}`} 
-                        />
-                    ) : (
-                        <div className="missing-image">Missing image</div>
-                    )}
-                </div>
+                    {/* Kontener dla przycisków */}
+                    <div className="item-buttons">
+                        {(['EMPLOYEE','ADMIN'].includes(role)) && (<>
+                        <Order_productButton productId={product.id_product} productName={product.name} />
+                        <Button variant="warning" onClick={openUpdateModal}>Update</Button>
+                        <Button variant="danger" onClick={() => setShowConfirm(true)}>Delete</Button>
+                        </>)}
+                    </div>
 
-                {/* Container for buttons */}
-                <div className="item-buttons">
-                    <Button variant="outline-success" className="me-2" onClick={handleAddToCart}>Add to Cart</Button>
-                    {/* Hide Show Products button */}
-                    {/* <Order_productButton productId={product.id_product} productName={product.name} /> */}
-                    <Button variant="warning" onClick={openUpdateModal}>Update</Button>
-                    <Button variant="danger" onClick={() => setShowConfirm(true)}>Delete</Button>
-                </div>
             </Card>
 
             <Modal show={showConfirm} onHide={() => setShowConfirm(false)}>

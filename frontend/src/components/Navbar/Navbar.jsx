@@ -28,27 +28,32 @@ const NavbarComponent = () => {
 
     const roleLinks = {
       ADMIN: [
-        { path: '/products', label: 'Products' },
-        { path: '/ships', label: 'Ships' },
-        { path: '/operations', label: 'Operations' },
-        { path: '/ports', label: 'Ports' },
-        { path: '/orders', label: 'Orders' },
-        { path: '/order_products', label: 'Order Products' },
-        { path: '/clients', label: 'Clients' },
-        { path: '/cart', label: <FaShoppingCart /> }, // Replaced Cart text with cart icon
+          { path: '/products', label: 'Products' },
+          { path: '/ships', label: 'Ships' },
+          { path: '/operations', label: 'Operations' },
+          { path: '/ports', label: 'Ports' },
+          { path: '/orders', label: 'Orders' },
+          { path: '/order_products', label: 'Order Products' },
+          { path: '/clients', label: 'Clients' },
+          { path: '/user_panel', label: 'User Panel' },
+          { path: '/cart', label: <FaShoppingCart /> }, 
       ],
       EMPLOYEE: [
-        { path: '/ships', label: 'Ships' },
-        { path: '/operations', label: 'Operations' },
-        { path: '/ports', label: 'Ports' },
-        { path: '/orders', label: 'Orders' },
-        { path: '/cart', label: <FaShoppingCart /> }, // Replaced Cart text with cart icon
+          { path: '/ships', label: 'Ships' },
+          { path: '/operations', label: 'Operations' },
+          { path: '/ports', label: 'Ports' },
+          { path: '/orders', label: 'Orders' },
+          { path: '/order_products', label: 'Order Products' },
+          { path: '/products', label: 'Products' },
+          { path: '/user_panel', label: 'User Panel' },
+          { path: '/cart', label: <FaShoppingCart /> }, 
       ],
       CLIENT: [
-        { path: '/ports', label: 'Ports' },
-        { path: '/orders', label: 'Orders' },
-        { path: '/products', label: 'Products' },
-        { path: '/cart', label: <FaShoppingCart /> }, // Replaced Cart text with cart icon
+          { path: '/ports', label: 'Ports' },
+          { path: '/orders', label: 'Orders' },
+          { path: '/products', label: 'Products' },
+          { path: '/user_panel', label: 'User Panel' },
+          { path: '/cart', label: <FaShoppingCart /> }, 
       ],
     };
 

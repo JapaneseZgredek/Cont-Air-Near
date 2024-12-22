@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import PortItem from './PortItem';
 import AddPort from './AddPort';
 import { fetchPorts } from '../../services/api';
 import { Container, Pagination, Dropdown } from 'react-bootstrap';
 import '../../styles/List.css';
 import SearchAndFilterBar from '../SearchAndFilterBar';
+import { RoleContext } from '../../contexts/RoleContext';
 
 const PortList = () => {
     const [ports, setPorts] = useState([]);
@@ -13,6 +14,7 @@ const PortList = () => {
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
+    const { role } = useContext(RoleContext);
 
     // Load ports from API
     const loadPorts = async () => {
@@ -100,7 +102,9 @@ const PortList = () => {
         <Container>
             <div className="d-flex justify-content-between mb-3">
                 <h2>Ports</h2>
+                {(['EMPLOYEE','ADMIN'].includes(role)) && (
                 <AddPort onAdd={handleAddPort} />
+                )}
             </div>
             <hr className="divider" /> {/*linia podzialu*/}
 

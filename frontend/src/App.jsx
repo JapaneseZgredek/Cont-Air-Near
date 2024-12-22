@@ -14,6 +14,7 @@ import PortPage from './pages/PortPage';
 import ClientPage from './pages/ClientPage';
 import OrderPage from './pages/OrderPage';
 import Order_productPage from './pages/Order_productPage';
+import UserPanelPage from './pages/UserPanelPage';
 
 import { RoleProvider } from "./contexts/RoleContext";
 import Cart from "./components/Cart/Cart";
@@ -93,7 +94,6 @@ const App = () => {
             element={
               // <ProtectedRoute requiredRoles={['CLIENT', 'EMPLOYEE', 'ADMIN']}>
                 <ProtectedRoute requiredRoles={['EMPLOYEE', 'ADMIN']}>
-                    {/*//bez clienta chyba co?*/}
                 <Order_productPage />
               </ProtectedRoute>
             }
@@ -107,7 +107,16 @@ const App = () => {
               </ProtectedRoute>
             }
           />
-            <Route path="/cart" element={<Cart />} />
+
+          <Route
+            path="/user_panel"
+            element={
+              <ProtectedRoute requiredRoles={['CLIENT', 'EMPLOYEE', 'ADMIN']}>
+                <UserPanelPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/cart" element={<Cart />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </Router>

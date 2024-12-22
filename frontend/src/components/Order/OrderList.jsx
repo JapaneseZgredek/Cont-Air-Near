@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import OrderItem from './OrderItem';
 import OrderAdd from './OrderAdd';
 import { fetchOrders, fetchCurrentClient, fetchOrdersForOwner } from '../../services/api';
 import { Container, Pagination, Dropdown } from 'react-bootstrap';
 import SearchAndFilterBar from '../SearchAndFilterBar';
 import '../../styles/List.css';
+import { RoleContext } from '../../contexts/RoleContext';
 
 const OrderList = () => {
     const [orders, setOrders] = useState([]);
@@ -14,6 +15,7 @@ const OrderList = () => {
     const [displayType, setDisplayType] = useState('straight');
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
+    const { role } = useContext(RoleContext);
 
     // Fetch orders based on the role
     const loadOrders = async () => {
@@ -97,7 +99,13 @@ const OrderList = () => {
         <Container>
             <div className="d-flex justify-content-between mb-3">
                 <h2>Orders</h2>
-                <OrderAdd onAdd={handleAddOrder} />
+                {(['ADMIN'].includes(role)) && (
+                <OrderAdd onAdd={(newOrder) => setOrders(prev => [...prev, newOrder])} />
+                )}
+
+                {/*<h2>Order List</h2>*/}
+                {/*<OrderAdd onAdd={handleAddOrder} />*/}
+
             </div>
             <hr className="divider" />
 

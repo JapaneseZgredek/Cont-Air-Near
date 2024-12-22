@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Card, Button, Modal } from 'react-bootstrap';
 import { deleteOrder_product } from '../../services/api';
 import { fetchProducts } from '../../services/api';
 import Order_productUpdate from './Order_productUpdate';
 import '../../styles/List.css';
+import { RoleContext } from '../../contexts/RoleContext';
 
 const Order_productItem = ({ order_product, onUpdate, onDelete }) => {
     const [showConfirm, setShowConfirm] = useState(false);
@@ -11,6 +12,7 @@ const Order_productItem = ({ order_product, onUpdate, onDelete }) => {
     const [products, setProducts] = useState([]);
     const [error, setError] = useState(null);
     const [displayType, setDisplayType] = useState("straight");
+    const { role } = useContext(RoleContext);    
 
     // Fetch products to resolve product names
     useEffect(() => {
@@ -66,11 +68,13 @@ const Order_productItem = ({ order_product, onUpdate, onDelete }) => {
                         <p>Quantity: {order_product.quantity}</p> {/* Displaying the quantity */}
                     </div>
 
-                    {/* Action Buttons */}
+                    {/* Kontener dla przycisków */}
+                    {(['ADMIN'].includes(role)) && (
                     <div className="item-buttons">
                         <Button variant="warning" className="me-2" onClick={openUpdateModal}>Update</Button>
                         <Button variant="danger" onClick={() => setShowConfirm(true)}>Delete</Button>
                     </div>
+                    )}
             </Card>
 
             {/* Confirmation Modal for Deletion */}
