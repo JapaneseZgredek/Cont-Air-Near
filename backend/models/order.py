@@ -22,6 +22,7 @@ class Order(Base):
     port = relationship("Port", back_populates="orders")
     client = relationship("Client", back_populates="orders")
 
+    operations = relationship("Operation", back_populates="order")
     order_products = relationship("Order_product", back_populates="order")
 
     # Placeholder for total price calculation

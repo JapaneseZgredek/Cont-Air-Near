@@ -16,11 +16,12 @@ const PortList = () => {
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const { role } = useContext(RoleContext);
 
+    // Load ports from API
     const loadPorts = async () => {
         try {
             const data = await fetchPorts();
             setPorts(data);
-            setFilteredPorts(data);
+            setFilteredPorts(data); // Initially set filtered list as all ports
         } catch (err) {
             setError('Failed to load ports');
         }
@@ -30,11 +31,13 @@ const PortList = () => {
         loadPorts();
     }, []);
 
+    // Handle the addition of a new port
     const handleAddPort = (newPort) => {
         setPorts((prevPorts) => [...prevPorts, newPort]);
         setFilteredPorts((prevPorts) => [...prevPorts, newPort]);
     };
 
+    // Handle the update of an existing port
     const handleUpdatePort = (updatedPort) => {
         setPorts((prevPorts) =>
             prevPorts.map((port) =>
@@ -48,22 +51,26 @@ const PortList = () => {
         );
     };
 
+    // Handle the deletion of a port
     const handleDeletePort = (id) => {
         setPorts((prevPorts) => prevPorts.filter((port) => port.id_port !== id));
         setFilteredPorts((prevPorts) => prevPorts.filter((port) => port.id_port !== id));
     };
 
+    // Handle search functionality based on search term
     const handleSearch = (searchTerm) => {
         if (!searchTerm) {
-            setFilteredPorts(ports);
+            setFilteredPorts(ports); // If no search term, show all ports
         } else if (searchInColumn) {
-            const filtered = ports.filter(port =>
+            // Filter based on selected column
+            const filtered = ports.filter((port) =>
                 port[searchInColumn] && port[searchInColumn].toString().toLowerCase().includes(searchTerm.toLowerCase())
             );
             setFilteredPorts(filtered);
         } else {
-            const filtered = ports.filter(port =>
-                Object.values(port).some(value =>
+            // Filter through all columns
+            const filtered = ports.filter((port) =>
+                Object.values(port).some((value) =>
                     value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
                 )
             );
@@ -71,6 +78,7 @@ const PortList = () => {
         }
     };
 
+    // Handle the column selection for search
     const handleSearchInChange = (column) => {
         setSearchInColumn(column);
     };
@@ -104,7 +112,7 @@ const PortList = () => {
                 onSearch={handleSearch}
                 onSearchInChange={handleSearchInChange}
                 onSortChange={() => {}}
-                filterOptions={['name', 'location', 'country']}
+                filterOptions={['name', 'location', 'country']} // Filtering options
             />
 
             <div className='pagination-container'>

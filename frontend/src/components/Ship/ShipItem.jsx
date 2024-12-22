@@ -65,7 +65,7 @@ const ShipItem = ({ ship, onUpdate, onDelete }) => {
 
                 {/* Kontener dla tekstów */}
                 <div className="item-texts">    
-                    <a>Capacity: {ship.capacity}</a>
+                    <a></a>
                 </div>
 
                 {/* Obrazek */}

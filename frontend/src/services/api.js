@@ -25,7 +25,7 @@ export const fetchShips = async () => {
 };
 
 export const createShip = async (ship) => {
-    await verifyRoles(['ADMIN']);
+    await verifyRoles(['EMPLOYEE', 'ADMIN']);
     try {
         console.log("Making POST request to /api/ships with payload:", ship);
         const response = await axios.post(`${API_URL}/api/ships`, ship, {
@@ -44,7 +44,7 @@ export const createShip = async (ship) => {
 
 export const deleteShip = async (ship_id) => {
     try {
-        await verifyRoles(['ADMIN']);
+        await verifyRoles(['EMPLOYEE', 'ADMIN']);
         return await fetchProtectedData(`/api/ships/${ship_id}`, {
             method: 'DELETE',
         });
@@ -55,7 +55,7 @@ export const deleteShip = async (ship_id) => {
 };
 
 export const updateShip = async (ship) => {
-    await verifyRoles(['ADMIN']);
+    await verifyRoles(['EMPLOYEE', 'ADMIN']);
     try {
         console.log("Making PUT request to /api/ships with payload:", ship);
         const response = await axios.put(`${API_URL}/api/ships/${ship.id_ship}`, ship, {
@@ -99,7 +99,7 @@ export const fetchShipImage = async (id_ship) => {
 
 // Operation table related
 export async function fetchOperationsByPort(portId) {
-    await verifyRoles(['EMPLOYEE', 'ADMIN']);
+    await verifyRoles(['EMPLOYEE', 'ADMIN', 'CLIENT']);
     return await fetchProtectedData(`/api/operations/port/${portId}`);
 }
 
@@ -219,7 +219,7 @@ export const updatePort = async (port) => {
 // Products table related
 
 export async function fetchProductsByPort(portId) {
-  await verifyRoles(['EMPLOYEE', 'ADMIN']); //CLIENT?
+  await verifyRoles(['EMPLOYEE', 'ADMIN', 'CLIENT']);
   return await fetchProtectedData(`/api/products/port/${portId}`);
 }
 
@@ -309,9 +309,21 @@ export const uploadProductImage = async (id_product, file) => {
 //Orders table related
 
 export const fetchOrders = async () => {
-    await verifyRoles(['EMPLOYEE', 'ADMIN']);
-    return await fetchProtectedData(`/api/orders`);
+    try {
+        const currentClient = await fetchCurrentClient();
+
+        if (currentClient.role === 'CLIENT') {
+            return await fetchOrdersByClient(currentClient.id_client);
+        }
+
+        await verifyRoles(['EMPLOYEE', 'ADMIN']);
+        return await fetchProtectedData(`/api/orders`);
+    } catch (error) {
+        console.error("Error fetching orders:", error.message);
+        throw error;
+    }
 };
+
 
 //DODAĆ, ŻE CLIENT MOŻE SAM ZFETCHOWAĆ SWÓJ ORDER w podobny sposób jak
 //fetchOrderById
@@ -319,19 +331,24 @@ export const fetchOrders = async () => {
 //napisac metode podobna do fetch current client tylko taką co fetchuje po id jego produkty i dorobić backend + front
 
 export const fetchOrdersByPort = async (port_id) => {
-    await verifyRoles(['EMPLOYEE', 'ADMIN']);
+    await verifyRoles(['EMPLOYEE', 'ADMIN', 'CLIENT']);
     return await fetchProtectedData(`/api/orders/port/${port_id}`);
 }
 
 
 export const fetchOrdersByClient = async (client_id) => {
-    await verifyRoles(['EMPLOYEE', 'ADMIN']);
+    await verifyRoles(['CLIENT', 'EMPLOYEE', 'ADMIN']);
+    return await fetchProtectedData(`/api/orders/client/${client_id}`);
+}
+
+export const fetchOrdersForOwner = async (client_id) => {
+    await verifyRoles(['CLIENT']);
     return await fetchProtectedData(`/api/orders/client/${client_id}`);
 }
 
 
 export const createOrder = async (order) => {
-    await verifyRoles(['EMPLOYEE','ADMIN']);
+    await verifyRoles(['CLIENT','EMPLOYEE','ADMIN']);
     try {
         console.log("Making POST request to /api/orders with payload:", order);
         const response = await axios.post(`${API_URL}/api/orders`, order, {
@@ -386,7 +403,7 @@ export const fetchOrders_products = async () => {
 };
 
 export const fetchOrders_productsByOrder = async (order_id) => {
-    await verifyRoles(['EMPLOYEE', 'ADMIN']);
+    await verifyRoles(['CLIENT', 'EMPLOYEE', 'ADMIN']);
     try {
         console.log(`Making GET request to /api/orders_products/order/${order_id}`);
         const response = await axios.get(`${API_URL}/api/orders_products/order/${order_id}`, {
@@ -423,7 +440,7 @@ export const fetchOrders_productsByProduct = async (product_id) => {
 
 
 export const createOrder_product = async (order_product) => {
-    await verifyRoles(['EMPLOYEE', 'ADMIN']);
+    await verifyRoles(['CLIENT', 'EMPLOYEE', 'ADMIN']);
     try {
         console.log("Making POST request to /api/orders_products with payload:", order_product);
         const response = await axios.post(`${API_URL}/api/orders_products`, order_product, {
@@ -513,9 +530,23 @@ export const fetchOrders_productsByProduct_zapas = async (product_id) => {
     }
 };
 
+export const fetchExcludedProducts = async () => {
+  try {
+    console.log("Making GET request to /api/products/exclude");
+    const response = await axios.get(`${API_URL}/api/products/exclude`, {
+      headers: authHeaders(),
+    });
+    console.log("Response from /api/products/exclude:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error in fetchExcludedProducts:", error.response?.data || error.message);
+    throw error.response?.data || new Error("Failed to fetch excluded products");
+  }
+};
+
 export const fetchClients = async () => {
     try {
-        await verifyRoles(['ADMIN']);
+        await verifyRoles(['CLIENT', 'EMPLOYEE' ,'ADMIN']);
         return await fetchProtectedData(`/api/clients`);
     } catch (error) {
         console.error("Role verification failed:", error.message);

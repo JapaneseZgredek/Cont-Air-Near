@@ -17,11 +17,11 @@ import Order_productPage from './pages/Order_productPage';
 import UserPanelPage from './pages/UserPanelPage';
 
 import { RoleProvider } from "./contexts/RoleContext";
+import Cart from "./components/Cart/Cart";
 
 
 const App = () => {
   const [role, setRole] = useState(null);
-
   const fetchRole = async () => {
     try {
       const client = await fetchCurrentClient();
@@ -60,7 +60,7 @@ const App = () => {
           <Route
             path="/ships"
             element={
-              <ProtectedRoute requiredRoles={['ADMIN']}>
+              <ProtectedRoute requiredRoles={['EMPLOYEE','ADMIN']}>
                 <ShipPage />
               </ProtectedRoute>
             }
@@ -116,6 +116,7 @@ const App = () => {
               </ProtectedRoute>
             }
           />
+          <Route path="/cart" element={<Cart />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </Router>
