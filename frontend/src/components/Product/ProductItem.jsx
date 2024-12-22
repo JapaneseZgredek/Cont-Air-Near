@@ -5,6 +5,7 @@ import UpdateProduct from "./UpdateProduct";
 import GenericDetailModal from "../GenericDetailModal";
 import '../../styles/List.css';
 import { RoleContext } from '../../contexts/RoleContext';
+import Order_productButton from "../Order_product/Order_productButton";
 
 const ProductItem = ({ product, onUpdate, onDelete, onAddToCart }) => {
     const [showConfirm, setShowConfirm] = useState(false);
@@ -126,7 +127,7 @@ const ProductItem = ({ product, onUpdate, onDelete, onAddToCart }) => {
                     {/* Kontener dla przycisków */}
                     <div className="item-buttons">
                         {(['EMPLOYEE','ADMIN'].includes(role)) && (<>
-                        <Order_productButton productId={product.id_product} productName={product.name} />
+                        <Button variant="outline-success" onClick={handleAddToCart}>Add to Cart</Button>
                         <Button variant="warning" onClick={openUpdateModal}>Update</Button>
                         <Button variant="danger" onClick={() => setShowConfirm(true)}>Delete</Button>
                         </>)}
