@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import OrderItem from './OrderItem';
 import OrderAdd from './OrderAdd';
-import { fetchOrders } from '../../services/api';
+import { fetchOrders, fetchCurrentClient, fetchOrdersForOwner } from '../../services/api';
 import { Container, Pagination, Dropdown } from 'react-bootstrap';
 import SearchAndFilterBar from '../SearchAndFilterBar';
 import '../../styles/List.css';
@@ -18,9 +18,16 @@ const OrderList = () => {
     // Fetch orders based on the role
     const loadOrders = async () => {
         try {
-            const allOrders = await fetchOrders(); // Automatically fetches appropriate orders based on user role
-            setOrders(allOrders);
-            setFilteredOrders(allOrders);
+            const client = await fetchCurrentClient();
+            let data;
+            if (client.role == "CLIENT"){
+                data = await fetchOrdersForOwner(client.id_client);
+            }
+            else{
+                data = await fetchOrders();
+            }
+            setOrders(data);
+            setFilteredOrders(data);
         } catch (err) {
             setError('Failed to load orders');
             console.error('Error fetching orders:', err);

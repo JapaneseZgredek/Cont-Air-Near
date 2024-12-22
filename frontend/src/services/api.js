@@ -341,6 +341,11 @@ export const fetchOrdersByClient = async (client_id) => {
     return await fetchProtectedData(`/api/orders/client/${client_id}`);
 }
 
+export const fetchOrdersForOwner = async (client_id) => {
+    await verifyRoles(['CLIENT']);
+    return await fetchProtectedData(`/api/orders/client/${client_id}`);
+}
+
 
 export const createOrder = async (order) => {
     await verifyRoles(['CLIENT','EMPLOYEE','ADMIN']);
