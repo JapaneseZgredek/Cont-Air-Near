@@ -514,6 +514,7 @@ export const fetchOrders_productsByProduct_zapas = async (product_id) => {
 };
 
 export const fetchExcludedProducts = async () => {
+  await verifyRoles(['CLIENT','EMPLOYEE','ADMIN'])
   try {
     console.log("Making GET request to /api/products/exclude");
     const response = await axios.get(`${API_URL}/api/products/exclude`, {
