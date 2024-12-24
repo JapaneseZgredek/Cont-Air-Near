@@ -62,7 +62,18 @@ const OrderDetails = () => {
                                     {order.port.name}
                                 </span>
                             </p>
-                            {order.client && <p><strong>Client:</strong> {order.client.name}</p>}
+                            {order.client && (
+                                <p>
+                                    <strong>Client:</strong>{' '}
+                                    <span
+                                        className="clickable"
+                                        style={{ cursor: 'pointer', color: '#0056b3', textDecoration: 'underline' }}
+                                        onClick={() => navigate(`/clients/${order.client.id_client}`)} // Przejście do szczegółów klienta
+                                    >
+                                        {order.client.name}
+                                    </span>
+                                </p>
+                            )}
                         </Card.Body>
                     </Card>
                 </Col>

@@ -560,6 +560,11 @@ export const fetchExcludedProducts = async () => {
   }
 };
 
+export const fetchClientDetails = async (clientId) => {
+    await verifyRoles(['CLIENT', 'EMPLOYEE' ,'ADMIN']);
+    return await fetchProtectedData(`/api/clients/${clientId}/details`);
+};
+
 export const fetchClients = async () => {
     try {
         await verifyRoles(['CLIENT', 'EMPLOYEE' ,'ADMIN']);

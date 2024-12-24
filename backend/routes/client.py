@@ -11,6 +11,8 @@ import os
 from datetime import datetime, timedelta
 from pydantic import BaseModel, EmailStr
 from typing import List, Optional
+
+from backend.models.order import Order
 from backend.utils.role_validation import check_user_role
 
 from backend.models.debl.email_block_list import email_block_list
@@ -62,6 +64,40 @@ class ClientLogin(BaseModel):
     class Config:
         orm_mode = True
         use_enum_values = True
+
+class ClientDetailsDTO(BaseModel):
+    id_client: int
+    name: str
+    address: str
+    telephone_number: Optional[int]
+    email: str
+    logon_name: str
+    role: str
+    orders: List[int]
+
+    class Config:
+        orm_mode = True
+
+@router.get("/clients/{id_client}/details", response_model=ClientDetailsDTO)
+def get_client_details(id_client: int, db: Session = Depends(get_db)):
+    client = db.query(Client).filter(Client.id_client == id_client).first()
+    if not client:
+        raise HTTPException(status_code=404, detail="Client not found")
+
+    # Pobieranie zamówień związanych z klientem
+    orders = db.query(Order.id_order).filter(Order.id_client == id_client).all()
+    order_ids = [order.id_order for order in orders]
+
+    return ClientDetailsDTO(
+        id_client=client.id_client,
+        name=client.name,
+        address=client.address,
+        telephone_number=client.telephone_number,
+        email=client.email,
+        logon_name=client.logon_name,
+        role=client.role.value,
+        orders=order_ids,
+    )
 
 
 def authenticate_client(logon_name: str, password: str, db: Session):
