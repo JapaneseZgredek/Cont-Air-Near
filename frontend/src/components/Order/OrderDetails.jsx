@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { fetchOrderDetails } from '../../services/api';
 import { Container, Table, Button, Row, Col, Card, Badge } from 'react-bootstrap';
 import '../../styles/panel.css'; // Wczytanie stylów z panel.css
@@ -8,6 +8,7 @@ const OrderDetails = () => {
     const { id } = useParams(); // Pobieranie ID z URL
     const [order, setOrder] = useState(null);
     const [error, setError] = useState(null);
+    const navigate = useNavigate(); // Do obsługi nawigacji
 
     useEffect(() => {
         const loadOrderDetails = async () => {
@@ -51,7 +52,16 @@ const OrderDetails = () => {
                     <Card className="p-3 shadow-sm">
                         <Card.Body>
                             <Card.Title>Port & Client</Card.Title>
-                            <p><strong>Port:</strong> {order.port.name}</p>
+                            <p>
+                                <strong>Port:</strong>{' '}
+                                <span
+                                    className="clickable"
+                                    style={{ cursor: 'pointer', color: '#0056b3', textDecoration: 'underline' }}
+                                    onClick={() => navigate(`/ports/${order.port.id_port}`)} // Przejście do szczegółów portu
+                                >
+                                    {order.port.name}
+                                </span>
+                            </p>
                             {order.client && <p><strong>Client:</strong> {order.client.name}</p>}
                         </Card.Body>
                     </Card>

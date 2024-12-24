@@ -216,6 +216,11 @@ export const updatePort = async (port) => {
     }
 };
 
+export const fetchPortDetails = async (id_port) => {
+    await verifyRoles(['EMPLOYEE', 'ADMIN', 'CLIENT']);
+    return await fetchProtectedData(`/api/ports/${id_port}/details`);
+};
+
 // Products table related
 
 export async function fetchProductsByPort(portId) {

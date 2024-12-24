@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 
-from backend.models import Operation
+from backend.models import Operation, Product
 from backend.models.order import Order
 from backend.models.order_product import Order_product
 from backend.models.port import Port
@@ -36,6 +36,76 @@ class PortRead(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+# This part is reposnsible for showing details for port
+
+class OperationDTO(BaseModel):
+    id_operation: int
+    name: str
+    description: Optional[str]
+
+class OrderDTO(BaseModel):
+    id_order: int
+    description: Optional[str]
+    status: str
+
+class ProductDTO(BaseModel):
+    id_product: int
+    name: str
+    price: float
+    weight: float
+
+class PortDetailsDTO(BaseModel):
+    id_port: int
+    name: str
+    location: str
+    country: str
+    operations: List[OperationDTO]
+    orders: List[OrderDTO]
+    products: List[ProductDTO]
+
+    class Config:
+        orm_mode = True
+
+
+@router.get("/ports/{id_port}/details", response_model=PortDetailsDTO)
+def get_port_details(
+    id_port: int,
+    db: Session = Depends(get_db),
+    current_client = Depends(get_current_client)
+):
+    check_user_role(current_client, [UserRole.EMPLOYEE, UserRole.ADMIN])
+    logger.info(f"Fetching details for port with id: {id_port}")
+    port = db.query(Port).filter(Port.id_port == id_port).first()
+
+    if not port:
+        logger.warning(f"Port with id: {id_port} not found")
+        raise HTTPException(status_code=404, detail="Port not found")
+
+    # Pobieranie operacji, zamówień i produktów powiązanych z portem
+    operations = db.query(Operation).filter(Operation.id_port == id_port).all()
+    orders = db.query(Order).filter(Order.id_port == id_port).all()
+    products = db.query(Product).filter(Product.id_port == id_port).all()
+
+    return PortDetailsDTO(
+        id_port=port.id_port,
+        name=port.name,
+        location=port.location,
+        country=port.country,
+        operations=[
+            OperationDTO(id_operation=op.id_operation, name=op.name, description=op.description)
+            for op in operations
+        ],
+        orders=[
+            OrderDTO(id_order=order.id_order, description=order.description, status=order.status.value)
+            for order in orders
+        ],
+        products=[
+            ProductDTO(id_product=product.id_product, name=product.name, price=product.price, weight=product.weight)
+            for product in products
+        ]
+    )
 
 
 @router.get("/ports", response_model=List[PortRead])

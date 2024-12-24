@@ -19,6 +19,7 @@ import UserPanelPage from './pages/UserPanelPage';
 import { RoleProvider } from "./contexts/RoleContext";
 import Cart from "./components/Cart/Cart";
 import OrderDetails from "./components/Order/OrderDetails";
+import PortDetails from "./components/Port/PortDetails";
 
 
 const App = () => {
@@ -119,7 +120,8 @@ const App = () => {
           />
           <Route path="/cart" element={<Cart />} />
           <Route path="*" element={<Navigate to="/" />} />
-          <Route path="/orders/:id" element={<OrderDetails />} />
+          <Route path="/orders/:id" element={<OrderDetails />} />ś
+          <Route path="/ports/:id" element={<PortDetails />} />
         </Routes>
       </Router>
     </RoleProvider>
