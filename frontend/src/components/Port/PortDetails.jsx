@@ -110,7 +110,11 @@ const PortDetails = () => {
                     </thead>
                     <tbody>
                         {port.products.map((product) => (
-                            <tr key={product.id_product}>
+                            <tr
+                                key={product.id_product}
+                                style={{ cursor: 'pointer' }}
+                                onClick={() => navigate(`/products/${product.id_product}`)} // Nawigacja do ProductDetails
+                            >
                                 <td>{product.id_product}</td>
                                 <td>{product.name}</td>
                                 <td>${product.price.toFixed(2)}</td>

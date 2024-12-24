@@ -1,22 +1,20 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Card, Button, Modal } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 import { deleteProduct, fetchPorts, fetchProductImage } from '../../services/api';
 import UpdateProduct from "./UpdateProduct";
-import GenericDetailModal from "../GenericDetailModal";
 import '../../styles/List.css';
 import { RoleContext } from '../../contexts/RoleContext';
-import Order_productButton from "../Order_product/Order_productButton";
 
 const ProductItem = ({ product, onUpdate, onDelete, onAddToCart }) => {
     const [showConfirm, setShowConfirm] = useState(false);
     const [showUpdateModal, setShowUpdateModal] = useState(false);
     const [imageUrl, setImageUrl] = useState(null);
     const [loadingImage, setLoadingImage] = useState(true);
-    const [showDetailModal, setShowDetailModal] = useState(false);
-    const [displayType, setDisplayType] = useState("grid");
-    const { role } = useContext(RoleContext);
     const [portName, setPortName] = useState('');
     const [error, setError] = useState('');
+    const { role } = useContext(RoleContext);
+    const navigate = useNavigate();
 
     // Fetch port names based on the product's id_port
     useEffect(() => {
@@ -94,45 +92,46 @@ const ProductItem = ({ product, onUpdate, onDelete, onAddToCart }) => {
 
     return (
         <>
-            <Card className={`${displayType}-item-card`}>
-                    <Card.Title
-                            className="clickable"
-                            onClick={() => setShowDetailModal(true)}
-                            style={{ cursor: 'pointer', textDecoration: 'underline' }}
-                        >
-                            {product.name}
-                        </Card.Title>
-                    {/* Kontener dla tekstów */}
-                    <div className="item-texts">
-                        <a>Price: {product.price}</a>
-                        <a>Weight: {product.weight}</a>
-                        <a>Port ID: {product.id_port}</a>
-                    </div>
+            <Card className="grid-item-card">
+                <Card.Title
+                    className="clickable"
+                    onClick={() => navigate(`/products/${product.id_product}`)} // Nawigacja do widoku szczegółowego produktu
+                    style={{ cursor: 'pointer', textDecoration: 'underline' }}
+                >
+                    {product.name}
+                </Card.Title>
+                {/* Kontener dla tekstów */}
+                <div className="item-texts">
+                    <a>Price: {product.price}</a>
+                    <a>Weight: {product.weight}</a>
+                    <a>Port: {portName || 'Loading...'}</a>
+                </div>
 
-                    {/* Obrazek */}
-                    <div>
-                        {loadingImage ? (
-                            <div className="loading-message">Loading image...</div>
-                        ) : imageUrl ? (
-                            <img 
-                                className="item-image" 
-                                src={imageUrl} 
-                                alt={`Product_${product.id_product}`} 
-                            />
-                        ) : (
-                            <div className="missing-image">Missing image</div>
-                        )}
-                    </div>
+                {/* Obrazek */}
+                <div>
+                    {loadingImage ? (
+                        <div className="loading-message">Loading image...</div>
+                    ) : imageUrl ? (
+                        <img
+                            className="item-image"
+                            src={imageUrl}
+                            alt={`Product_${product.id_product}`}
+                        />
+                    ) : (
+                        <div className="missing-image">Missing image</div>
+                    )}
+                </div>
 
-                    {/* Kontener dla przycisków */}
-                    <div className="item-buttons">
-                        {(['EMPLOYEE','ADMIN'].includes(role)) && (<>
-                        <Button variant="outline-success" onClick={handleAddToCart}>Add to Cart</Button>
-                        <Button variant="warning" onClick={openUpdateModal}>Update</Button>
-                        <Button variant="danger" onClick={() => setShowConfirm(true)}>Delete</Button>
-                        </>)}
-                    </div>
-
+                {/* Kontener dla przycisków */}
+                <div className="item-buttons">
+                    {(['EMPLOYEE', 'ADMIN'].includes(role)) && (
+                        <>
+                            <Button variant="outline-success" onClick={handleAddToCart}>Add to Cart</Button>
+                            <Button variant="warning" onClick={openUpdateModal}>Update</Button>
+                            <Button variant="danger" onClick={() => setShowConfirm(true)}>Delete</Button>
+                        </>
+                    )}
+                </div>
             </Card>
 
             <Modal show={showConfirm} onHide={() => setShowConfirm(false)}>
@@ -147,13 +146,6 @@ const ProductItem = ({ product, onUpdate, onDelete, onAddToCart }) => {
                     <Button variant="danger" onClick={handleDelete}>Yes, delete</Button>
                 </Modal.Footer>
             </Modal>
-
-            <GenericDetailModal
-                show={showDetailModal}
-                onHide={() => setShowDetailModal(false)}
-                title={`Product: ${product.name}`}
-                details={product}
-            />
 
             <UpdateProduct
                 product={product}

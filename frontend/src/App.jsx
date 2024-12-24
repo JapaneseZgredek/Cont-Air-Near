@@ -20,6 +20,7 @@ import { RoleProvider } from "./contexts/RoleContext";
 import Cart from "./components/Cart/Cart";
 import OrderDetails from "./components/Order/OrderDetails";
 import PortDetails from "./components/Port/PortDetails";
+import ProductDetails from "./components/Product/ProductDetails";
 
 
 const App = () => {
@@ -120,8 +121,9 @@ const App = () => {
           />
           <Route path="/cart" element={<Cart />} />
           <Route path="*" element={<Navigate to="/" />} />
-          <Route path="/orders/:id" element={<OrderDetails />} />ś
+          <Route path="/orders/:id" element={<OrderDetails />} />
           <Route path="/ports/:id" element={<PortDetails />} />
+          <Route path="/products/:id" element={<ProductDetails />} />
         </Routes>
       </Router>
     </RoleProvider>

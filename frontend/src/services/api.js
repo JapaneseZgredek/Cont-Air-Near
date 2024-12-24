@@ -230,6 +230,11 @@ export async function fetchProductsByPort(portId) {
 
 // Guest Table product do not add auth
 
+export const fetchProductDetails = async (id_product) => {
+    await verifyRoles(['CLIENT', 'EMPLOYEE','ADMIN']);
+    return await fetchProtectedData(`/api/products/${id_product}/details`);
+};
+
 export const fetchProducts = async () => {
   const response = await fetch(`${API_URL}/api/products`);
   if (!response.ok) {
