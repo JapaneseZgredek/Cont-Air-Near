@@ -18,6 +18,7 @@ import UserPanelPage from './pages/UserPanelPage';
 
 import { RoleProvider } from "./contexts/RoleContext";
 import Cart from "./components/Cart/Cart";
+import OrderDetails from "./components/Order/OrderDetails";
 
 
 const App = () => {
@@ -118,6 +119,7 @@ const App = () => {
           />
           <Route path="/cart" element={<Cart />} />
           <Route path="*" element={<Navigate to="/" />} />
+          <Route path="/orders/:id" element={<OrderDetails />} />
         </Routes>
       </Router>
     </RoleProvider>

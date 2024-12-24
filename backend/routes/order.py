@@ -45,6 +45,87 @@ class OrderRead(BaseModel):
     class Config:
         orm_mode = True  # Ensures Pydantic works with ORM objects
 
+# Section responsible for details
+
+class PortDTO(BaseModel):
+    id_port: int
+    name: str
+
+class ClientDTO(BaseModel):
+    id_client: int
+    name: str
+
+class OperationDTO(BaseModel):
+    id_operation: int
+    name: str
+    description: Optional[str]
+
+class ProductDTO(BaseModel):
+    id_product: int
+    name: str
+    price: float
+    weight: float
+
+class OrderDetailsDTO(BaseModel):
+    id_order: int
+    date_of_order: datetime
+    status: str
+    description: Optional[str]
+    port: PortDTO
+    client: Optional[ClientDTO]
+    operations: List[OperationDTO]
+    products: List[ProductDTO]  # Produkty zamiast `order_products`
+
+    class Config:
+        orm_mode = True
+
+
+@router.get("/orders/{order_id}", response_model=OrderDetailsDTO)
+def get_order_details(order_id: int, db: Session = Depends(get_db)):
+    # Pobieranie zamówienia
+    order = db.query(Order).filter(Order.id_order == order_id).first()
+
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+
+    # Pobieranie danych powiązanych
+    port = db.query(Port).filter(Port.id_port == order.id_port).first()
+    client = db.query(Client).filter(Client.id_client == order.id_client).first()
+    operations = db.query(Operation).filter(Operation.id_order == order.id_order).all()
+    products = (
+        db.query(Product)
+        .join(Order_product, Product.id_product == Order_product.id_product)
+        .filter(Order_product.id_order == order.id_order)
+        .all()
+    )
+
+    # Tworzenie odpowiedzi DTO
+    return OrderDetailsDTO(
+        id_order=order.id_order,
+        date_of_order=order.date_of_order,
+        status=order.status.value,
+        description=order.description,
+        port=PortDTO(id_port=port.id_port, name=port.name),
+        client=ClientDTO(id_client=client.id_client, name=client.name) if client else None,
+        operations=[
+            OperationDTO(
+                id_operation=op.id_operation,
+                name=op.name,
+                description=op.description
+            )
+            for op in operations
+        ],
+        products=[
+            ProductDTO(
+                id_product=product.id_product,
+                name=product.name,
+                price=product.price,
+                weight=product.weight
+            )
+            for product in products
+        ]
+    )
+
 
 @router.get("/orders/port/{id_port}", response_model=List[OrderRead])
 def read_orders_by_port(id_port: int, db: Session = Depends(get_db), current_client=Depends(get_current_client)):
@@ -94,14 +175,15 @@ def create_order(order: OrderCreate, db: Session = Depends(get_db), current_clie
         raise HTTPException(status_code=400, detail=f"Failed to create order. {str(e)}")
 
 
-@router.get("/orders/{id_order}", response_model=OrderRead)
-def read_order(id_order: int, db: Session = Depends(get_db), current_client=Depends(get_current_client)):
-    logger.info(f"Reading order with id: {id_order}")
-    db_order = db.query(Order).filter(Order.id_order == id_order).first()
-    if db_order is None:
-        logger.error(f"Order with id: {id_order} not found")
-        raise HTTPException(status_code=404, detail="Order not found")
-    return db_order
+# Commented out due to making details for Order
+# @router.get("/orders/{id_order}", response_model=OrderRead)
+# def read_order(id_order: int, db: Session = Depends(get_db), current_client=Depends(get_current_client)):
+#    logger.info(f"Reading order with id: {id_order}")
+#    db_order = db.query(Order).filter(Order.id_order == id_order).first()
+#    if db_order is None:
+#        logger.error(f"Order with id: {id_order} not found")
+#        raise HTTPException(status_code=404, detail="Order not found")
+#    return db_order
 
 
 @router.put("/orders/{id_order}", response_model=OrderRead)

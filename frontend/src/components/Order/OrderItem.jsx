@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Card, Button, Modal } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 import { deleteOrder, fetchPorts, fetchClients } from '../../services/api';
-import OrderUpdate from "./OrderUpdate";
-import OrdersButton from "./OrdersButton";
-import GenericDetailModal from "../GenericDetailModal";
+import OrderUpdate from './OrderUpdate';
+import OrdersButton from './OrdersButton';
 import Order_productButton from '../Order_product/Order_productButton';
 
 import '../../styles/List.css';
@@ -12,12 +12,11 @@ import { RoleContext } from '../../contexts/RoleContext';
 const OrderItem = ({ order, onUpdate, onDelete }) => {
     const [showConfirm, setShowConfirm] = useState(false);
     const [showUpdateModal, setShowUpdateModal] = useState(false);
-    const [showDetailModal, setShowDetailModal] = useState(false);
-    const [displayType, setDisplayType] = useState("straight");
-    const { role } = useContext(RoleContext);    
     const [portName, setPortName] = useState('');
     const [clientName, setClientName] = useState('');
     const [error, setError] = useState('');
+    const { role } = useContext(RoleContext);
+    const navigate = useNavigate();
 
     // Fetch port and client names based on the order's ids
     useEffect(() => {
@@ -59,35 +58,36 @@ const OrderItem = ({ order, onUpdate, onDelete }) => {
 
     return (
         <>
-            <Card className={`${displayType}-item-card`}>
+            <Card className="item-card">
+                <Card.Body>
                     <Card.Title
                         className="clickable"
-                        onClick={() => setShowDetailModal(true)}
+                        onClick={() => navigate(`/orders/${order.id_order}`)}
                         style={{ cursor: 'pointer', textDecoration: 'underline' }}
                     >
                         Order ID: {order.id_order}
                     </Card.Title>
 
-                    {/* Kontener dla tekstów */}
+                    {/* Text container */}
                     <div className="item-texts">
-                        <a>Status: {order.status}</a>
-                        <a>Description: {order.description}</a>
-                        <a>Port ID: {portName || 'Loading...'}</a>
-                        <a>Client ID: {clientName || 'Loading...'}</a>
+                        <p><strong>Status:</strong> {order.status}</p>
+                        <p><strong>Description:</strong> {order.description || 'No description'}</p>
+                        <p><strong>Port ID:</strong> {portName || 'Loading...'}</p>
+                        <p><strong>Client ID:</strong> {clientName || 'Loading...'}</p>
                     </div>
 
-                    {/* Kontener dla przycisków */}
+                    {/* Button container */}
                     <div className="item-buttons">
-                        <Order_productButton orderId={order.id_order}/>
+                        <Order_productButton orderId={order.id_order} />
                         {(['EMPLOYEE', 'ADMIN'].includes(role)) && (
                             <>
-                            <Button variant="warning" className="me-2" onClick={openUpdateModal}>Update</Button>
-                            <Button variant="danger" onClick={() => setShowConfirm(true)}>Delete</Button>
+                                <Button variant="warning" className="me-2" onClick={openUpdateModal}>Update</Button>
+                                <Button variant="danger" onClick={() => setShowConfirm(true)}>Delete</Button>
                             </>
                         )}
-
                         <OrdersButton portId={order.id_port} portName={portName} clientId={order.id_client} clientName={clientName} />
                     </div>
+                </Card.Body>
             </Card>
 
             {/* Confirmation Modal for Deletion */}
@@ -101,14 +101,6 @@ const OrderItem = ({ order, onUpdate, onDelete }) => {
                     <Button variant="danger" onClick={handleDelete}>Yes, delete</Button>
                 </Modal.Footer>
             </Modal>
-
-            {/* Generic Detail Modal for Viewing Order Details */}
-            <GenericDetailModal
-                show={showDetailModal}
-                onHide={() => setShowDetailModal(false)}
-                title={`Order: ${order.id_order}`}
-                details={order}
-            />
 
             {/* Order Update Modal */}
             <OrderUpdate

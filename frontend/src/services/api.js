@@ -330,6 +330,11 @@ export const fetchOrders = async () => {
 //verify roles
 //napisac metode podobna do fetch current client tylko taką co fetchuje po id jego produkty i dorobić backend + front
 
+export const fetchOrderDetails = async (order_id) => {
+    await verifyRoles(['EMPLOYEE', 'ADMIN', 'CLIENT']);
+    return await fetchProtectedData(`/api/orders/${order_id}`);
+};
+
 export const fetchOrdersByPort = async (port_id) => {
     await verifyRoles(['EMPLOYEE', 'ADMIN', 'CLIENT']);
     return await fetchProtectedData(`/api/orders/port/${port_id}`);
