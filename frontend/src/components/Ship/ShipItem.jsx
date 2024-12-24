@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Card, Button, Modal } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 import { deleteShip, fetchShipImage } from '../../services/api';
 import UpdateShip from "./UpdateShip";
 import OperationsButton from "../Operation/OperationsButton";
@@ -12,9 +13,8 @@ const ShipItem = ({ ship, onUpdate, onDelete }) => {
     const [showUpdatedModal, setShowUpdateModal] = useState(false);
     const [imageUrl, setImageUrl] = useState(null);
     const [loadingImage, setLoadingImage] = useState(true);
-    const [showDetailModal, setShowDetailModal] = useState(false);
-    const [displayType, setDisplayType] = useState("grid");
     const { role } = useContext(RoleContext);
+    const navigate = useNavigate(); // Added navigation
 
     const handleDelete = async () => {
         try {
@@ -33,20 +33,20 @@ const ShipItem = ({ ship, onUpdate, onDelete }) => {
     const closeUpdateModal = () => {
         setShowUpdateModal(false);
         loadImage();
-    }
+    };
 
     const loadImage = async () => {
         try {
-              setLoadingImage(true);
-              const url = await fetchShipImage(ship.id_ship);
-              setImageUrl(url);
-          } catch (error) {
-              console.error("Failed to load ship image", error);
-              setImageUrl(null);
-          } finally {
-              setLoadingImage(false);
-          }
-      };
+            setLoadingImage(true);
+            const url = await fetchShipImage(ship.id_ship);
+            setImageUrl(url);
+        } catch (error) {
+            console.error("Failed to load ship image", error);
+            setImageUrl(null);
+        } finally {
+            setLoadingImage(false);
+        }
+    };
 
     useEffect(() => {
         loadImage();
@@ -54,75 +54,70 @@ const ShipItem = ({ ship, onUpdate, onDelete }) => {
 
     return (
         <>
-        <Card className={`${displayType}-item-card`}>
+            <Card className="grid-item-card">
                 <Card.Title
                     className="clickable"
-                    onClick={() => setShowDetailModal(true)}
+                    onClick={() => navigate(`/ships/${ship.id_ship}`)} // Navigate to ShipDetails
                     style={{ cursor: 'pointer', textDecoration: 'underline' }}
                 >
                     {ship.name}
                 </Card.Title>
 
-                {/* Kontener dla tekstów */}
-                <div className="item-texts">    
-                    <a></a>
+                {/* Ship Details */}
+                <div className="item-texts">
+                    <a>Status: {ship.status}</a>
                 </div>
 
-                {/* Obrazek */}
+                {/* Image */}
                 <div>
-                        {loadingImage ? (
-                            <div className="loading-message">Loading image...</div>
-                        ) : imageUrl ? (
-                            <img 
-                                className="item-image" 
-                                src={imageUrl} 
-                                alt={`Ship_${ship.id_ship}`} 
-                            />
-                        ) : (
-                            <div className="missing-image">Missing image</div>
-                        )}
-                    </div>
-
-                {/* Kontener dla przycisków */}
-                <div className="item-buttons">
-                    {(['EMPLOYEE','ADMIN'].includes(role)) && (
-                    <>
-                    <OperationsButton shipId={ship.id_ship} shipName={ship.name} />
-                    <Button variant="warning" onClick={openUpdateModal}>Update</Button>
-                    <Button variant="danger" onClick={() => setShowConfirm(true)}>Delete</Button>
-                    </>)}
+                    {loadingImage ? (
+                        <div className="loading-message">Loading image...</div>
+                    ) : imageUrl ? (
+                        <img
+                            className="item-image"
+                            src={imageUrl}
+                            alt={`Ship_${ship.id_ship}`}
+                        />
+                    ) : (
+                        <div className="missing-image">Missing image</div>
+                    )}
                 </div>
-        </Card>
 
-        <Modal show={showConfirm} onHide={() => setShowConfirm(false)}>
-            <Modal.Header closeButton>
-                <Modal.Title>Confirm Deletion</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-                Are you sure you want to delete this record? There is no going back
-            </Modal.Body>
-            <Modal.Footer>
-                <Button variant="secondary" onClick={() => setShowConfirm(false)}>Cancel</Button>
-                <Button variant="danger" onClick={handleDelete}>Yes, delete</Button>
-            </Modal.Footer>
-        </Modal>
+                {/* Action Buttons */}
+                <div className="item-buttons">
+                    {(['EMPLOYEE', 'ADMIN'].includes(role)) && (
+                        <>
+                            <OperationsButton shipId={ship.id_ship} shipName={ship.name} />
+                            <Button variant="warning" onClick={openUpdateModal}>Update</Button>
+                            <Button variant="danger" onClick={() => setShowConfirm(true)}>Delete</Button>
+                        </>
+                    )}
+                </div>
+            </Card>
 
-        <GenericDetailModal
-            show={showDetailModal}
-            onHide={() => setShowDetailModal(false)}
-            title={`Ship: ${ship.name}`}
-            details={ship}
-        />
+            {/* Confirm Delete Modal */}
+            <Modal show={showConfirm} onHide={() => setShowConfirm(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Confirm Deletion</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    Are you sure you want to delete this record? There is no going back
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowConfirm(false)}>Cancel</Button>
+                    <Button variant="danger" onClick={handleDelete}>Yes, delete</Button>
+                </Modal.Footer>
+            </Modal>
 
-        <UpdateShip
-            ship={ship}
-            show={showUpdatedModal}
-            onHide={closeUpdateModal}
-            onUpdate={onUpdate}
-        />
+            {/* Update Ship Modal */}
+            <UpdateShip
+                ship={ship}
+                show={showUpdatedModal}
+                onHide={closeUpdateModal}
+                onUpdate={onUpdate}
+            />
         </>
     );
 };
 
 export default ShipItem;
-

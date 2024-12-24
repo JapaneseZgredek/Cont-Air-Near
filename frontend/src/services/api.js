@@ -19,6 +19,10 @@ const authHeaders = () => {
   };
 };
 
+export const fetchShipDetails = async (ship_id) => {
+    await verifyRoles(['EMPLOYEE', 'ADMIN']);
+    return await fetchProtectedData(`/api/ships/${ship_id}/details`);
+}
 export const fetchShips = async () => {
     await verifyRoles(['EMPLOYEE', 'ADMIN']);
     return await fetchProtectedData(`/api/ships/`);
