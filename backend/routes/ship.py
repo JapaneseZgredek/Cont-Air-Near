@@ -84,7 +84,7 @@ def get_ship_details(id_ship: int, db: Session = Depends(get_db)):
                 id_operation=op.id_operation,
                 name_of_operation=op.name_of_operation,
                 operation_type=op.operation_type.value,
-                date_of_operation=op.date_of_operation,
+                date_of_operation=op.date_of_operation.isoformat(),
             )
             for op in operations
         ]

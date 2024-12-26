@@ -58,7 +58,11 @@ class ClientDTO(BaseModel):
 class OperationDTO(BaseModel):
     id_operation: int
     name: str
-    description: Optional[str]
+    operation_type: str
+    date_of_operation: str  # ISO format string
+
+    class Config:
+        orm_mode = True
 
 class ProductDTO(BaseModel):
     id_product: int
@@ -82,13 +86,13 @@ class OrderDetailsDTO(BaseModel):
 
 @router.get("/orders/{order_id}", response_model=OrderDetailsDTO)
 def get_order_details(order_id: int, db: Session = Depends(get_db)):
-    # Pobieranie zamówienia
+    # Fetch the order
     order = db.query(Order).filter(Order.id_order == order_id).first()
 
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
 
-    # Pobieranie danych powiązanych
+    # Fetch related data
     port = db.query(Port).filter(Port.id_port == order.id_port).first()
     client = db.query(Client).filter(Client.id_client == order.id_client).first()
     operations = db.query(Operation).filter(Operation.id_order == order.id_order).all()
@@ -99,7 +103,7 @@ def get_order_details(order_id: int, db: Session = Depends(get_db)):
         .all()
     )
 
-    # Tworzenie odpowiedzi DTO
+    # Create and return the DTO response
     return OrderDetailsDTO(
         id_order=order.id_order,
         date_of_order=order.date_of_order,
@@ -110,8 +114,9 @@ def get_order_details(order_id: int, db: Session = Depends(get_db)):
         operations=[
             OperationDTO(
                 id_operation=op.id_operation,
-                name=op.name,
-                description=op.description
+                name=op.name_of_operation,
+                operation_type=op.operation_type.value,
+                date_of_operation=op.date_of_operation.isoformat()  # Format datetime to string
             )
             for op in operations
         ],
@@ -125,6 +130,7 @@ def get_order_details(order_id: int, db: Session = Depends(get_db)):
             for product in products
         ]
     )
+
 
 
 @router.get("/orders/port/{id_port}", response_model=List[OrderRead])

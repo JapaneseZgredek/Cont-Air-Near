@@ -112,6 +112,11 @@ export async function fetchOperationsByShip(shipId) {
     return await fetchProtectedData(`/api/operations/ship/${shipId}`);
 }
 
+export async function fetchOperationDetails(id_operation) {
+    await verifyRoles(['EMPLOYEE', 'ADMIN'])
+    return await fetchProtectedData(`/api/operations/${id_operation}/details`)
+}
+
 export const fetchOperations = async () => {
   await verifyRoles(['EMPLOYEE', 'ADMIN']);
   return await fetchProtectedData(`/api/operations/`);

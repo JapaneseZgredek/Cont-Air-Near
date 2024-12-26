@@ -42,8 +42,13 @@ class PortRead(BaseModel):
 
 class OperationDTO(BaseModel):
     id_operation: int
-    name: str
-    description: Optional[str]
+    name_of_operation: str
+    operation_type: str
+    date_of_operation: str  # ISO 8601 format
+
+    class Config:
+        orm_mode = True
+
 
 class OrderDTO(BaseModel):
     id_order: int
@@ -68,7 +73,6 @@ class PortDetailsDTO(BaseModel):
     class Config:
         orm_mode = True
 
-
 @router.get("/ports/{id_port}/details", response_model=PortDetailsDTO)
 def get_port_details(
     id_port: int,
@@ -83,7 +87,7 @@ def get_port_details(
         logger.warning(f"Port with id: {id_port} not found")
         raise HTTPException(status_code=404, detail="Port not found")
 
-    # Pobieranie operacji, zamówień i produktów powiązanych z portem
+    # Fetch related data
     operations = db.query(Operation).filter(Operation.id_port == id_port).all()
     orders = db.query(Order).filter(Order.id_port == id_port).all()
     products = db.query(Product).filter(Product.id_port == id_port).all()
@@ -94,7 +98,12 @@ def get_port_details(
         location=port.location,
         country=port.country,
         operations=[
-            OperationDTO(id_operation=op.id_operation, name=op.name, description=op.description)
+            OperationDTO(
+                id_operation=op.id_operation,
+                name_of_operation=op.name_of_operation,
+                operation_type=op.operation_type.value,
+                date_of_operation=op.date_of_operation.isoformat()
+            )
             for op in operations
         ],
         orders=[
@@ -106,6 +115,7 @@ def get_port_details(
             for product in products
         ]
     )
+
 
 
 @router.get("/ports", response_model=List[PortRead])

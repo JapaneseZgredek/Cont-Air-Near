@@ -23,6 +23,7 @@ import PortDetails from "./components/Port/PortDetails";
 import ProductDetails from "./components/Product/ProductDetails";
 import ClientDetails from "./components/Client/ClientDetails";
 import ShipDetails from "./components/Ship/ShipDetails";
+import OperationDetails from "./components/Operation/OperationDetails";
 
 
 const App = () => {
@@ -128,6 +129,7 @@ const App = () => {
           <Route path="/products/:id" element={<ProductDetails />} />
           <Route path="/clients/:id" element={<ClientDetails />} />
           <Route path="/ships/:id" element={<ShipDetails />} />
+          <Route path="/operations/:id_operation" element={<OperationDetails />} />
         </Routes>
       </Router>
     </RoleProvider>

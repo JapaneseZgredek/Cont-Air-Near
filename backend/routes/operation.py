@@ -1,3 +1,5 @@
+from enum import Enum
+
 from fastapi import APIRouter, HTTPException, Depends, status
 from sqlalchemy.orm import Session
 from datetime import datetime
@@ -40,6 +42,47 @@ class OperationRead(BaseModel):
 
     class Config:
         orm_mode = True
+
+class OperationTypeDTO(str, Enum):
+    AT_BAY = "AT_BAY"
+    TRANSPORT = "TRANSPORT"
+    TRANSFER = "TRANSFER"
+    DEPARTURE = "DEPARTURE"
+    ARRIVAL = "ARRIVAL"
+    CARGO_LOADING = "CARGO_LOADING"
+    CARGO_DISCHARGE = "CARGO_DISCHARGE"
+
+class OperationDetailsDTO(BaseModel):
+    id_operation: int
+    name_of_operation: str
+    operation_type: OperationTypeDTO
+    date_of_operation: datetime
+    ship_name: Optional[str]
+    port_name: Optional[str]
+    order_id: Optional[int]
+
+    class Config:
+        orm_mode = True
+
+
+@router.get("/operations/{id_operation}/details", response_model=OperationDetailsDTO)
+def get_operation_details(id_operation: int, db: Session = Depends(get_db)):
+    operation = db.query(Operation).filter(Operation.id_operation == id_operation).first()
+    if not operation:
+        raise HTTPException(status_code=404, detail="Operation not found")
+
+    ship_name = operation.ship.name if operation.ship else None
+    port_name = operation.port.name if operation.port else None
+
+    return OperationDetailsDTO(
+        id_operation=operation.id_operation,
+        name_of_operation=operation.name_of_operation,
+        operation_type=operation.operation_type,
+        date_of_operation=operation.date_of_operation,
+        ship_name=ship_name,
+        port_name=port_name,
+        order_id=operation.id_order,
+    )
 
 # Operations endpoints with role validation
 @router.get("/operations/port/{id_port}", response_model=List[OperationRead])
