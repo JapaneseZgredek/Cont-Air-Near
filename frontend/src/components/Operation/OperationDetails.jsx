@@ -1,26 +1,49 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { fetchOperationDetails } from '../../services/api';
-import { Container, Card, Row, Col, Badge, Button } from 'react-bootstrap';
+import { fetchOperationDetails, deleteOperation, updateOperation } from '../../services/api';
+import { Container, Card, Row, Col, Badge, Button, Modal } from 'react-bootstrap';
+import UpdateOperation from './UpdateOperation';
+import '../../styles/panel.css';
 
 const OperationDetails = () => {
-    const { id_operation } = useParams();
-    const [operation, setOperation] = useState(null);
-    const [error, setError] = useState(null);
-    const navigate = useNavigate();
+    const { id_operation } = useParams(); // Extract operation ID from URL
+    const [operation, setOperation] = useState(null); // Store operation details
+    const [error, setError] = useState(null); // Store errors
+    const [showUpdateModal, setShowUpdateModal] = useState(false); // State for Update Modal
+    const [showConfirm, setShowConfirm] = useState(false); // State for Delete Confirmation Modal
+    const navigate = useNavigate(); // Navigation hook
+
+    const loadOperationDetails = async () => {
+        try {
+            const data = await fetchOperationDetails(id_operation); // Fetch operation details from API
+            setOperation(data);
+        } catch (err) {
+            setError('Failed to load operation details');
+        }
+    };
 
     useEffect(() => {
-        const loadOperationDetails = async () => {
-            try {
-                const data = await fetchOperationDetails(id_operation);
-                setOperation(data);
-            } catch (err) {
-                setError('Failed to load operation details');
-            }
-        };
-
         loadOperationDetails();
     }, [id_operation]);
+
+    const handleDelete = async () => {
+        try {
+            await deleteOperation(id_operation); // Delete operation via API
+            navigate('/operations'); // Redirect to operations list
+        } catch (error) {
+            console.error('Failed to delete operation:', error);
+        }
+    };
+
+    const handleUpdate = async (updatedOperation) => {
+        try {
+            await updateOperation(updatedOperation); // Update operation via API
+            setShowUpdateModal(false); // Close Update Modal
+            loadOperationDetails(); // Reload updated operation details
+        } catch (error) {
+            console.error('Failed to update operation:', error);
+        }
+    };
 
     if (error) {
         return <p className="error">{error}</p>;
@@ -32,7 +55,7 @@ const OperationDetails = () => {
 
     return (
         <Container>
-            <h2>Operation Details</h2>
+            <h2 className="section-name">Operation Details</h2>
             <div className="section-divider mb-4"></div>
 
             {/* Operation Overview */}
@@ -48,57 +71,81 @@ const OperationDetails = () => {
                     </Card>
                 </Col>
                 <Col md={6}>
-                    {operation.ship_name && (
-                        <Card className="p-3 shadow-sm">
-                            <Card.Body>
-                                <Card.Title>Ship</Card.Title>
-                                <p
-                                    className="clickable"
-                                    style={{ cursor: 'pointer', textDecoration: 'underline', color: '#0056b3' }}
-                                    onClick={() => navigate(`/ships/${operation.ship_id}`)}
-                                >
-                                    {operation.ship_name}
+                    <Card className="p-3 shadow-sm">
+                        <Card.Body>
+                            <Card.Title>Associated Entities</Card.Title>
+                            {operation.ship_id && (
+                                <p>
+                                    <strong>Ship:</strong>{' '}
+                                    <span
+                                        className="clickable"
+                                        style={{ cursor: 'pointer', color: '#0056b3', textDecoration: 'underline' }}
+                                        onClick={() => navigate(`/ships/${operation.ship_id}`)}
+                                    >
+                                        {operation.ship_name}
+                                    </span>
                                 </p>
-                            </Card.Body>
-                        </Card>
-                    )}
-                    {operation.port_name && (
-                        <Card className="p-3 shadow-sm">
-                            <Card.Body>
-                                <Card.Title>Port</Card.Title>
-                                <p
-                                    className="clickable"
-                                    style={{ cursor: 'pointer', textDecoration: 'underline', color: '#0056b3' }}
-                                    onClick={() => navigate(`/ports/${operation.port_id}`)}
-                                >
-                                    {operation.port_name}
+                            )}
+                            {operation.port_id && (
+                                <p>
+                                    <strong>Port:</strong>{' '}
+                                    <span
+                                        className="clickable"
+                                        style={{ cursor: 'pointer', color: '#0056b3', textDecoration: 'underline' }}
+                                        onClick={() => navigate(`/ports/${operation.port_id}`)}
+                                    >
+                                        {operation.port_name}
+                                    </span>
                                 </p>
-                            </Card.Body>
-                        </Card>
-                    )}
+                            )}
+                            {operation.order_id && (
+                                <p>
+                                    <strong>Order:</strong>{' '}
+                                    <span
+                                        className="clickable"
+                                        style={{ cursor: 'pointer', color: '#0056b3', textDecoration: 'underline' }}
+                                        onClick={() => navigate(`/orders/${operation.order_id}`)}
+                                    >
+                                        Order ID: {operation.order_id}
+                                    </span>
+                                </p>
+                            )}
+                        </Card.Body>
+                    </Card>
                 </Col>
             </Row>
 
-            {/* Order Link */}
-            {operation.order_id && (
-                <Card className="p-3 shadow-sm">
-                    <Card.Body>
-                        <Card.Title>Related Order</Card.Title>
-                        <p
-                            className="clickable"
-                            style={{ cursor: 'pointer', textDecoration: 'underline', color: '#0056b3' }}
-                            onClick={() => navigate(`/orders/${operation.order_id}`)}
-                        >
-                            Order ID: {operation.order_id}
-                        </p>
-                    </Card.Body>
-                </Card>
-            )}
-
             {/* Action Buttons */}
-            <div className="mt-4">
-                <Button variant="primary" onClick={() => navigate(-1)}>Back</Button>
+            <div className="mt-4 d-flex justify-content-between">
+                <Button variant="warning" onClick={() => setShowUpdateModal(true)}>
+                    Update Operation
+                </Button>
+                <Button variant="danger" onClick={() => setShowConfirm(true)}>
+                    Delete Operation
+                </Button>
             </div>
+
+            {/* Confirmation Modal for Deletion */}
+            <Modal show={showConfirm} onHide={() => setShowConfirm(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Confirm Deletion</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    Are you sure you want to delete this operation? This action cannot be undone.
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowConfirm(false)}>Cancel</Button>
+                    <Button variant="danger" onClick={handleDelete}>Yes, delete</Button>
+                </Modal.Footer>
+            </Modal>
+
+            {/* Update Modal */}
+            <UpdateOperation
+                operation={operation}
+                show={showUpdateModal}
+                onHide={() => setShowUpdateModal(false)}
+                onUpdate={handleUpdate}
+            />
         </Container>
     );
 };

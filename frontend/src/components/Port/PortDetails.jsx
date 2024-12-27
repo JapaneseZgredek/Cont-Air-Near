@@ -5,15 +5,15 @@ import { Container, Table, Row, Col, Card, Badge } from 'react-bootstrap';
 import '../../styles/panel.css';
 
 const PortDetails = () => {
-    const { id } = useParams(); // Pobieranie ID z URL
-    const [port, setPort] = useState(null);
-    const [error, setError] = useState(null);
-    const navigate = useNavigate(); // Do obsługi nawigacji
+    const { id } = useParams(); // Retrieve port ID from URL
+    const [port, setPort] = useState(null); // State for port details
+    const [error, setError] = useState(null); // State for errors
+    const navigate = useNavigate(); // Navigation hook
 
     useEffect(() => {
         const loadPortDetails = async () => {
             try {
-                const data = await fetchPortDetails(id);
+                const data = await fetchPortDetails(id); // Fetch port details
                 setPort(data);
             } catch (err) {
                 setError('Failed to load port details');
@@ -54,13 +54,30 @@ const PortDetails = () => {
             <h4 className="section-name">Operations</h4>
             <div className="section-divider mb-3"></div>
             {port.operations.length > 0 ? (
-                <ul>
-                    {port.operations.map((op) => (
-                        <li key={op.id_operation}>
-                            <strong>{op.name}</strong>: {op.description || 'No description'}
-                        </li>
-                    ))}
-                </ul>
+                <Table striped bordered hover className="shadow-sm">
+                    <thead>
+                        <tr>
+                            <th>Operation ID</th>
+                            <th>Name</th>
+                            <th>Type</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {port.operations.map((operation) => (
+                            <tr
+                                key={operation.id_operation}
+                                style={{ cursor: 'pointer' }}
+                                onClick={() => navigate(`/operations/${operation.id_operation}`)} // Navigate to OperationDetails
+                            >
+                                <td>{operation.id_operation}</td>
+                                <td>{operation.name_of_operation}</td>
+                                <td><Badge bg="info">{operation.operation_type}</Badge></td>
+                                <td>{new Date(operation.date_of_operation).toLocaleString()}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </Table>
             ) : (
                 <p>No operations available.</p>
             )}
@@ -82,7 +99,7 @@ const PortDetails = () => {
                             <tr
                                 key={order.id_order}
                                 style={{ cursor: 'pointer' }}
-                                onClick={() => navigate(`/orders/${order.id_order}`)} // Nawigacja do OrderDetails
+                                onClick={() => navigate(`/orders/${order.id_order}`)} // Navigate to OrderDetails
                             >
                                 <td>{order.id_order}</td>
                                 <td>{order.description || 'No description'}</td>
@@ -113,7 +130,7 @@ const PortDetails = () => {
                             <tr
                                 key={product.id_product}
                                 style={{ cursor: 'pointer' }}
-                                onClick={() => navigate(`/products/${product.id_product}`)} // Nawigacja do ProductDetails
+                                onClick={() => navigate(`/products/${product.id_product}`)} // Navigate to ProductDetails
                             >
                                 <td>{product.id_product}</td>
                                 <td>{product.name}</td>

@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { fetchShipDetails } from '../../services/api';
-import { Container, Row, Col, Card, Table } from 'react-bootstrap';
+import { Container, Row, Col, Card, Table, Badge } from 'react-bootstrap';
 
 const ShipDetails = () => {
     const { id } = useParams();
     const [ship, setShip] = useState(null);
     const [error, setError] = useState(null);
+    const navigate = useNavigate(); // Hook for navigation
 
     useEffect(() => {
         const loadShipDetails = async () => {
@@ -37,28 +38,40 @@ const ShipDetails = () => {
 
     return (
         <Container className="ship-details-container">
-            <h2>Ship Details</h2>
+            <h2 className="section-name">Ship Details</h2>
+            <div className="section-divider mb-4"></div>
+
+            {/* Ship Overview */}
             <Row className="mb-4">
                 <Col md={6}>
                     <Card className="p-3 shadow-sm">
                         <Card.Body>
-                            <Card.Title>{ship.name}</Card.Title>
-                            <p><strong>Status:</strong> {ship.status}</p>
+                            <Card.Title>Ship Information</Card.Title>
+                            <p><strong>Name:</strong> {ship.name}</p>
+                            <p><strong>Status:</strong> <Badge bg="info">{ship.status}</Badge></p>
                         </Card.Body>
                     </Card>
                 </Col>
                 <Col md={6}>
                     {ship.image ? (
-                        <img src={ship.image} alt={ship.name} className="img-fluid" />
+                        <Card className="p-3 shadow-sm">
+                            <Card.Img variant="top" src={ship.image} alt={ship.name} className="img-fluid" />
+                        </Card>
                     ) : (
-                        <p>No image available</p>
+                        <Card className="p-3 shadow-sm">
+                            <Card.Body>
+                                <p>No image available</p>
+                            </Card.Body>
+                        </Card>
                     )}
                 </Col>
             </Row>
 
-            <h4>Operations</h4>
+            {/* Operations Section */}
+            <h4 className="section-name">Operations</h4>
+            <div className="section-divider mb-3"></div>
             {ship.operations.length > 0 ? (
-                <Table striped bordered hover>
+                <Table striped bordered hover className="shadow-sm">
                     <thead>
                         <tr>
                             <th>Operation ID</th>
@@ -69,10 +82,14 @@ const ShipDetails = () => {
                     </thead>
                     <tbody>
                         {ship.operations.map((operation) => (
-                            <tr key={operation.id_operation}>
+                            <tr
+                                key={operation.id_operation}
+                                style={{ cursor: 'pointer' }}
+                                onClick={() => navigate(`/operations/${operation.id_operation}`)} // Navigate to OperationDetails
+                            >
                                 <td>{operation.id_operation}</td>
                                 <td>{operation.name_of_operation}</td>
-                                <td>{operation.operation_type}</td>
+                                <td><Badge bg="info">{operation.operation_type}</Badge></td>
                                 <td>{new Date(operation.date_of_operation).toLocaleString()}</td>
                             </tr>
                         ))}
