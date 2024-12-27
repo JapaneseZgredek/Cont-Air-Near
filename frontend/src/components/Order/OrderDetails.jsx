@@ -1,25 +1,43 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { fetchOrderDetails } from '../../services/api';
-import { Container, Table, Button, Row, Col, Card, Badge } from 'react-bootstrap';
-import '../../styles/panel.css'; // Load panel styles
+import { fetchOrderDetails, deleteOrder } from '../../services/api';
+import { Container, Table, Row, Col, Card, Badge, Button, Modal } from 'react-bootstrap';
+import OrderUpdate from './OrderUpdate';
+import '../../styles/panel.css';
 
 const OrderDetails = () => {
-    const { id } = useParams(); // Get the order ID from the URL
-    const [order, setOrder] = useState(null);
-    const [error, setError] = useState(null);
+    const { id } = useParams(); // Get order ID from URL
+    const [order, setOrder] = useState(null); // State for order details
+    const [error, setError] = useState(null); // State for error messages
+    const [showConfirm, setShowConfirm] = useState(false); // State for delete confirmation modal
+    const [showUpdateModal, setShowUpdateModal] = useState(false); // State for update modal
     const navigate = useNavigate(); // Hook for navigation
 
-    useEffect(() => {
-        const loadOrderDetails = async () => {
-            try {
-                const data = await fetchOrderDetails(id);
-                setOrder(data);
-            } catch (err) {
-                setError('Failed to load order details');
-            }
-        };
+    const loadOrderDetails = async () => {
+        try {
+            const data = await fetchOrderDetails(id); // Fetch order details
+            setOrder(data);
+        } catch (err) {
+            setError('Failed to load order details');
+        }
+    };
 
+    const handleDelete = async () => {
+        try {
+            await deleteOrder(id); // Delete the order
+            navigate('/orders'); // Redirect to orders list after deletion
+        } catch (err) {
+            setError('Failed to delete order');
+            console.error(err);
+        }
+    };
+
+    const handleUpdate = async (updatedOrder) => {
+        setShowUpdateModal(false); // Close the update modal
+        loadOrderDetails(); // Reload order details after update
+    };
+
+    useEffect(() => {
         loadOrderDetails();
     }, [id]);
 
@@ -145,13 +163,29 @@ const OrderDetails = () => {
 
             {/* Action Buttons */}
             <div className="mt-4 d-flex justify-content-between">
-                <Button variant="primary" onClick={() => console.log('Update order')}>
-                    Update Order
-                </Button>
-                <Button variant="danger" onClick={() => console.log('Delete order')}>
-                    Delete Order
-                </Button>
+                <Button variant="warning" onClick={() => setShowUpdateModal(true)}>Update Order</Button>
+                <Button variant="danger" onClick={() => setShowConfirm(true)}>Delete Order</Button>
             </div>
+
+            {/* Confirmation Modal */}
+            <Modal show={showConfirm} onHide={() => setShowConfirm(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Confirm Deletion</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>Are you sure you want to delete this order?</Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowConfirm(false)}>Cancel</Button>
+                    <Button variant="danger" onClick={handleDelete}>Yes, delete</Button>
+                </Modal.Footer>
+            </Modal>
+
+            {/* Update Modal */}
+            <OrderUpdate
+                order={order}
+                show={showUpdateModal}
+                onHide={() => setShowUpdateModal(false)}
+                onUpdate={handleUpdate}
+            />
         </Container>
     );
 };

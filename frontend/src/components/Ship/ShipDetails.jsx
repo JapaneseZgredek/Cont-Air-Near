@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { fetchShipDetails } from '../../services/api';
-import { Container, Row, Col, Card, Table, Badge } from 'react-bootstrap';
+import { fetchShipDetails, deleteShip, updateShip } from '../../services/api';
+import { Container, Row, Col, Card, Table, Badge, Button, Modal } from 'react-bootstrap';
+import UpdateShip from './UpdateShip';
 
 const ShipDetails = () => {
     const { id } = useParams();
     const [ship, setShip] = useState(null);
     const [error, setError] = useState(null);
+    const [showUpdateModal, setShowUpdateModal] = useState(false); // State for update modal
+    const [showConfirm, setShowConfirm] = useState(false); // State for delete confirmation modal
     const navigate = useNavigate(); // Hook for navigation
 
     useEffect(() => {
@@ -27,6 +30,26 @@ const ShipDetails = () => {
 
         loadShipDetails();
     }, [id]);
+
+    const handleDelete = async () => {
+        try {
+            await deleteShip(id); // Delete ship from the database
+            navigate('/ships'); // Redirect to the ships list after deletion
+        } catch (error) {
+            console.error('Failed to delete ship:', error);
+        }
+    };
+
+    const handleUpdate = async (updatedShip) => {
+        try {
+            await updateShip(updatedShip); // Update ship in the database
+            setShowUpdateModal(false); // Close the update modal
+            const data = await fetchShipDetails(id); // Refresh details
+            setShip(data);
+        } catch (error) {
+            console.error('Failed to update ship:', error);
+        }
+    };
 
     if (error) {
         return <p className="error">{error}</p>;
@@ -98,6 +121,45 @@ const ShipDetails = () => {
             ) : (
                 <p>No operations associated with this ship.</p>
             )}
+
+            {/* Action Buttons */}
+            <div className="mt-4">
+                <Button
+                    variant="warning"
+                    className="me-2"
+                    onClick={() => setShowUpdateModal(true)}
+                >
+                    Update Ship
+                </Button>
+                <Button
+                    variant="danger"
+                    onClick={() => setShowConfirm(true)}
+                >
+                    Delete Ship
+                </Button>
+            </div>
+
+            {/* Delete Confirmation Modal */}
+            <Modal show={showConfirm} onHide={() => setShowConfirm(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Confirm Deletion</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    Are you sure you want to delete this ship? This action cannot be undone.
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowConfirm(false)}>Cancel</Button>
+                    <Button variant="danger" onClick={handleDelete}>Yes, delete</Button>
+                </Modal.Footer>
+            </Modal>
+
+            {/* Update Modal */}
+            <UpdateShip
+                ship={ship}
+                show={showUpdateModal}
+                onHide={() => setShowUpdateModal(false)}
+                onUpdate={handleUpdate}
+            />
         </Container>
     );
 };

@@ -1,32 +1,54 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { fetchProductDetails } from '../../services/api';
-import { Container, Table, Card, Row, Col } from 'react-bootstrap';
+import { fetchProductDetails, deleteProduct, updateProduct } from '../../services/api';
+import { Container, Table, Card, Row, Col, Button, Modal } from 'react-bootstrap';
+import UpdateProduct from './UpdateProduct';
 
 const ProductDetails = () => {
     const { id } = useParams();
     const [product, setProduct] = useState(null);
     const [error, setError] = useState(null);
+    const [showUpdateModal, setShowUpdateModal] = useState(false);
+    const [showConfirm, setShowConfirm] = useState(false);
     const navigate = useNavigate();
 
-    useEffect(() => {
-        const loadProductDetails = async () => {
-            try {
-                const data = await fetchProductDetails(id);
+    const loadProductDetails = async () => {
+        try {
+            const data = await fetchProductDetails(id);
 
-                // Jeśli obraz jest zakodowany w Base64, dodajemy prefix
-                if (data.image) {
-                    data.image = `data:image/jpeg;base64,${data.image}`; // Zakładamy format JPEG
-                }
-
-                setProduct(data);
-            } catch (err) {
-                setError('Failed to load product details');
+            // If the product has a base64 image, prefix it for rendering
+            if (data.image) {
+                data.image = `data:image/jpeg;base64,${data.image}`;
             }
-        };
 
+            setProduct(data);
+        } catch (err) {
+            setError('Failed to load product details');
+        }
+    };
+
+    useEffect(() => {
         loadProductDetails();
     }, [id]);
+
+    const handleDelete = async () => {
+        try {
+            await deleteProduct(id);
+            navigate('/products'); // Redirect to product list after deletion
+        } catch (error) {
+            console.error('Failed to delete product:', error);
+        }
+    };
+
+    const handleUpdate = async (updatedProduct) => {
+        try {
+            await updateProduct(updatedProduct);
+            setShowUpdateModal(false); // Close modal
+            loadProductDetails(); // Reload updated product details
+        } catch (error) {
+            console.error('Failed to update product:', error);
+        }
+    };
 
     if (error) {
         return <p className="error">{error}</p>;
@@ -48,13 +70,12 @@ const ProductDetails = () => {
                             <Card.Title>{product.name}</Card.Title>
                             <p><strong>Price:</strong> ${product.price.toFixed(2)}</p>
                             <p><strong>Weight:</strong> {product.weight.toFixed(2)} kg</p>
-                            {/* Port Name as Clickable Link */}
                             <p>
                                 <strong>Port:</strong>{' '}
                                 <span
                                     className="clickable"
                                     style={{ color: 'blue', textDecoration: 'underline', cursor: 'pointer' }}
-                                    onClick={() => navigate(`/ports/${product.port_id}`)} // Zakładamy, że portId jest w danych produktu
+                                    onClick={() => navigate(`/ports/${product.port_id}`)}
                                 >
                                     {product.port}
                                 </span>
@@ -71,6 +92,7 @@ const ProductDetails = () => {
                 </Col>
             </Row>
 
+            {/* Associated Orders */}
             <h4>Associated Orders</h4>
             {product.orders.length > 0 ? (
                 <Table striped bordered hover>
@@ -94,6 +116,38 @@ const ProductDetails = () => {
             ) : (
                 <p>No associated orders</p>
             )}
+
+            {/* Action Buttons */}
+            <div className="mt-4 d-flex justify-content-between">
+                <Button variant="warning" onClick={() => setShowUpdateModal(true)}>
+                    Update Product
+                </Button>
+                <Button variant="danger" onClick={() => setShowConfirm(true)}>
+                    Delete Product
+                </Button>
+            </div>
+
+            {/* Confirmation Modal for Deletion */}
+            <Modal show={showConfirm} onHide={() => setShowConfirm(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Confirm Deletion</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    Are you sure you want to delete this product? This action cannot be undone.
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowConfirm(false)}>Cancel</Button>
+                    <Button variant="danger" onClick={handleDelete}>Yes, delete</Button>
+                </Modal.Footer>
+            </Modal>
+
+            {/* Update Modal */}
+            <UpdateProduct
+                product={product}
+                show={showUpdateModal}
+                onHide={() => setShowUpdateModal(false)}
+                onUpdate={handleUpdate}
+            />
         </Container>
     );
 };

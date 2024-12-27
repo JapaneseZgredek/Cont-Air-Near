@@ -1,14 +1,11 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Card, Button, Modal } from 'react-bootstrap';
+import { Card } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import { deleteProduct, fetchPorts, fetchProductImage } from '../../services/api';
-import UpdateProduct from "./UpdateProduct";
+import { fetchPorts, fetchProductImage } from '../../services/api';
 import '../../styles/List.css';
 import { RoleContext } from '../../contexts/RoleContext';
 
-const ProductItem = ({ product, onUpdate, onDelete, onAddToCart }) => {
-    const [showConfirm, setShowConfirm] = useState(false);
-    const [showUpdateModal, setShowUpdateModal] = useState(false);
+const ProductItem = ({ product, onAddToCart }) => {
     const [imageUrl, setImageUrl] = useState(null);
     const [loadingImage, setLoadingImage] = useState(true);
     const [portName, setPortName] = useState('');
@@ -32,25 +29,6 @@ const ProductItem = ({ product, onUpdate, onDelete, onAddToCart }) => {
         fetchPortName();
     }, [product.id_port]);
 
-    const handleDelete = async () => {
-        try {
-            await deleteProduct(product.id_product);
-            onDelete(product.id_product);
-            setShowConfirm(false);
-        } catch (error) {
-            console.error('Failed to delete product: ', error);
-        }
-    };
-
-    const openUpdateModal = () => {
-        setShowUpdateModal(true);
-    };
-
-    const closeUpdateModal = () => {
-        setShowUpdateModal(false);
-        loadImage();
-    };
-
     const handleAddToCart = () => {
         const existingCart = JSON.parse(localStorage.getItem('cart')) || [];
         const existingProduct = existingCart.find(item => item.id_product === product.id_product);
@@ -70,7 +48,7 @@ const ProductItem = ({ product, onUpdate, onDelete, onAddToCart }) => {
             onAddToCart(product.id_product);
         }
 
-        alert('Produkt dodany do koszyka!');
+        alert('Product added to cart!');
     };
 
     const loadImage = async () => {
@@ -95,19 +73,19 @@ const ProductItem = ({ product, onUpdate, onDelete, onAddToCart }) => {
             <Card className="grid-item-card">
                 <Card.Title
                     className="clickable"
-                    onClick={() => navigate(`/products/${product.id_product}`)} // Nawigacja do widoku szczegółowego produktu
+                    onClick={() => navigate(`/products/${product.id_product}`)} // Navigate to product details view
                     style={{ cursor: 'pointer', textDecoration: 'underline' }}
                 >
                     {product.name}
                 </Card.Title>
-                {/* Kontener dla tekstów */}
+                {/* Container for texts */}
                 <div className="item-texts">
                     <a>Price: {product.price}</a>
                     <a>Weight: {product.weight}</a>
                     <a>Port: {portName || 'Loading...'}</a>
                 </div>
 
-                {/* Obrazek */}
+                {/* Image */}
                 <div>
                     {loadingImage ? (
                         <div className="loading-message">Loading image...</div>
@@ -122,37 +100,18 @@ const ProductItem = ({ product, onUpdate, onDelete, onAddToCart }) => {
                     )}
                 </div>
 
-                {/* Kontener dla przycisków */}
+                {/* Buttons */}
                 <div className="item-buttons">
-                    {(['EMPLOYEE', 'ADMIN'].includes(role)) && (
-                        <>
-                            <Button variant="outline-success" onClick={handleAddToCart}>Add to Cart</Button>
-                            <Button variant="warning" onClick={openUpdateModal}>Update</Button>
-                            <Button variant="danger" onClick={() => setShowConfirm(true)}>Delete</Button>
-                        </>
+                    {(['CLIENT', 'EMPLOYEE', 'ADMIN'].includes(role)) && (
+                        <button
+                            className="btn btn-outline-success"
+                            onClick={handleAddToCart}
+                        >
+                            Add to Cart
+                        </button>
                     )}
                 </div>
             </Card>
-
-            <Modal show={showConfirm} onHide={() => setShowConfirm(false)}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Confirm Deletion</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    Are you sure you want to delete this product? There is no going back
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setShowConfirm(false)}>Cancel</Button>
-                    <Button variant="danger" onClick={handleDelete}>Yes, delete</Button>
-                </Modal.Footer>
-            </Modal>
-
-            <UpdateProduct
-                product={product}
-                show={showUpdateModal}
-                onHide={closeUpdateModal}
-                onUpdate={onUpdate}
-            />
         </>
     );
 };

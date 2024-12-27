@@ -1,27 +1,49 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { fetchPortDetails } from '../../services/api';
-import { Container, Table, Row, Col, Card, Badge } from 'react-bootstrap';
+import { fetchPortDetails, deletePort, updatePort } from '../../services/api';
+import { Container, Table, Row, Col, Card, Badge, Button, Modal } from 'react-bootstrap';
+import UpdatePort from './UpdatePort';
 import '../../styles/panel.css';
 
 const PortDetails = () => {
     const { id } = useParams(); // Retrieve port ID from URL
     const [port, setPort] = useState(null); // State for port details
     const [error, setError] = useState(null); // State for errors
+    const [showConfirm, setShowConfirm] = useState(false); // Confirmation modal state
+    const [showUpdateModal, setShowUpdateModal] = useState(false); // Update modal state
     const navigate = useNavigate(); // Navigation hook
 
-    useEffect(() => {
-        const loadPortDetails = async () => {
-            try {
-                const data = await fetchPortDetails(id); // Fetch port details
-                setPort(data);
-            } catch (err) {
-                setError('Failed to load port details');
-            }
-        };
+    const loadPortDetails = async () => {
+        try {
+            const data = await fetchPortDetails(id); // Fetch port details
+            setPort(data);
+        } catch (err) {
+            setError('Failed to load port details');
+        }
+    };
 
+    useEffect(() => {
         loadPortDetails();
     }, [id]);
+
+    const handleDelete = async () => {
+        try {
+            await deletePort(id); // Delete port
+            navigate('/ports'); // Redirect to port list after deletion
+        } catch (error) {
+            console.error('Failed to delete port:', error);
+        }
+    };
+
+    const handleUpdate = async (updatedPort) => {
+        try {
+            await updatePort(updatedPort); // Update port
+            setShowUpdateModal(false); // Close the update modal
+            loadPortDetails(); // Reload updated port details
+        } catch (error) {
+            console.error('Failed to update port:', error);
+        }
+    };
 
     if (error) {
         return <p className="error">{error}</p>;
@@ -143,6 +165,38 @@ const PortDetails = () => {
             ) : (
                 <p>No products associated with this port.</p>
             )}
+
+            {/* Action Buttons */}
+            <div className="mt-4 d-flex justify-content-between">
+                <Button variant="warning" onClick={() => setShowUpdateModal(true)}>
+                    Update Port
+                </Button>
+                <Button variant="danger" onClick={() => setShowConfirm(true)}>
+                    Delete Port
+                </Button>
+            </div>
+
+            {/* Confirmation Modal for Deletion */}
+            <Modal show={showConfirm} onHide={() => setShowConfirm(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Confirm Deletion</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    Are you sure you want to delete this port? This action cannot be undone.
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowConfirm(false)}>Cancel</Button>
+                    <Button variant="danger" onClick={handleDelete}>Yes, delete</Button>
+                </Modal.Footer>
+            </Modal>
+
+            {/* Update Modal */}
+            <UpdatePort
+                port={port}
+                show={showUpdateModal}
+                onHide={() => setShowUpdateModal(false)}
+                onUpdate={handleUpdate}
+            />
         </Container>
     );
 };
