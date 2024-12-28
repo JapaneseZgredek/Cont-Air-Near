@@ -19,6 +19,10 @@ const authHeaders = () => {
   };
 };
 
+export const fetchShipDetails = async (ship_id) => {
+    await verifyRoles(['EMPLOYEE', 'ADMIN']);
+    return await fetchProtectedData(`/api/ships/${ship_id}/details`);
+}
 export const fetchShips = async () => {
     await verifyRoles(['EMPLOYEE', 'ADMIN']);
     return await fetchProtectedData(`/api/ships/`);
@@ -106,6 +110,11 @@ export async function fetchOperationsByPort(portId) {
 export async function fetchOperationsByShip(shipId) {
     await verifyRoles(['EMPLOYEE', 'ADMIN']);
     return await fetchProtectedData(`/api/operations/ship/${shipId}`);
+}
+
+export async function fetchOperationDetails(id_operation) {
+    await verifyRoles(['EMPLOYEE', 'ADMIN'])
+    return await fetchProtectedData(`/api/operations/${id_operation}/details`)
 }
 
 export const fetchOperations = async () => {
@@ -216,6 +225,11 @@ export const updatePort = async (port) => {
     }
 };
 
+export const fetchPortDetails = async (id_port) => {
+    await verifyRoles(['EMPLOYEE', 'ADMIN', 'CLIENT']);
+    return await fetchProtectedData(`/api/ports/${id_port}/details`);
+};
+
 // Products table related
 
 export async function fetchProductsByPort(portId) {
@@ -224,6 +238,11 @@ export async function fetchProductsByPort(portId) {
 }
 
 // Guest Table product do not add auth
+
+export const fetchProductDetails = async (id_product) => {
+    await verifyRoles(['CLIENT', 'EMPLOYEE','ADMIN']);
+    return await fetchProtectedData(`/api/products/${id_product}/details`);
+};
 
 export const fetchProducts = async () => {
   const response = await fetch(`${API_URL}/api/products`);
@@ -329,6 +348,11 @@ export const fetchOrders = async () => {
 //fetchOrderById
 //verify roles
 //napisac metode podobna do fetch current client tylko taką co fetchuje po id jego produkty i dorobić backend + front
+
+export const fetchOrderDetails = async (order_id) => {
+    await verifyRoles(['EMPLOYEE', 'ADMIN', 'CLIENT']);
+    return await fetchProtectedData(`/api/orders/${order_id}`);
+};
 
 export const fetchOrdersByPort = async (port_id) => {
     await verifyRoles(['EMPLOYEE', 'ADMIN', 'CLIENT']);
@@ -543,6 +567,11 @@ export const fetchExcludedProducts = async () => {
     console.error("Error in fetchExcludedProducts:", error.response?.data || error.message);
     throw error.response?.data || new Error("Failed to fetch excluded products");
   }
+};
+
+export const fetchClientDetails = async (clientId) => {
+    await verifyRoles(['CLIENT', 'EMPLOYEE' ,'ADMIN']);
+    return await fetchProtectedData(`/api/clients/${clientId}/details`);
 };
 
 export const fetchClients = async () => {

@@ -13,6 +13,7 @@ import base64
 from io import BytesIO
 import os
 from pathlib import Path
+import datetime
 
 from .client import get_current_client
 from ..models import UserRole
@@ -41,6 +42,54 @@ class ShipRead(BaseModel):
 
     class Config:
         from_attributes = True
+
+class OperationDTO(BaseModel):
+    id_operation: int
+    name_of_operation: str
+    operation_type: str
+    date_of_operation: str
+
+    class Config:
+        orm_mode = True
+
+class ShipDetailsDTO(BaseModel):
+    id_ship: int
+    name: str
+    status: str
+    image: Optional[str]
+    operations: List[OperationDTO]
+
+    class Config:
+        orm_mode = True
+
+@router.get("/ships/{id_ship}/details", response_model=ShipDetailsDTO)
+def get_ship_details(id_ship: int, db: Session = Depends(get_db)):
+    ship = db.query(Ship).filter(Ship.id_ship == id_ship).first()
+    if not ship:
+        raise HTTPException(status_code=404, detail="Ship not found")
+
+    operations = (
+        db.query(Operation)
+        .filter(Operation.id_ship == id_ship)
+        .all()
+    )
+
+    return ShipDetailsDTO(
+        id_ship=ship.id_ship,
+        name=ship.name,
+        status=ship.status.value,
+        image=ship.image,
+        operations=[
+            OperationDTO(
+                id_operation=op.id_operation,
+                name_of_operation=op.name_of_operation,
+                operation_type=op.operation_type.value,
+                date_of_operation=op.date_of_operation.isoformat(),
+            )
+            for op in operations
+        ]
+    )
+
 
 @router.post("/ships", response_model=ShipRead)  # Response model is ShipRead so there is an id in returned object, this allowed to remove objects from the list without reloading page
 def create_ship(

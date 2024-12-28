@@ -1,7 +1,8 @@
 from fastapi import APIRouter, HTTPException, Depends, File, UploadFile
 from sqlalchemy.orm import Session
 
-from backend.models import Order_product
+from backend.models import Order_product, Port
+from backend.models.order import Order
 from backend.models.product import Product
 from backend.database import get_db
 from backend.logging_config import logger
@@ -40,6 +41,51 @@ class ProductRead(BaseModel):
 
     class Config:
         from_attributes = True
+
+class ProductDetailsDTO(BaseModel):
+    id_product: int
+    name: str
+    price: float
+    weight: float
+    image: Optional[str]
+    port: str
+    port_id: int  # Dodano ID portu
+    orders: List[int]
+
+    class Config:
+        orm_mode = True
+
+
+@router.get("/products/{id_product}/details", response_model=ProductDetailsDTO)
+def get_product_details(id_product: int, db: Session = Depends(get_db)):
+    # Pobranie produktu
+    product = db.query(Product).filter(Product.id_product == id_product).first()
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    # Pobranie zamówień powiązanych z produktem
+    orders = (
+        db.query(Order.id_order)
+        .join(Order_product, Order.id_order == Order_product.id_order)
+        .filter(Order_product.id_product == id_product)
+        .all()
+    )
+    order_ids = [order.id_order for order in orders]
+
+    # Pobranie danych portu
+    port = db.query(Port).filter(Port.id_port == product.id_port).first()
+
+    return ProductDetailsDTO(
+        id_product=product.id_product,
+        name=product.name,
+        price=product.price,
+        weight=product.weight,
+        image=product.image,
+        port=port.name if port else "Unknown",
+        port_id=port.id_port if port else None,  # Dodano port_id
+        orders=order_ids,
+    )
+
 
 
 @router.get("/products/port/{port_id}", response_model=List[ProductRead])

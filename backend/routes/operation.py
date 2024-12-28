@@ -1,3 +1,5 @@
+from enum import Enum
+
 from fastapi import APIRouter, HTTPException, Depends, status
 from sqlalchemy.orm import Session
 from datetime import datetime
@@ -40,6 +42,55 @@ class OperationRead(BaseModel):
 
     class Config:
         orm_mode = True
+
+class OperationTypeDTO(str, Enum):
+    AT_BAY = "AT_BAY"
+    TRANSPORT = "TRANSPORT"
+    TRANSFER = "TRANSFER"
+    DEPARTURE = "DEPARTURE"
+    ARRIVAL = "ARRIVAL"
+    CARGO_LOADING = "CARGO_LOADING"
+    CARGO_DISCHARGE = "CARGO_DISCHARGE"
+
+class OperationDetailsDTO(BaseModel):
+    id_operation: int
+    name_of_operation: str
+    operation_type: str  # Use str if OperationTypeDTO is not defined
+    date_of_operation: datetime
+    ship_id: Optional[int]
+    ship_name: Optional[str]
+    port_id: Optional[int]
+    port_name: Optional[str]
+    order_id: Optional[int]
+
+    class Config:
+        orm_mode = True
+
+
+@router.get("/operations/{id_operation}/details", response_model=OperationDetailsDTO)
+def get_operation_details(id_operation: int, db: Session = Depends(get_db)):
+    # Fetch operation with related data using relationships
+    operation = db.query(Operation).filter(Operation.id_operation == id_operation).first()
+
+    if not operation:
+        raise HTTPException(status_code=404, detail="Operation not found")
+
+    # Safely retrieve ship and port details
+    ship = operation.ship
+    port = operation.port
+
+    return OperationDetailsDTO(
+        id_operation=operation.id_operation,
+        name_of_operation=operation.name_of_operation,
+        operation_type=operation.operation_type.value,  # Convert Enum to string
+        date_of_operation=operation.date_of_operation,
+        ship_id=ship.id_ship if ship else None,
+        ship_name=ship.name if ship else None,
+        port_id=port.id_port if port else None,
+        port_name=port.name if port else None,
+        order_id=operation.id_order,
+    )
+
 
 # Operations endpoints with role validation
 @router.get("/operations/port/{id_port}", response_model=List[OperationRead])
