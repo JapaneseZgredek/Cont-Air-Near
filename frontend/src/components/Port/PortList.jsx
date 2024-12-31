@@ -10,20 +10,22 @@ import { RoleContext } from '../../contexts/RoleContext';
 const PortList = () => {
     const [ports, setPorts] = useState([]);
     const [filteredPorts, setFilteredPorts] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
     const [searchInColumn, setSearchInColumn] = useState('');
+    const [sortValue, setSortValue] = useState('');
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const { role } = useContext(RoleContext);
 
-    // Load ports from API
     const loadPorts = async () => {
         try {
             const data = await fetchPorts();
             setPorts(data);
-            setFilteredPorts(data); // Initially set filtered list as all ports
+            setFilteredPorts(data);
         } catch (err) {
             setError('Failed to load ports');
+            console.error('Error fetching ports:', err);
         }
     };
 
@@ -31,56 +33,51 @@ const PortList = () => {
         loadPorts();
     }, []);
 
-    // Handle the addition of a new port
-    const handleAddPort = (newPort) => {
-        setPorts((prevPorts) => [...prevPorts, newPort]);
-        setFilteredPorts((prevPorts) => [...prevPorts, newPort]);
-    };
+    useEffect(() => {
+        let filtered = [...ports];
 
-    // Handle the update of an existing port
-    const handleUpdatePort = (updatedPort) => {
-        setPorts((prevPorts) =>
-            prevPorts.map((port) =>
-                port.id_port === updatedPort.id_port ? updatedPort : port
-            )
-        );
-        setFilteredPorts((prevPorts) =>
-            prevPorts.map((port) =>
-                port.id_port === updatedPort.id_port ? updatedPort : port
-            )
-        );
-    };
+        // Apply search filtering
+        if (searchTerm) {
+            filtered = filtered.filter(port => {
+                const value = searchInColumn ? port[searchInColumn] : null;
 
-    // Handle the deletion of a port
-    const handleDeletePort = (id) => {
-        setPorts((prevPorts) => prevPorts.filter((port) => port.id_port !== id));
-        setFilteredPorts((prevPorts) => prevPorts.filter((port) => port.id_port !== id));
-    };
+                if (!searchInColumn) {
+                    return Object.values(port).some(val =>
+                        val?.toString().toLowerCase().includes(searchTerm.toLowerCase())
+                    );
+                }
 
-    // Handle search functionality based on search term
-    const handleSearch = (searchTerm) => {
-        if (!searchTerm) {
-            setFilteredPorts(ports); // If no search term, show all ports
-        } else if (searchInColumn) {
-            // Filter based on selected column
-            const filtered = ports.filter((port) =>
-                port[searchInColumn] && port[searchInColumn].toString().toLowerCase().includes(searchTerm.toLowerCase())
-            );
-            setFilteredPorts(filtered);
-        } else {
-            // Filter through all columns
-            const filtered = ports.filter((port) =>
-                Object.values(port).some((value) =>
-                    value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
-                )
-            );
-            setFilteredPorts(filtered);
+                return value?.toString().toLowerCase().includes(searchTerm.toLowerCase());
+            });
         }
+
+        // Apply sorting
+        if (sortValue) {
+            filtered.sort((a, b) => {
+                const valueA = a[sortValue];
+                const valueB = b[sortValue];
+
+                if (typeof valueA === 'number' && typeof valueB === 'number') {
+                    return valueA - valueB;
+                }
+
+                return valueA?.toString().localeCompare(valueB?.toString());
+            });
+        }
+
+        setFilteredPorts(filtered);
+    }, [ports, searchTerm, searchInColumn, sortValue]);
+
+    const handleSearch = (term) => {
+        setSearchTerm(term);
     };
 
-    // Handle the column selection for search
     const handleSearchInChange = (column) => {
         setSearchInColumn(column);
+    };
+
+    const handleSortChange = (sortField) => {
+        setSortValue(sortField);
     };
 
     const handlePageChange = (pageNumber) => {
@@ -92,112 +89,93 @@ const PortList = () => {
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentItems = filteredPorts.slice(indexOfFirstItem, indexOfLastItem);
 
+    const handleAddPort = (newPort) => {
+        setPorts(prevPorts => [...prevPorts, newPort]);
+    };
+
+    const handleDeletePort = (id) => {
+        setPorts(prevPorts => prevPorts.filter(port => port.id_port !== id));
+    };
+
+    const handleUpdatePort = (updatedPort) => {
+        setPorts(prevPorts =>
+            prevPorts.map(port => (port.id_port === updatedPort.id_port ? updatedPort : port))
+        );
+    };
+
     const handleItemsPerPageChange = (newItemsPerPage) => {
         setItemsPerPage(newItemsPerPage);
         setCurrentPage(1);
     };
 
-
     return (
         <Container>
             <div className="d-flex justify-content-between mb-3">
                 <h2>Ports</h2>
-                {(['EMPLOYEE','ADMIN'].includes(role)) && (
-                <AddPort onAdd={handleAddPort} />
+                {(['EMPLOYEE', 'ADMIN'].includes(role)) && (
+                    <AddPort onAdd={handleAddPort} />
                 )}
             </div>
-            <hr className="divider" /> {/*linia podzialu*/}
+            <hr className="divider" />
 
             <SearchAndFilterBar
                 onSearch={handleSearch}
                 onSearchInChange={handleSearchInChange}
-                onSortChange={() => {}}
-                filterOptions={['name', 'location', 'country']} // Filtering options
+                onSortChange={handleSortChange}
+                filterOptions={['name', 'location', 'country']}
             />
 
-            <div className='pagination-container'>
-                {/* Pagination controls */}
+            <div className="pagination-container">
                 {totalPages > 1 && (
-                  <Pagination
-                    count={totalPages}
-                    className="pagination"
-                  >
-                    <Pagination.First
-                        className="pagination-item"
-                        onClick={() => handlePageChange(1)}
-                        disabled={currentPage === 1}
-                    />      
-                    <Pagination.Prev
-                      className="pagination-item"
-                      onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
-                      disabled={currentPage === 1}
-                    />
-
-                    {/* Input for page number */}
-                    <Pagination.Item className="pagination-item-middle" key={currentPage}>
-                        <input
-                            type="number"
-                            min="1"
-                            max={totalPages}
-                            value={currentPage}
-                            onChange={(e) => {
-                                const page = Math.max(1, Math.min(totalPages, Number(e.target.value)));
-                                handlePageChange(page);
-                            }}
-                            onBlur={() => handlePageChange(currentPage)}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                    handlePageChange(currentPage);
-                                }
-                            }}
-                            style={{ width: '50px', textAlign: 'center' }}
+                    <Pagination>
+                        <Pagination.First
+                            onClick={() => handlePageChange(1)}
+                            disabled={currentPage === 1}
                         />
-                      {` / ${totalPages}`}
-                    </Pagination.Item>
-
-                    <Pagination.Next
-                      className="pagination-item"
-                      onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
-                      disabled={currentPage === totalPages}
-                    />      
-                    <Pagination.Last
-                        className="pagination-item"
-                        onClick={() => handlePageChange(totalPages)}
-                        disabled={currentPage === totalPages}
-                    />
-                  </Pagination>
+                        <Pagination.Prev
+                            onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
+                            disabled={currentPage === 1}
+                        />
+                        <Pagination.Item active>{currentPage}</Pagination.Item>
+                        <Pagination.Next
+                            onClick={() => handlePageChange(currentPage + 1)}
+                            disabled={currentPage === totalPages}
+                        />
+                        <Pagination.Last
+                            onClick={() => handlePageChange(totalPages)}
+                            disabled={currentPage === totalPages}
+                        />
+                    </Pagination>
                 )}
 
-                {/* Items per page dropdown */}
                 <Dropdown onSelect={handleItemsPerPageChange}>
-                  <Dropdown.Toggle variant="success" id="dropdown-items-per-page">
-                    Items per page: {itemsPerPage}
-                  </Dropdown.Toggle>
-                  <Dropdown.Menu>
-                    {[1, 5, 10, 25, 50].map((number) => (
-                      <Dropdown.Item key={number} eventKey={number}>
-                        {number}
-                      </Dropdown.Item>
-                    ))}
-                  </Dropdown.Menu>
+                    <Dropdown.Toggle variant="success" id="dropdown-items-per-page">
+                        Items per page: {itemsPerPage}
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu>
+                        {[1, 5, 10, 25, 50].map(number => (
+                            <Dropdown.Item key={number} eventKey={number}>
+                                {number}
+                            </Dropdown.Item>
+                        ))}
+                    </Dropdown.Menu>
                 </Dropdown>
             </div>
 
-            {error && <p className="err-field">{"Err: "+error}</p>}
+            {error && <p className="err-field">{"Err: " + error}</p>}
             <div className="straight-list">
-
-            {currentItems.length > 0 ? (
-                currentItems.map((port) => (
-                    <PortItem
-                        key={port.id_port}
-                        port={port}
-                        onDelete={handleDeletePort}
-                        onUpdate={handleUpdatePort}
-                    />
-                ))
-            ) : (
-                <p>No ports available.</p>
-            )}
+                {currentItems.length > 0 ? (
+                    currentItems.map(port => (
+                        <PortItem
+                            key={port.id_port}
+                            port={port}
+                            onDelete={handleDeletePort}
+                            onUpdate={handleUpdatePort}
+                        />
+                    ))
+                ) : (
+                    <p>No ports available.</p>
+                )}
             </div>
         </Container>
     );

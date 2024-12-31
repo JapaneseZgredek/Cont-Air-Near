@@ -10,20 +10,23 @@ import { RoleContext } from '../../contexts/RoleContext';
 const OperationList = () => {
     const [operations, setOperations] = useState([]);
     const [filteredOperations, setFilteredOperations] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
     const [searchInColumn, setSearchInColumn] = useState('');
+    const [sortValue, setSortValue] = useState('');
     const [error, setError] = useState(null);
-    const [displayType, setDisplayType] = useState("straight");
+    const [displayType, setDisplayType] = useState('straight');
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
-    const { role } = useContext(RoleContext);    
+    const { role } = useContext(RoleContext);
 
     const loadOperations = async () => {
         try {
             const data = await fetchOperations();
             setOperations(data);
-            setFilteredOperations(data);
+            setFilteredOperations(data); // Ensure initial view shows all data
         } catch (err) {
             setError('Failed to load operations');
+            console.error('Error fetching operations:', err);
         }
     };
 
@@ -31,49 +34,51 @@ const OperationList = () => {
         loadOperations();
     }, []);
 
-    const handleAddOperation = (newOperation) => {
-        setOperations((prevOperations) => [...prevOperations, newOperation]);
-        setFilteredOperations((prevOperations) => [...prevOperations, newOperation]);
-    };
+    useEffect(() => {
+        let filtered = [...operations];
 
-    const handleUpdateOperation = (updatedOperation) => {
-        setOperations((prevOperations) =>
-            prevOperations.map((operation) =>
-                operation.id_operation === updatedOperation.id_operation ? updatedOperation : operation
-            )
-        );
-        setFilteredOperations((prevOperations) =>
-            prevOperations.map((operation) =>
-                operation.id_operation === updatedOperation.id_operation ? updatedOperation : operation
-            )
-        );
-    };
+        // Apply search filtering
+        if (searchTerm) {
+            filtered = filtered.filter(operation => {
+                const value = searchInColumn ? operation[searchInColumn] : null;
 
-    const handleDeleteOperation = (id) => {
-        setOperations((prevOperations) => prevOperations.filter((operation) => operation.id_operation !== id));
-        setFilteredOperations((prevOperations) => prevOperations.filter((operation) => operation.id_operation !== id));
-    };
+                if (!searchInColumn) {
+                    return Object.values(operation).some(val =>
+                        val?.toString().toLowerCase().includes(searchTerm.toLowerCase())
+                    );
+                }
 
-    const handleSearch = (searchTerm) => {
-        if (!searchTerm) {
-            setFilteredOperations(operations);
-        } else if (searchInColumn) {
-            const filtered = operations.filter(operation =>
-                operation[searchInColumn] && operation[searchInColumn].toString().toLowerCase().includes(searchTerm.toLowerCase())
-            );
-            setFilteredOperations(filtered);
-        } else {
-            const filtered = operations.filter(operation =>
-                Object.values(operation).some(value =>
-                    value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
-                )
-            );
-            setFilteredOperations(filtered);
+                return value?.toString().toLowerCase().includes(searchTerm.toLowerCase());
+            });
         }
+
+        // Apply sorting
+        if (sortValue) {
+            filtered.sort((a, b) => {
+                const valueA = a[sortValue];
+                const valueB = b[sortValue];
+
+                if (typeof valueA === 'number' && typeof valueB === 'number') {
+                    return valueA - valueB;
+                }
+
+                return valueA?.toString().localeCompare(valueB?.toString());
+            });
+        }
+
+        setFilteredOperations(filtered);
+    }, [operations, searchTerm, searchInColumn, sortValue]);
+
+    const handleSearch = (term) => {
+        setSearchTerm(term);
     };
 
     const handleSearchInChange = (column) => {
         setSearchInColumn(column);
+    };
+
+    const handleSortChange = (sortField) => {
+        setSortValue(sortField);
     };
 
     const handlePageChange = (pageNumber) => {
@@ -85,6 +90,22 @@ const OperationList = () => {
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentItems = filteredOperations.slice(indexOfFirstItem, indexOfLastItem);
 
+    const handleAddOperation = (newOperation) => {
+        setOperations(prevOperations => [...prevOperations, newOperation]);
+    };
+
+    const handleDeleteOperation = (id) => {
+        setOperations(prevOperations => prevOperations.filter(operation => operation.id_operation !== id));
+    };
+
+    const handleUpdateOperation = (updatedOperation) => {
+        setOperations(prevOperations =>
+            prevOperations.map(operation =>
+                operation.id_operation === updatedOperation.id_operation ? updatedOperation : operation
+            )
+        );
+    };
+
     const handleItemsPerPageChange = (newItemsPerPage) => {
         setItemsPerPage(newItemsPerPage);
         setCurrentPage(1);
@@ -95,101 +116,69 @@ const OperationList = () => {
             <div className="d-flex justify-content-between mb-3">
                 <h2>Operations</h2>
                 {(['EMPLOYEE', 'ADMIN'].includes(role)) && (
-                <AddOperation onAdd={handleAddOperation} />
+                    <AddOperation onAdd={handleAddOperation} />
                 )}
             </div>
-            <hr className="divider" /> {/*linia podzialu*/}
-            
+            <hr className="divider" />
 
             <SearchAndFilterBar
                 onSearch={handleSearch}
                 onSearchInChange={handleSearchInChange}
-                onSortChange={() => {}}
-                filterOptions={['name of operation', 'operation type', 'date of operation', 'id ship', 'id port']}
+                onSortChange={handleSortChange}
+                filterOptions={['name of operation', 'operation type', 'date of operation']}
             />
 
-            <div className='pagination-container'>
-                {/* Pagination controls */}
+            <div className="pagination-container">
                 {totalPages > 1 && (
-                  <Pagination
-                    count={totalPages}
-                    className="pagination"
-                  >
-                    <Pagination.First
-                        className="pagination-item"
-                        onClick={() => handlePageChange(1)}
-                        disabled={currentPage === 1}
-                    />      
-                    <Pagination.Prev
-                      className="pagination-item"
-                      onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
-                      disabled={currentPage === 1}
-                    />
-
-                    {/* Input for page number */}
-                    <Pagination.Item className="pagination-item-middle" key={currentPage}>
-                        <input
-                            type="number"
-                            min="1"
-                            max={totalPages}
-                            value={currentPage}
-                            onChange={(e) => {
-                                const page = Math.max(1, Math.min(totalPages, Number(e.target.value)));
-                                handlePageChange(page);
-                            }}
-                            onBlur={() => handlePageChange(currentPage)}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                    handlePageChange(currentPage);
-                                }
-                            }}
-                            style={{ width: '50px', textAlign: 'center' }}
+                    <Pagination>
+                        <Pagination.First
+                            onClick={() => handlePageChange(1)}
+                            disabled={currentPage === 1}
                         />
-                      {` / ${totalPages}`}
-                    </Pagination.Item>
-
-                    <Pagination.Next
-                      className="pagination-item"
-                      onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
-                      disabled={currentPage === totalPages}
-                    />      
-                    <Pagination.Last
-                        className="pagination-item"
-                        onClick={() => handlePageChange(totalPages)}
-                        disabled={currentPage === totalPages}
-                    />
-                  </Pagination>
+                        <Pagination.Prev
+                            onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
+                            disabled={currentPage === 1}
+                        />
+                        <Pagination.Item active>{currentPage}</Pagination.Item>
+                        <Pagination.Next
+                            onClick={() => handlePageChange(currentPage + 1)}
+                            disabled={currentPage === totalPages}
+                        />
+                        <Pagination.Last
+                            onClick={() => handlePageChange(totalPages)}
+                            disabled={currentPage === totalPages}
+                        />
+                    </Pagination>
                 )}
 
-                {/* Items per page dropdown */}
                 <Dropdown onSelect={handleItemsPerPageChange}>
-                  <Dropdown.Toggle variant="success" id="dropdown-items-per-page">
-                    Items per page: {itemsPerPage}
-                  </Dropdown.Toggle>
-                  <Dropdown.Menu>
-                    {[1, 5, 10, 25, 50].map((number) => (
-                      <Dropdown.Item key={number} eventKey={number}>
-                        {number}
-                      </Dropdown.Item>
-                    ))}
-                  </Dropdown.Menu>
+                    <Dropdown.Toggle variant="success" id="dropdown-items-per-page">
+                        Items per page: {itemsPerPage}
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu>
+                        {[1, 5, 10, 25, 50].map(number => (
+                            <Dropdown.Item key={number} eventKey={number}>
+                                {number}
+                            </Dropdown.Item>
+                        ))}
+                    </Dropdown.Menu>
                 </Dropdown>
             </div>
 
-            {error && <p className="err-field">{"Err: "+error}</p>}
+            {error && <p className="err-field">{"Err: " + error}</p>}
             <div className={`${displayType}-list`}>
-            {currentItems.length > 0 ? (
-                currentItems.map((operation) => (
-                    <OperationItem
-                        key={operation.id_operation}
-                        operation={operation}
-                        onDelete={handleDeleteOperation}
-                        onUpdate={handleUpdateOperation}
-                    />
-                ))
-            ) : (
-                <p>No operations available.</p>
-            )}
+                {currentItems.length > 0 ? (
+                    currentItems.map(operation => (
+                        <OperationItem
+                            key={operation.id_operation}
+                            operation={operation}
+                            onDelete={handleDeleteOperation}
+                            onUpdate={handleUpdateOperation}
+                        />
+                    ))
+                ) : (
+                    <p>No operations available.</p>
+                )}
             </div>
         </Container>
     );
