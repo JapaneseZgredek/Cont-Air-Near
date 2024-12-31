@@ -113,7 +113,7 @@ const OrderList = () => {
                 onSearch={handleSearch}
                 onSearchInChange={handleSearchInChange}
                 onSortChange={() => {}}
-                filterOptions={['id_order', 'status', 'id_port']}
+                filterOptions={['id_order', 'status', 'description']}
             />
 
             <div className="pagination-container">
