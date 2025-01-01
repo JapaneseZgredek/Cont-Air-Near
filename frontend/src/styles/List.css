@@ -27,12 +27,17 @@
 /* Tytuł itemu */
 .grid-item-card .card-title,
 .straight-item-card .card-title{
-    width: 250px;
     font-family: 'Montserrat', sans-serif;
     font-size: 1.5rem;
     font-weight: bold;
     color: #2600ff;
     transition: color 0.3s ease;
+}
+.grid-item-card .card-title{
+    width:100%;
+}
+.straight-item-card .card-title{
+    width:30%;
 }
 .grid-item-card .card-title:hover,
 .straight-item-card .card-title:hover{
@@ -56,6 +61,9 @@
     gap: 10px;
     justify-content: flex-end;
     flex-wrap: wrap;
+}
+.straight-item-card .item-buttons {
+    width: 20%;
 }
 
 /* Styl dla przycisków itemu */
@@ -98,7 +106,7 @@
     flex-wrap: wrap;
 }
 .straight-item-card .item-texts{
-    width: 500px;
+    width: 70%;
     justify-content: space-between;
 }
 
