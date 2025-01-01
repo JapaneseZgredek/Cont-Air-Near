@@ -13,8 +13,8 @@ const HomePage = () => {
     return (
         <div className='home-page'>
             {/*<Navbar />*/}
-            <div className="d-flex flex-column justify-content-center align-items-center mt-5">
-                <h1 className="display-1 text-primary fw-bold text-center">
+            <div className="d-flex flex-column justify-content-center align-items-center">
+                <h1 className="display-1 text-primary fw-bold text-center mt-5">
                     Welcome to Cont-Air-Near!
                 </h1>
                 {token ? (
