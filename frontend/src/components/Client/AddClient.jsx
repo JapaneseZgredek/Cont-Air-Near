@@ -10,6 +10,7 @@ const AddClient = ({ show, onHide, onAdd }) => {
   const [logon_name, setLogonName] = useState("");
   const [role, setRole] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -149,14 +150,27 @@ const AddClient = ({ show, onHide, onAdd }) => {
           <Form.Group className="mb-3">
             <Form.Label>Password</Form.Label>
             <Form.Control
-              type="password"
+              type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter password"
               isInvalid={!!validationErrors.password}
             />
             <Form.Control.Feedback type="invalid">{validationErrors.password}</Form.Control.Feedback>
+            <div className="form-check mt-2">
+            <input
+              type="checkbox"
+              className="form-check-input"
+              id="showPassword"
+              checked={showPassword}
+              onChange={() => setShowPassword(!showPassword)}
+            />
+            <label className="form-check-label" htmlFor="showPassword">
+              Show Password
+            </label>
+            </div>
           </Form.Group>
+          
           {validationErrors.server && (
             <div className="text-danger mb-3">{validationErrors.server}</div>
           )}

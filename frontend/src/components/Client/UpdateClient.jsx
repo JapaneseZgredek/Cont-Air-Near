@@ -10,6 +10,8 @@ const UpdateClient = ({ client, show, onHide, onUpdate }) => {
   const [logon_name, setLogonName] = useState(client.logon_name);
   const [role, setRole] = useState(client.role);
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [keepPassword, setKeepPassword] = useState(true);
   const [validationErrors, setValidationErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -51,7 +53,7 @@ const UpdateClient = ({ client, show, onHide, onUpdate }) => {
       email,
       logon_name,
       role,
-      password: password
+      password: (keepPassword ? "" : password)
     };
 
     try {
@@ -148,12 +150,41 @@ const UpdateClient = ({ client, show, onHide, onUpdate }) => {
           </Form.Group>
           <Form.Group className="mb-3">
             <Form.Label>Password</Form.Label>
+            {!keepPassword && (
             <Form.Control
-              type="password"
+              type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter new password"
             />
+            )}
+            {!keepPassword && (
+              <div className="form-check mt-2">
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  id="showPassword"
+                  checked={showPassword}
+                  onChange={() => setShowPassword(!showPassword)}
+                />
+                <label className="form-check-label" htmlFor="showPassword">
+                  Show Password
+                </label>
+              </div>
+            )}
+
+            <div className="form-check mt-2">
+              <input
+                type="checkbox"
+                className="form-check-input"
+                id="keepPassword"
+                checked={keepPassword}
+                onChange={() => setKeepPassword(!keepPassword)}
+              />
+              <label className="form-check-label" htmlFor="keepPassword">
+                Keep the old password
+              </label>
+            </div>
           </Form.Group>
           {validationErrors.server && (
             <div className="text-danger mb-3">{validationErrors.server}</div>

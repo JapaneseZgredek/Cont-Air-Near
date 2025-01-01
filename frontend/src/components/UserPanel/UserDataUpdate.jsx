@@ -165,18 +165,20 @@ const UserDataUpdate = ({client, show, onHide}) => {
                 )}
                 {errors.password && <div className="invalid-feedback">{errors.password}</div>}
 
-                <div className="form-check mt-2">
-                  <input
-                    type="checkbox"
-                    className="form-check-input"
-                    id="showPassword"
-                    checked={showPassword}
-                    onChange={() => setShowPassword(!showPassword)}
-                  />
-                  <label className="form-check-label" htmlFor="showPassword">
-                    Show Password
-                  </label>
-                </div>
+                {!keepPassword && (
+                  <div className="form-check mt-2">
+                    <input
+                      type="checkbox"
+                      className="form-check-input"
+                      id="showPassword"
+                      checked={showPassword}
+                      onChange={() => setShowPassword(!showPassword)}
+                    />
+                    <label className="form-check-label" htmlFor="showPassword">
+                      Show Password
+                    </label>
+                  </div>
+                )}
 
                 <div className="form-check mt-2">
                   <input
