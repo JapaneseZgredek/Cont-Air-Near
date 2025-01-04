@@ -37,7 +37,8 @@ const UpdateShip = ({ ship, show, onHide, onUpdate }) => {
       return;
     }
 
-    const updatedShip = { ...ship, name, capacity };
+    const updatedShip = { ...ship, name, capacity, 
+      image: deleteImage?"":ship.image};
     
     try {
       // Check image dimensions before submitting
@@ -45,16 +46,9 @@ const UpdateShip = ({ ship, show, onHide, onUpdate }) => {
         await checkImageDimensions(imageFile);
       }
 
-      // Remove image if requested
-      if (deleteImage) {
-        updatedShip.image = "";
-      }
-
-      const result = await updateShip(updatedShip);
-
-      // If a new image was chosen, upload it
+      let result = await updateShip(updatedShip);
       if (imageFile) {
-        await uploadShipImage(ship.id_ship, imageFile);
+        result.image = (await uploadShipImage(ship.id_ship, imageFile)).image;
       }
 
       // Update UI to reflect changes
@@ -159,7 +153,7 @@ const UpdateShip = ({ ship, show, onHide, onUpdate }) => {
           )}
 
           {/* Only show delete checkbox if there is an existing image */}
-          {!image && !imageFile && (
+          {image && !imageFile && (
             <Form.Check
               type="checkbox"
               label="Delete Image"
