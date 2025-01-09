@@ -18,8 +18,16 @@ const UpdateClient = ({ client, show, onHide, onUpdate }) => {
   const validateInputs = () => {
     const errors = {};
 
-    if (!name.trim()) errors.name = "Name is required.";
-    if (!address.trim()) errors.address = "Address is required.";
+    if (!name.trim()) {
+      errors.name = "Name is required.";
+    } else if (!/^[a-zA-Z ]{3,}$/.test(name)) {
+      errors.name = 'Name must be at least 3 letters long.'; 
+    }
+    if (!address.trim()) {
+      errors.address = "Address is required.";
+    } else if (!/^[a-zA-Z0-9 .\-\/]{8,64}$/.test(address)) {
+      errors.address = 'Address must be at least 8-64 characters long.';
+    }
     if (!telephone_number) {
       errors.telephone_number = "Telephone number is required.";
     } else if (!/^\d{7,15}$/.test(telephone_number)) {
@@ -30,8 +38,20 @@ const UpdateClient = ({ client, show, onHide, onUpdate }) => {
     } else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)) {
       errors.email = "Invalid email format.";
     }
-    if (!logon_name.trim()) errors.logon_name = "Logon name is required.";
+    if (!logon_name.trim()) {
+      errors.logon_name = "Logon name is required.";
+    } else if (!/^[a-zA-Z0-9]{4,}$/.test(logon_name)) {
+      errors.logon_name = 'Login must be at least 4 characters long and alphanumeric.';
+    }
     if (!role) errors.role = "Role selection is required.";
+    if(!keepPassword)
+    {
+      if (!password.trim())  {
+        errors.password = "Password is required.";
+      } else if (!/^.{8,}$/.test(password)) {
+        errors.password = 'Password must be at least 8 characters long.';
+      }
+    }
 
     return errors;
   };
@@ -151,12 +171,16 @@ const UpdateClient = ({ client, show, onHide, onUpdate }) => {
           <Form.Group className="mb-3">
             <Form.Label>Password</Form.Label>
             {!keepPassword && (
+            <>
             <Form.Control
               type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter new password"
+              isInvalid={!!validationErrors.password}
             />
+            <Form.Control.Feedback type="invalid">{validationErrors.password}</Form.Control.Feedback>
+            </>
             )}
             {!keepPassword && (
               <div className="form-check mt-2">
