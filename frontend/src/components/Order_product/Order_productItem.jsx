@@ -66,7 +66,7 @@ const Order_productItem = ({ order_product, onUpdate, onDelete }) => {
 
                     {/* Display Quantity */}
                     <div className="item-texts">
-                        <p>Quantity: {order_product.quantity}</p> {/* Displaying the quantity */}
+                        <p><strong>Quantity:</strong> {order_product.quantity}</p> {/* Displaying the quantity */}
                     </div>
 
                     {/* Kontener dla przycisków */}
