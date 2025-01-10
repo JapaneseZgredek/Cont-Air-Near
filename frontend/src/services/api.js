@@ -738,7 +738,7 @@ const fetchProtectedData = async (endpoint, options = {}) => {
     if (error.response) {
       console.error(`Error fetching ${endpoint}:`, error.response.data);
       if (error.response.status === 404) {
-        throw new Error("Failed to load orders. No orders found.");
+        throw new Error("Failed to load objects. No object found.");
       } else if (error.response.status === 403) {
         throw new Error("Access denied. Insufficient permissions.");
       } else if (error.response.status === 401) {
