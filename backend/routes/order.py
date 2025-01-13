@@ -153,10 +153,6 @@ def read_orders_by_client(id_client: int, db: Session = Depends(get_db), current
 def get_all_orders(db: Session = Depends(get_db), current_client=Depends(get_current_client)):
     logger.info("Getting all orders")
     orders = db.query(Order).all()
-    if not orders:
-        raise HTTPException(
-            status_code=404, detail="No orders found"
-        )
     return orders
 
 
