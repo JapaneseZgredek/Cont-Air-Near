@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from backend.models import Client, Order_product, Port, Operation, Product, Ship, UserRole
 from backend.models.ship import ShipStatus
 from backend.models.operation import OperationType
-from backend.models.order import Order
+from backend.models.order import Order, OrderStatus
 from backend.database import get_db
 
 cities = [
@@ -22,6 +22,7 @@ def db_filler():
     generate_ports(db)
     generate_products(db)
     generate_ships(db)
+    generate_orderswith_order_products(db)
     generate_operations(db)
 
 def generate_clients(db:Session):
@@ -230,3 +231,55 @@ def generate_operations(db: Session):
     db.commit()
     for new_record in db.new:
         db.refresh(new_record)
+
+def generate_orderswith_order_products(db: Session):
+    order_statuses = [OrderStatus.PENDING, OrderStatus.SHIPPED, OrderStatus.DELIVERED, OrderStatus.CANCELLED]
+    descriptions = [
+        'Urgent delivery', 'Regular shipment', 'Priority order', 'Backordered item', 
+        'Customer request', 'Replacement order', 'Express delivery', 'Scheduled delivery'
+    ]
+    
+    ports = db.query(Port).all()
+    clients = db.query(Client).all()
+    products = db.query(Product).all()
+
+    order_num = 30
+    created_orders=0
+    created_order_products=0
+    while order_num>0 and len(products)>0:
+        port = random.choice(ports)
+        client = random.choice(clients)
+
+        order = Order(
+            date_of_order=datetime.now(),
+            status=random.choice(order_statuses),
+            description=random.choice(descriptions),
+            id_port=port.id_port,
+            id_client=client.id_client
+        )
+        db.add(order)
+        db.commit()
+        db.refresh(order)
+        created_orders+=1
+        
+        order_num-=1
+        num_products = random.randint(1, 5 if 5<=len(products) else len(products))
+
+        for _ in range(num_products):
+            product = random.choice(products)
+            quantity = random.randint(1, 10)
+
+            order_product = Order_product(
+                id_order=order.id_order,
+                id_product=product.id_product,
+                quantity=quantity
+            )
+            db.add(order_product)
+            products.remove(product)
+            created_order_products+=1
+
+    db.commit()
+    for new_record in db.new:
+        db.refresh(new_record)
+    logger.info(f"Created {created_orders} orders successfully.")
+    logger.info(f"Created {created_order_products} order_products successfully.")
