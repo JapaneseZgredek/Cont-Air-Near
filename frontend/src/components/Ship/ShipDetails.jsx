@@ -17,11 +17,6 @@ const ShipDetails = () => {
             try {
                 const data = await fetchShipDetails(id);
 
-                // Decode image if in Base64 format
-                if (data.image) {
-                    data.image = `data:image/jpeg;base64,${data.image}`;
-                }
-
                 setShip(data);
             } catch (err) {
                 setError('Failed to load ship details');
@@ -78,7 +73,7 @@ const ShipDetails = () => {
                 <Col md={6}>
                     {ship.image ? (
                         <Card className="p-3 shadow-sm">
-                            <Card.Img variant="top" src={ship.image} alt={ship.name} className="img-fluid" />
+                            <Card.Img variant="top" src={`data:image/jpeg;base64,${ship.image}`} alt={ship.name} className="img-fluid" />
                         </Card>
                     ) : (
                         <Card className="p-3 shadow-sm">

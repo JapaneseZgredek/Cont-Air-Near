@@ -36,20 +36,18 @@ const UpdateProduct = ({ product, show, onHide, onUpdate }) => {
       ...product, 
       name, 
       price, 
-      weight
+      weight,
+      image: deleteImage?"":product.image
      };
     
     try {
       if (imageFile) {
         await checkImageDimensions(imageFile);
       }
-      if (deleteImage) {
-        updatedProduct.image="";
-      }
-      const result = await updateProduct(updatedProduct);
       // if new image was chosen - uploading it
+      let result = await updateProduct(updatedProduct);
       if (imageFile) {
-        await uploadProductImage(product.id_product, imageFile);
+        result.image = (await uploadProductImage(product.id_product, imageFile)).image;
       }
       setImage(deleteImage ? "" : "present");
       onUpdate(result);

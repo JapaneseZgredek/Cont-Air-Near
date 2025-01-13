@@ -16,11 +16,6 @@ const ProductDetails = () => {
         try {
             const data = await fetchProductDetails(id);
 
-            // If the product has a base64 image, prefix it for rendering
-            if (data.image) {
-                data.image = `data:image/jpeg;base64,${data.image}`;
-            }
-
             setProduct(data);
         } catch (err) {
             setError('Failed to load product details');
@@ -85,7 +80,7 @@ const ProductDetails = () => {
                 </Col>
                 <Col md={6}>
                     {product.image ? (
-                        <img src={product.image} alt={product.name} className="img-fluid" />
+                        <img src={`data:image/jpeg;base64,${product.image}`} alt={product.name} className="img-fluid" />
                     ) : (
                         <p>No image available</p>
                     )}

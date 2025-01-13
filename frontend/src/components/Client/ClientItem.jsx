@@ -19,9 +19,9 @@ const ClientItem = ({ client }) => {
 
                 {/* Kontener dla tekstów */}
                 <div className="item-texts">
-                    <p>Address: {client.address}</p>
-                    <p>Telephone number: {client.telephone_number || 'N/A'}</p>
-                    <p>Email: {client.email}</p>
+                    <p><strong>Address:</strong> {client.address}</p>
+                    <p><strong>Telephone number:</strong> {client.telephone_number || 'N/A'}</p>
+                    <p><strong>Email:</strong> {client.email}</p>
                 </div>
             </Card>
         </>
