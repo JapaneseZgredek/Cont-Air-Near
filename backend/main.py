@@ -5,6 +5,7 @@ from backend.database import engine, Base
 
 from backend.routes import ship, operation, port, product, order, client, order_product, cart
 from backend.models import Client, UserRole
+from backend.db_filler import db_filler
 from backend.logging_config import logger
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
@@ -43,6 +44,7 @@ async def startup_event():
     #print("Email blocklist updated")
     logger.info("Server started")
     create_default_users()
+    db_filler()
 
 def create_user_if_not_exists(db: Session, logon_name: str, name: str, address: str, telephone_number: int, email: str, password: str, role: UserRole):
     existing_user = db.query(Client).filter(Client.logon_name == logon_name).first()
