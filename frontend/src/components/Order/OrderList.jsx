@@ -127,7 +127,29 @@ const OrderList = () => {
                             onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
                             disabled={currentPage === 1}
                         />
-                        <Pagination.Item active>{currentPage}</Pagination.Item>
+                        
+                        {/* Input for page number */}
+                        <Pagination.Item className="pagination-item-middle" key={currentPage}>
+                            <input
+                                type="number"
+                                min="1"
+                                max={totalPages}
+                                value={currentPage}
+                                onChange={(e) => {
+                                    const page = Math.max(1, Math.min(totalPages, Number(e.target.value)));
+                                    handlePageChange(page);
+                                }}
+                                onBlur={() => handlePageChange(currentPage)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        handlePageChange(currentPage);
+                                    }
+                                }}
+                                style={{ width: '50px', textAlign: 'center' }}
+                            />
+                          {` / ${totalPages}`}
+                        </Pagination.Item>
+
                         <Pagination.Next
                             onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
                             disabled={currentPage === totalPages}
