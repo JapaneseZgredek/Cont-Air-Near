@@ -4,8 +4,10 @@ from datetime import datetime
 import bcrypt
 from backend.logging_config import logger
 from sqlalchemy.orm import Session
-from backend.models import Client, Order_product, Port, Product, Ship, UserRole
+from backend.models import Client, Order_product, Port, Operation, Product, Ship, UserRole
 from backend.models.ship import ShipStatus
+from backend.models.operation import OperationType
+from backend.models.order import Order
 from backend.database import get_db
 
 cities = [
@@ -20,6 +22,7 @@ def db_filler():
     generate_ports(db)
     generate_products(db)
     generate_ships(db)
+    generate_operations(db)
 
 def generate_clients(db:Session):
 
@@ -181,6 +184,49 @@ def generate_ships(db: Session):
             db.add(new_ship)
 
     logger.info(f"Created {len(db.new)} ships successfully.")
+    db.commit()
+    for new_record in db.new:
+        db.refresh(new_record)
+
+def generate_operations(db: Session):
+    
+    operation_types = list(OperationType)
+
+    ships = db.query(Ship).all()
+    ports = db.query(Port).all()
+    orders = db.query(Order).all()
+
+    for _ in range(30):
+        operation_type = random.choice(operation_types)
+        date_of_operation = datetime.now()
+        
+        ship = random.choice(ships)
+        port = random.choice(ports)
+        order = random.choice(orders)
+        
+        existing_operation = db.query(Operation).filter(
+            Operation.operation_type == operation_type,
+            Operation.id_ship == ship.id_ship,
+            Operation.id_port == port.id_port,
+            Operation.id_order == order.id_order
+        ).first()
+
+        if not existing_operation:
+            name_of_operation=str(operation_type.value).lower().replace('_', ' ')
+            name_of_operation=name_of_operation[0].upper() + name_of_operation[1:]
+
+            new_operation = Operation(
+                name_of_operation = name_of_operation +" #"+''.join(random
+            .choices(string.ascii_uppercase + string.digits, k=7)),
+                operation_type=operation_type,
+                date_of_operation=date_of_operation,
+                id_ship=ship.id_ship,
+                id_port=port.id_port,
+                id_order=order.id_order
+            )
+            db.add(new_operation)
+
+    logger.info(f"Created {len(db.new)} operations successfully.")
     db.commit()
     for new_record in db.new:
         db.refresh(new_record)
