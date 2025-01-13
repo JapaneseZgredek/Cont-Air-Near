@@ -9,6 +9,8 @@ from backend.models.ship import ShipStatus
 from backend.models.operation import OperationType
 from backend.models.order import Order, OrderStatus
 from backend.database import get_db
+import os
+import base64
 
 cities = [
     'New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix',
@@ -18,14 +20,42 @@ cities = [
 
 def db_filler():
     db: Session = next(get_db())
-    generate_clients(db)
-    generate_ports(db)
-    generate_products(db)
-    generate_ships(db)
-    generate_orderswith_order_products(db)
-    generate_operations(db)
+    min_record_count = 30
 
-def generate_clients(db:Session):
+    if db.query(Client).count()<min_record_count:
+        generate_clients(db,min_record_count)
+        generate_ports(db,min_record_count)
+
+        if db.query(Order_product).count()>0:
+            logger.info(f"Can't fill Product table, clear Order_product table first")
+        else:
+            by_pass=12
+            generate_products(db,min_record_count+by_pass)
+            products_to_delete = db.query(Product).limit(by_pass).all()
+            for product in products_to_delete:
+                db.delete(product)
+            db.commit()
+            logger.info(f"Deleted {by_pass} faulty products")
+
+
+        if db.query(Operation).count()>0:
+            logger.info(f"Can't fill Ship table, clear Operation table first")
+        else:
+            by_pass=88
+            generate_ships(db,min_record_count+by_pass)
+            ships_to_delete = db.query(Ship).limit(by_pass).all()
+            for ship in ships_to_delete:
+                db.delete(ship)
+            db.commit()
+            logger.info(f"Deleted {by_pass} faulty ships")
+
+        generate_orderswith_order_products(db,min_record_count)
+        generate_products(db,min_record_count) #second time, for case if there was no left after orders
+        generate_operations(db,min_record_count)
+    else:
+        logger.info(f"Client count greater than '{min_record_count}'. Database fill cancelled")
+
+def generate_clients(db:Session, num_to_generate: int):
 
     first_names = [
     'Richard', 'Joseph', 'Charles', 'Thomas', 'Christopher',
@@ -58,7 +88,7 @@ def generate_clients(db:Session):
     '.com', '.pl', '.org', '.net', '.edu',
     '.gov', '.co', '.info', '.io', '.us']
     
-    for _ in range(30):
+    for _ in range(num_to_generate):
         part1, part2 = random.sample(username_parts, 2)
         digits = random.randint(0, 99)
         logon_name = part1 + part2 + str(digits)
@@ -88,7 +118,7 @@ def generate_clients(db:Session):
     for new_record in db.new:
         db.refresh(new_record)
 
-def generate_ports(db: Session):
+def generate_ports(db: Session, num_to_generate: int):
     port_names1 = [
         'South', 'East', 'West', 'North', 'Center', 
         'Main', 'New', 'Old', 'Grand', 'Saint', 'First']
@@ -100,7 +130,7 @@ def generate_ports(db: Session):
         'Brazil', 'China', 'Russia', 'South Africa', 'Egypt'
     ]
     
-    for _ in range(30):
+    for _ in range(num_to_generate):
         port_name = random.choice(port_names1)+" "+random.choice(port_names2)
         existing_port = db.query(Port).filter(Port.name == port_name).first()
 
@@ -117,36 +147,45 @@ def generate_ports(db: Session):
     for new_record in db.new:
         db.refresh(new_record)
 
-def generate_products(db: Session):
+def generate_products(db: Session, num_to_generate: int):
     product_names = [
-    'Sofa', 'Table', 'Chair', 'Armchair', 'Bed', 'Shelf', 'Desk',
+    'Sofa', 'Table', 'Chair', 'Armchair', 'Bed', 'Desk',
     'Wardrobe', 'Dresser', 'Coffee Table', 'Garden Furniture Set',
-    'Pallets', 'Scaffolding', 'Cement', 'Glass', 'Gypsum', 'Asbest',
-    'Marble Countertop', 'Fiberglass', 'Mattresses', 'Forklift',
-    'Lifter', 'Electric Cable', 'Welding Kit', 'Hydraulic Pump']
+    'Paletts', 'Scaffolding', 'Cement', 'Glass', 'Gypsum', 'Asbest',
+    'Marble Countertop', 'Fiberglass', 'Mattress', 'Forklift',
+    'Lifter', 'Electric Cable', 'Welding Kit', 'Hydraulic Pump',
+    'Coal', 'Container']
     
-    price_range = (1, 200)
-    weight_range = (1, 1000)
+    price_range = (100, 20000)
+    weight_range = (100, 10000)
     
     ports = db.query(Port).all()
 
-    for _ in range(30):
-        name = random.choice(product_names)+" #"+''.join(random
+    for _ in range(num_to_generate):
+        name = random.choice(product_names)
+        name_serial_number = " #"+''.join(random
             .choices(string.ascii_uppercase + string.digits, k=7))
         port = random.choice(ports).id_port
 
-        existing_product = db.query(Product).filter(Product.name == name, Product.id_port == port).first()
+        existing_product = db.query(Product).filter(Product.name == name+name_serial_number, Product.id_port == port).first()
+
+        image=""
+        image_path = f"backend/uploads/default_products/{name}.jpg"
+        try:
+            with open(image_path, "rb") as image_file:
+                image = base64.b64encode(image_file.read()).decode('utf-8')
+        except Exception as e:
+            logger.error(f"Error encoding image {image_path}: {e}")
 
         if not existing_product:
             created_at = datetime.now()
-
             new_product = Product(
-                name=name,
-                price=round(random.uniform(*price_range), 2)*100,
-                weight=round(random.uniform(*weight_range), 2)*10,
+                name=name+name_serial_number,
+                price = round(random.uniform(*price_range), 1),
+                weight=round(random.uniform(*weight_range), 1),
                 created_at=created_at,
                 updated_at=created_at,
-                image="",
+                image=image,
                 id_port=port
             )
             db.add(new_product)
@@ -156,7 +195,7 @@ def generate_products(db: Session):
     for new_record in db.new:
         db.refresh(new_record)
 
-def generate_ships(db: Session):
+def generate_ships(db: Session, num_to_generate: int):
     ship_names1 = [
         'Titanic', 'Queen', 'Oasis', 'Explorer', 
         'Voyager', 'Radiance', 'Enchantment'
@@ -168,11 +207,23 @@ def generate_ships(db: Session):
     
     capacity_range = (100, 3000)
     
-    for _ in range(30):
+    for _ in range(num_to_generate):
         name = random.choice(ship_names1)+" of "+random.choice(ship_names2)
         capacity = random.randint(*capacity_range)
         existing_ship = db.query(Ship).filter(Ship.name == name).first()
         if not existing_ship:
+            image = ""
+            folder_path = "backend/uploads/default_ships"
+            image_files = [f for f in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path, f))]
+            if image_files:
+                selected_image = random.choice(image_files)
+                image_path = os.path.join(folder_path, selected_image)
+                with open(image_path, "rb") as image_file:
+                    image = base64.b64encode(image_file.read()).decode('utf-8')
+            else:
+                logger.error("Brak obrazków w folderze.")
+            
+            
             created_at = datetime.now()
             new_ship = Ship(
                 name=name,
@@ -180,7 +231,7 @@ def generate_ships(db: Session):
                 status=random.choice([ShipStatus.ACTIVE, ShipStatus.INACTIVE]),
                 created_at=created_at,
                 updated_at=created_at,
-                image=""
+                image=image
             )
             db.add(new_ship)
 
@@ -189,7 +240,7 @@ def generate_ships(db: Session):
     for new_record in db.new:
         db.refresh(new_record)
 
-def generate_operations(db: Session):
+def generate_operations(db: Session, num_to_generate: int):
     
     operation_types = list(OperationType)
 
@@ -197,7 +248,7 @@ def generate_operations(db: Session):
     ports = db.query(Port).all()
     orders = db.query(Order).all()
 
-    for _ in range(30):
+    for _ in range(num_to_generate):
         operation_type = random.choice(operation_types)
         date_of_operation = datetime.now()
         
@@ -232,7 +283,7 @@ def generate_operations(db: Session):
     for new_record in db.new:
         db.refresh(new_record)
 
-def generate_orderswith_order_products(db: Session):
+def generate_orderswith_order_products(db: Session, num_to_generate: int):
     order_statuses = [OrderStatus.PENDING, OrderStatus.SHIPPED, OrderStatus.DELIVERED, OrderStatus.CANCELLED]
     descriptions = [
         'Urgent delivery', 'Regular shipment', 'Priority order', 'Backordered item', 
@@ -243,7 +294,7 @@ def generate_orderswith_order_products(db: Session):
     clients = db.query(Client).all()
     products = db.query(Product).all()
 
-    order_num = 30
+    order_num = num_to_generate
     created_orders=0
     created_order_products=0
     while order_num>0 and len(products)>0:
