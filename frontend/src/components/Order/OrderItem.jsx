@@ -31,8 +31,7 @@ const OrderItem = ({ order }) => {
     }, [order.id_port, order.id_client]);
 
     return (
-        <Card className="item-card">
-            <Card.Body>
+        <Card className="straight-item-card">
                 <Card.Title
                     className="clickable"
                     onClick={() => navigate(`/orders/${order.id_order}`)}
@@ -46,7 +45,6 @@ const OrderItem = ({ order }) => {
                     <p><strong>Port:</strong> {portName || 'Loading...'}</p>
                     <p><strong>Client:</strong> {clientName || 'Loading...'}</p>
                 </div>
-            </Card.Body>
         </Card>
     );
 };

@@ -38,7 +38,7 @@ const ShipItem = ({ ship }) => {
 
             {/* Ship Details */}
             <div className="item-texts">
-                <a>Status: {ship.status}</a>
+                <a><strong>Status:</strong> {ship.status}</a>
             </div>
 
             {/* Image */}

@@ -80,9 +80,9 @@ const ProductItem = ({ product, onAddToCart }) => {
                 </Card.Title>
                 {/* Container for texts */}
                 <div className="item-texts">
-                    <a>Price: {product.price}</a>
-                    <a>Weight: {product.weight}</a>
-                    <a>Port: {portName || 'Loading...'}</a>
+                    <a><strong>Price:</strong> {product.price}</a>
+                    <a><strong>Weight:</strong> {product.weight}</a>
+                    <a><strong>Port:</strong> {portName || 'Loading...'}</a>
                 </div>
 
                 {/* Image */}

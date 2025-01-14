@@ -59,13 +59,14 @@ const Order_productItem = ({ order_product, onUpdate, onDelete }) => {
             <Card className={`${displayType}-item-card`}>
                     <Card.Title>
                         Order ID: {order_product.id_order} 
-                        <br />
+                    </Card.Title>
+                    <Card.Title>
                         Product: {getProductName(order_product.id_product)}
                     </Card.Title>
 
                     {/* Display Quantity */}
                     <div className="item-texts">
-                        <p>Quantity: {order_product.quantity}</p> {/* Displaying the quantity */}
+                        <p><strong>Quantity:</strong> {order_product.quantity}</p> {/* Displaying the quantity */}
                     </div>
 
                     {/* Kontener dla przycisków */}

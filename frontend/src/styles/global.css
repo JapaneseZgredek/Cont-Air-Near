@@ -28,6 +28,13 @@
     min-height: 100vh; /* Ustawia minimalną wysokość na 100% wysokości okna */
 }
 
+/* Dodanie odstępu Body od navbar*/
+.listing-page,
+.home-page,
+.form-page{
+    padding-top: 1.5rem;
+}
+
 /* Styl dla komunikatu o błędzie */
 .err-field {
     color: red;

@@ -43,10 +43,10 @@ const OperationItem = ({ operation }) => {
 
             {/* Operation Details */}
             <div className="item-texts">
-                <a>Type: {operation.operation_type}</a>
-                <a>Date: {new Date(operation.date_of_operation).toLocaleString()}</a>
-                <a>Ship: {shipName || 'Loading...'}</a>
-                <a>Port: {portName || 'Loading...'}</a>
+                <a><strong>Type:</strong> {operation.operation_type}</a>
+                <a><strong>Date:</strong> {new Date(operation.date_of_operation).toLocaleString()}</a>
+                <a><strong>Ship:</strong> {shipName || 'Loading...'}</a>
+                <a><strong>Port:</strong> {portName || 'Loading...'}</a>
             </div>
         </Card>
     );

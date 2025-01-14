@@ -70,7 +70,7 @@ const NavbarComponent = () => {
   };
 
   return (
-    <BootstrapNavbar bg="dark" variant="dark" expand="lg" className="mb-4">
+    <BootstrapNavbar bg="dark" variant="dark" expand="lg">
       <Container>
         <LinkContainer to="/">
           <BootstrapNavbar.Brand>Cont-Air-Near</BootstrapNavbar.Brand>
