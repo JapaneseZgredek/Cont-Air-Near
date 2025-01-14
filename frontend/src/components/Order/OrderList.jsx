@@ -31,8 +31,8 @@ const OrderList = () => {
             setOrders(data);
             setFilteredOrders(data);
         } catch (err) {
-            setError('Failed to load orders');
             console.error('Error fetching orders:', err);
+            setError('Failed to load orders');
         }
     };
 
