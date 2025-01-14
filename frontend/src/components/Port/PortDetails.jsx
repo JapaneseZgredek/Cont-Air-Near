@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { fetchPortDetails, deletePort, updatePort } from '../../services/api';
 import { Container, Table, Row, Col, Card, Badge, Button, Modal } from 'react-bootstrap';
 import UpdatePort from './UpdatePort';
+import { RoleContext } from '../../contexts/RoleContext';
 import '../../styles/panel.css';
 
 const PortDetails = () => {
@@ -12,6 +13,7 @@ const PortDetails = () => {
     const [showConfirm, setShowConfirm] = useState(false); // Confirmation modal state
     const [showUpdateModal, setShowUpdateModal] = useState(false); // Update modal state
     const navigate = useNavigate(); // Navigation hook
+    const { role } = useContext(RoleContext);
 
     const loadPortDetails = async () => {
         try {
@@ -167,6 +169,7 @@ const PortDetails = () => {
             )}
 
             {/* Action Buttons */}
+            {(['EMPLOYEE', 'ADMIN'].includes(role)) && (
             <div className="mt-4 d-flex justify-content-between">
                 <Button variant="warning" onClick={() => setShowUpdateModal(true)}>
                     Update Port
@@ -175,6 +178,7 @@ const PortDetails = () => {
                     Delete Port
                 </Button>
             </div>
+            )}
 
             {/* Confirmation Modal for Deletion */}
             <Modal show={showConfirm} onHide={() => setShowConfirm(false)}>

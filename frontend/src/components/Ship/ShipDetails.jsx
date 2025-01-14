@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { fetchShipDetails, deleteShip, updateShip } from '../../services/api';
 import { Container, Row, Col, Card, Table, Badge, Button, Modal } from 'react-bootstrap';
 import UpdateShip from './UpdateShip';
+import { RoleContext } from '../../contexts/RoleContext';
 
 const ShipDetails = () => {
     const { id } = useParams();
@@ -10,6 +11,7 @@ const ShipDetails = () => {
     const [error, setError] = useState(null);
     const [showUpdateModal, setShowUpdateModal] = useState(false); // State for update modal
     const [showConfirm, setShowConfirm] = useState(false); // State for delete confirmation modal
+    const { role } = useContext(RoleContext);
     const navigate = useNavigate(); // Hook for navigation
 
     useEffect(() => {
@@ -118,7 +120,8 @@ const ShipDetails = () => {
             )}
 
             {/* Action Buttons */}
-            <div className="mt-4">
+            {(['EMPLOYEE', 'ADMIN'].includes(role)) && (
+            <div className="mt-4 d-flex justify-content-between">
                 <Button
                     variant="warning"
                     className="me-2"
@@ -133,6 +136,7 @@ const ShipDetails = () => {
                     Delete Ship
                 </Button>
             </div>
+            )}
 
             {/* Delete Confirmation Modal */}
             <Modal show={showConfirm} onHide={() => setShowConfirm(false)}>

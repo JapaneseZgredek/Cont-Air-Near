@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { fetchClientDetails, deleteClient, updateClient } from '../../services/api';
 import { Container, Table, Card, Row, Col, Button, Modal, Badge } from 'react-bootstrap';
 import UpdateClient from "./UpdateClient";
+import { RoleContext } from '../../contexts/RoleContext';
 import '../../styles/panel.css'; // Include consistent styling
 
 const ClientDetails = () => {
@@ -12,6 +13,7 @@ const ClientDetails = () => {
     const [showConfirm, setShowConfirm] = useState(false); // Confirmation modal for deletion
     const [showUpdateModal, setShowUpdateModal] = useState(false); // Modal for client update
     const navigate = useNavigate(); // Navigation hook
+    const { role } = useContext(RoleContext);
 
     const loadClientDetails = async () => {
         try {
@@ -102,6 +104,7 @@ const ClientDetails = () => {
             )}
 
             {/* Action Buttons */}
+            {(['ADMIN'].includes(role)) && (
             <div className="mt-4 d-flex justify-content-between">
                 <Button
                     variant="warning"
@@ -116,6 +119,7 @@ const ClientDetails = () => {
                     Delete Client
                 </Button>
             </div>
+            )}
 
             {/* Confirmation Modal for Deletion */}
             <Modal show={showConfirm} onHide={() => setShowConfirm(false)}>
