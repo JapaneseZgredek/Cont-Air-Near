@@ -8,8 +8,8 @@ const UpdateOperation = ({ operation, show, onHide, onUpdate }) => {
   const [nameOfOperation, setNameOfOperation] = useState(operation.name_of_operation);
   const [operationType, setOperationType] = useState(operation.operation_type);
   const [dateOfOperation, setDateOfOperation] = useState(operation.date_of_operation);
-  const [idShip, setIdShip] = useState(operation.id_ship);
-  const [idPort, setIdPort] = useState(operation.id_port);
+  const [idShip, setIdShip] = useState(operation.ship_id);
+  const [idPort, setIdPort] = useState(operation.port_id);
   const [error, setError] = useState(null);
   const [validationErrors, setValidationErrors] = useState({});
 
