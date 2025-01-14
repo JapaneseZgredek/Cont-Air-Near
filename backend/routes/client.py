@@ -21,7 +21,7 @@ from email_validator import validate_email, EmailNotValidError
 load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY", "default-fallback-key")
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = 90
 
 router = APIRouter()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/clients/login")
