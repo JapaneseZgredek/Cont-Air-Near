@@ -4,8 +4,8 @@ import { updateOrder, fetchClients, fetchPorts } from '../../services/api';
 
 const OrderUpdate = ({ order, show, onHide, onUpdate }) => {
     const [status, setStatus] = useState(order.status);
-    const [idPort, setIdPort] = useState(order.id_port);
-    const [idClient, setIdClient] = useState(order.id_client);
+    const [idPort, setIdPort] = useState(order.port.id_port);
+    const [idClient, setIdClient] = useState(order.client.id_client);
     const [ports, setPorts] = useState([]);
     const [clients, setClients] = useState([]);
     const [error, setError] = useState(null);
