@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { fetchOrderDetails, deleteOrder } from '../../services/api';
 import { Container, Table, Row, Col, Card, Badge, Button, Modal } from 'react-bootstrap';
 import OrderUpdate from './OrderUpdate';
+import { RoleContext } from '../../contexts/RoleContext';
 import '../../styles/panel.css';
 
 const OrderDetails = () => {
@@ -12,6 +13,7 @@ const OrderDetails = () => {
     const [showConfirm, setShowConfirm] = useState(false); // State for delete confirmation modal
     const [showUpdateModal, setShowUpdateModal] = useState(false); // State for update modal
     const navigate = useNavigate(); // Hook for navigation
+        const { role } = useContext(RoleContext);
 
     const loadOrderDetails = async () => {
         try {
@@ -162,10 +164,12 @@ const OrderDetails = () => {
             )}
 
             {/* Action Buttons */}
+            {(['EMPLOYEE', 'ADMIN'].includes(role)) && (
             <div className="mt-4 d-flex justify-content-between">
                 <Button variant="warning" onClick={() => setShowUpdateModal(true)}>Update Order</Button>
                 <Button variant="danger" onClick={() => setShowConfirm(true)}>Delete Order</Button>
             </div>
+            )}
 
             {/* Confirmation Modal */}
             <Modal show={showConfirm} onHide={() => setShowConfirm(false)}>
