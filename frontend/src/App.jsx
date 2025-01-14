@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import NavbarComponent from './components/Navbar/Navbar';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -25,9 +25,9 @@ import ClientDetails from "./components/Client/ClientDetails";
 import ShipDetails from "./components/Ship/ShipDetails";
 import OperationDetails from "./components/Operation/OperationDetails";
 
-
 const App = () => {
   const [role, setRole] = useState(null);
+
   const fetchRole = async () => {
     try {
       const client = await fetchCurrentClient();
@@ -38,35 +38,56 @@ const App = () => {
     }
   };
 
-  useEffect(() => {
-    fetchRole(); // pobranie roli
-  }, []);
-
-  const handleLoginSuccess = async () => {
-    await fetchRole(); // update roli
-  };
-
   const handleLogout = () => {
     localStorage.removeItem('token');
-    setRole(null); // Reset roli przy logoucie
+    setRole(null); // Reset role on logout
+    window.location.reload(); // Refresh page after logout
   };
+
+  useEffect(() => {
+    fetchRole();
+
+    const token = localStorage.getItem('token');
+    if (token) {
+      const tokenData = JSON.parse(atob(token.split('.')[1])); // Decode JWT
+      const expirationTime = tokenData.exp * 1000; // Convert to milliseconds
+      const timeUntilExpiration = expirationTime - Date.now();
+
+      if (timeUntilExpiration > 0) {
+        const timeout = setTimeout(() => {
+          handleLogout();
+          alert('Session expired, you have been logged out.');
+        }, timeUntilExpiration);
+
+        return () => clearTimeout(timeout); // Cleanup timeout
+      } else {
+        handleLogout();
+      }
+    }
+  }, []);
 
   return (
     <RoleProvider value={{ role, handleLogout }}>
       <Router>
-        <NavbarComponent onLoginSuccess={handleLoginSuccess} />
+        <NavbarComponent />
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<HomePage />} />
-          <Route path="/products" element={<ProductPage />} />
-          <Route path="/login" element={<LoginPage onLoginSuccess={handleLoginSuccess} />} />
-          <Route path="/register" element={<RegisterPage onRegisterSuccess={handleLoginSuccess} />} />
+          <Route
+              path="/products"
+              element={
+              <ProtectedRoute requiredRoles={['CLIENT','EMPLOYEE', 'ADMIN']}>
+              <ProductPage />
+              </ProtectedRoute>
+          } />
+          <Route path="/login" element={<LoginPage onLoginSuccess={fetchRole} />} />
+          <Route path="/register" element={<RegisterPage onRegisterSuccess={fetchRole} />} />
 
           {/* Protected Routes */}
           <Route
             path="/ships"
             element={
-              <ProtectedRoute requiredRoles={['EMPLOYEE','ADMIN']}>
+              <ProtectedRoute requiredRoles={['EMPLOYEE', 'ADMIN']}>
                 <ShipPage />
               </ProtectedRoute>
             }
@@ -98,8 +119,7 @@ const App = () => {
           <Route
             path="/order_products"
             element={
-              // <ProtectedRoute requiredRoles={['CLIENT', 'EMPLOYEE', 'ADMIN']}>
-                <ProtectedRoute requiredRoles={['EMPLOYEE', 'ADMIN']}>
+              <ProtectedRoute requiredRoles={['EMPLOYEE', 'ADMIN']}>
                 <Order_productPage />
               </ProtectedRoute>
             }

@@ -3,13 +3,18 @@ import { Button, Form, Modal } from 'react-bootstrap';
 import { updateOperation } from '../../services/api';
 import { fetchShips } from '../../services/api';
 import { fetchPorts } from '../../services/api';
+import { format } from 'date-fns';
 
 const UpdateOperation = ({ operation, show, onHide, onUpdate }) => {
   const [nameOfOperation, setNameOfOperation] = useState(operation.name_of_operation);
   const [operationType, setOperationType] = useState(operation.operation_type);
-  const [dateOfOperation, setDateOfOperation] = useState(operation.date_of_operation);
-  const [idShip, setIdShip] = useState(operation.ship_id);
-  const [idPort, setIdPort] = useState(operation.port_id);
+  // const [dateOfOperation, setDateOfOperation] = useState(operation.date_of_operation);
+  const formattedDate = useState(operation.date_of_operation)
+  ? format(new Date(operation.date_of_operation), "yyyy-MM-dd'T'HH:mm")
+  : '';
+  const [dateOfOperation, setDateOfOperation] = useState(formattedDate);
+  const [idShip, setIdShip] = useState(operation.id_ship);
+  const [idPort, setIdPort] = useState(operation.id_port);
   const [error, setError] = useState(null);
   const [validationErrors, setValidationErrors] = useState({});
 

@@ -1,19 +1,40 @@
-import React, {useContext, useState} from 'react';
+import React, { useEffect, useContext, useState } from 'react';
 import { Navbar as BootstrapNavbar, Container, Nav } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import { RoleContext } from '../../contexts/RoleContext';
-import { FaShoppingCart } from 'react-icons/fa'; // Import the cart icon from react-icons
+import { FaShoppingCart } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 
 const NavbarComponent = () => {
   const { role, handleLogout } = useContext(RoleContext);
   const navigate = useNavigate();
-  const handleLogoutClick = () => {
-    handleLogout(); // Wywołanie funkcji wylogowania
-    navigate('/login'); // Przeniesienie na stronę logowania
-  };
 
-  const [loggedIn, setLoggedIn] = useState(false);
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const tokenData = JSON.parse(atob(token.split('.')[1])); // Decode JWT
+      const expirationTime = tokenData.exp * 1000; // Convert to milliseconds
+      const timeUntilExpiration = expirationTime - Date.now();
+
+      if (timeUntilExpiration > 0) {
+        const timeout = setTimeout(() => {
+          handleLogout();
+          alert('Session expired, you have been logged out.');
+          window.location.reload(); // Refresh page after auto-logout
+        }, timeUntilExpiration);
+
+        return () => clearTimeout(timeout); // Cleanup timeout
+      } else {
+        handleLogout();
+        window.location.reload(); // Refresh page immediately if token already expired
+      }
+    }
+  }, [handleLogout]);
+
+  const handleLogoutClick = () => {
+    handleLogout();
+    navigate('/login');
+  };
 
   const getLinksForRole = () => {
     if (!role) {
@@ -28,41 +49,34 @@ const NavbarComponent = () => {
 
     const roleLinks = {
       ADMIN: [
-          { path: '/products', label: 'Products' },
-          { path: '/ships', label: 'Ships' },
-          { path: '/operations', label: 'Operations' },
-          { path: '/ports', label: 'Ports' },
-          { path: '/orders', label: 'Orders' },
-          { path: '/clients', label: 'Clients' },
-          { path: '/user_panel', label: 'User Panel' },
-          { path: '/cart', label: <FaShoppingCart /> }, 
+        { path: '/products', label: 'Products' },
+        { path: '/ships', label: 'Ships' },
+        { path: '/operations', label: 'Operations' },
+        { path: '/ports', label: 'Ports' },
+        { path: '/orders', label: 'Orders' },
+        { path: '/clients', label: 'Clients' },
+        { path: '/user_panel', label: 'User Panel' },
+        { path: '/cart', label: <FaShoppingCart /> },
       ],
       EMPLOYEE: [
-          { path: '/ships', label: 'Ships' },
-          { path: '/operations', label: 'Operations' },
-          { path: '/ports', label: 'Ports' },
-          { path: '/orders', label: 'Orders' },
-          { path: '/products', label: 'Products' },
-          { path: '/user_panel', label: 'User Panel' },
-          { path: '/cart', label: <FaShoppingCart /> }, 
+        { path: '/ships', label: 'Ships' },
+        { path: '/operations', label: 'Operations' },
+        { path: '/ports', label: 'Ports' },
+        { path: '/orders', label: 'Orders' },
+        { path: '/products', label: 'Products' },
+        { path: '/user_panel', label: 'User Panel' },
+        { path: '/cart', label: <FaShoppingCart /> },
       ],
       CLIENT: [
-          { path: '/ports', label: 'Ports' },
-          { path: '/orders', label: 'Orders' },
-          { path: '/products', label: 'Products' },
-          { path: '/user_panel', label: 'User Panel' },
-          { path: '/cart', label: <FaShoppingCart /> }, 
+        { path: '/ports', label: 'Ports' },
+        { path: '/orders', label: 'Orders' },
+        { path: '/products', label: 'Products' },
+        { path: '/user_panel', label: 'User Panel' },
+        { path: '/cart', label: <FaShoppingCart /> },
       ],
     };
 
-    // Handle user logout
-    // const handleLogout = () => {
-    //     localStorage.removeItem('token'); // Remove JWT token
-    //     setIsLoggedIn(false);
-    //     window.location.href = '/'; // Redirect to login
-    // };
-
-    return roleLinks[role].map((link) => (
+    return roleLinks[role]?.map((link) => (
       <LinkContainer key={link.path} to={link.path}>
         <Nav.Link>{link.label}</Nav.Link>
       </LinkContainer>
