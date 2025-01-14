@@ -82,7 +82,9 @@ const ProductDetails = () => {
                 </Col>
                 <Col md={6}>
                     {product.image ? (
+                        <Card className="p-3 shadow-sm">
                         <img src={`data:image/jpeg;base64,${product.image}`} alt={product.name} className="img-fluid" />
+                        </Card>
                     ) : (
                         <p>No image available</p>
                     )}
