@@ -5,7 +5,7 @@ import { createShip, uploadShipImage } from "../../services/api";
 const AddShip = ({ onAdd }) => {
     const [show, setShow] = useState(false);
     const [name, setName] = useState('');
-    const [capacity, setCapacity] = useState('');
+    const [capacity, setCapacity] = useState(1996);
     const [imageFile, setImageFile] = useState(null);
     const [error, setError] = useState(null);
     const [validationErrors, setValidationErrors] = useState({});
@@ -14,11 +14,11 @@ const AddShip = ({ onAdd }) => {
         const errors = {};
 
         if (!name.trim()) errors.name = "Ship name is required.";
-        if (!capacity.trim()) {
+        /*if (!capacity.trim()) {
             errors.capacity = "Capacity is required.";
         } else if (!/^\d+$/.test(capacity) || parseInt(capacity) <= 0) {
             errors.capacity = "Capacity must be a positive number.";
-        }
+        }*/
 
         return errors;
     }
@@ -105,7 +105,7 @@ const AddShip = ({ onAdd }) => {
                                 {validationErrors.name}
                             </Form.Control.Feedback>
                         </Form.Group>
-                        <Form.Group className="mb-3">
+                        {/*<Form.Group className="mb-3">
                             <Form.Label>Capacity</Form.Label>
                             <Form.Control
                                 type="number"
@@ -117,7 +117,7 @@ const AddShip = ({ onAdd }) => {
                             <Form.Control.Feedback type="invalid">
                                 {validationErrors.capacity}
                             </Form.Control.Feedback>
-                        </Form.Group>
+                        </Form.Group>*/}
 
                         {/* Pole wyboru obrazka */}
                         <Form.Group className="mb-3">

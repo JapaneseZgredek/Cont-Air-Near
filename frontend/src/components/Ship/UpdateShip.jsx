@@ -18,11 +18,11 @@ const UpdateShip = ({ ship, show, onHide, onUpdate }) => {
     const errors = {};
 
     if (!name.trim()) errors.name = "Ship name is required";
-    if (!capacity) {
+    /*if (!capacity) {
       errors.capacity = "Capacity is required";
     } else if (!/^\d+$/.test(String(capacity)) || capacity <= 0) {
       errors.capacity = "Capacity must be a positive number.";
-    }
+    }*/
 
     return errors;
   };
@@ -120,7 +120,7 @@ const UpdateShip = ({ ship, show, onHide, onUpdate }) => {
               {validationErrors.name}
             </Form.Control.Feedback>
           </Form.Group>
-          <Form.Group className="mb-3">
+          {/*<Form.Group className="mb-3">
             <Form.Label>Capacity</Form.Label>
             <Form.Control
               type="number"
@@ -132,7 +132,7 @@ const UpdateShip = ({ ship, show, onHide, onUpdate }) => {
             <Form.Control.Feedback type="invalid">
               {validationErrors.capacity}
             </Form.Control.Feedback>
-          </Form.Group>
+          </Form.Group>*/}
 
           {!deleteImage && (
             <Form.Group className="mb-3">
