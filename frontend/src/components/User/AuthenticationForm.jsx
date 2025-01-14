@@ -133,7 +133,8 @@ const AuthenticationForm = () => {
       }
       setErrors({});
     } catch (err) {
-      setMessage(err.message || 'Something went wrong!');
+      // setMessage(err.message || 'Something went wrong!'); kod 400
+      setMessage('Please fill form with correct data' || 'Something went wrong!');
     }
   };
 

@@ -120,7 +120,7 @@ const OrderDetails = () => {
                                 onClick={() => navigate(`/operations/${operation.id_operation}`)} // Navigate to operation details
                             >
                                 <td>{operation.id_operation}</td>
-                                <td>{operation.name_of_operation}</td>
+                                <td>{operation.name}</td>
                                 <td><Badge bg="info">{operation.operation_type}</Badge></td>
                                 <td>{new Date(operation.date_of_operation).toLocaleString()}</td>
                             </tr>
