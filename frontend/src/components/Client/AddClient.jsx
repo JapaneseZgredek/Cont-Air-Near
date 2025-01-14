@@ -78,7 +78,7 @@ const AddClient = ({ show, onHide, onAdd }) => {
       setValidationErrors({});
     } catch (error) {
       console.error("Failed to add client:", error);
-      setValidationErrors({ server: error.response?.data?.detail || "Failed to add client" });
+      setValidationErrors({ server: error.response?.data?.detail || `Failed to add client: ${error.detail}` });
     } finally {
       setIsSubmitting(false);
     }

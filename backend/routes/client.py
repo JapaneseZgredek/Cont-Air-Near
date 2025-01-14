@@ -150,10 +150,16 @@ def read_client(id_client: int, db: Session = Depends(get_db), current_client=De
 
 def is_disposable_email(email: str, db: Session) -> bool:
     try:
+        logger.info(f"Checking if email is disposable: {email}")
         validated_email = validate_email(email).email
+        logger.info(f"Validating email: {validated_email}")
         domain = validated_email.split('@')[-1].lower()
-        return db.query(email_block_list).filter(email_block_list.domain == domain).first() is not None
+        logger.info(f"Validating domain: {domain}")
+        is_blocked = db.query(email_block_list).filter(email_block_list.domain == domain).first() is not None
+        logger.info(f"Is domain blocked: {is_blocked}")
+        return is_blocked
     except EmailNotValidError:
+        logger.error(f"Email validation failed: {str(EmailNotValidError)}")
         raise HTTPException(status_code=400, detail="Invalid email format")
 @router.post("/clients", response_model=ClientRead)
 def create_client(
